@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Borrowed Books</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/admin/adminBorrow.css">
+</head>
+<body>
+<div class="container table-container">
+    <h1 class="text-center mb-4">Borrowed Books</h1>
+    <table class="table table-bordered">
+        <thead class="thead-dark">
+        <tr>
+            <th scope="col">Borrow ID</th>
+            <th scope="col">Username</th>
+            <th scope="col">Book ID</th>
+            <th scope="col">Loan Start Time</th>
+            <th scope="col">Loan End Time</th>
+            <th scope="col">Book Title</th>
+        </tr>
+        </thead>
+        <tbody id="books-table-body">
+        <!-- Table rows will be inserted here dynamically -->
+        </tbody>
+    </table>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="/static/js/admin/adminBorrow.js"></script>
+</body>
+</html>
