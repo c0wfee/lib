@@ -8,7 +8,7 @@ public class BorrowViewController {
 
     @GetMapping("/adminBorrow")
     public String getBorrowedBooksPage() {
-        return "adminBorrow";
+        return "admin/adminBorrow";
     }
 
     @GetMapping("/userhome")
