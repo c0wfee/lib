@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>搜索结果</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="../static/css/admin/searchResults.css">
+</head>
+<body>
+<div class="container mt-5">
+  <a href="/adminHome" class="btn btn-secondary mt-3">Back to Home</a>
+  <a href="/resourcesLib" class="btn btn-secondary mt-3">Back to Source Databases</a>
+  <h1>Searching results</h1>
+
+  <div class="mb-4">
+    <h2><span th:text="${resultCount}">0</span> results found</h2>
+  </div>
+
+  <!-- 显示搜索结果的条数 -->
+  <div class="mb-4">
+    <form id="searchForm" action="/test/search2" method="get">
+      <div class="form-group">
+        <label for="searchType">Search By</label>
+        <select id="searchType" name="searchType" class="form-control" onchange="updateSearchField()">
+          <option value="allkinds">All</option>
+          <option value="title">Title</option>
+          <option value="isbn">ISBN</option>
+          <option value="alternativeTitle">Alternative Title</option>
+          <option value="author">Author</option>
+        </select>
+      </div>
+
+      <div class="form-group" id="searchTitleGroup" style="display: none;">
+        <label for="searchTitle">Title</label>
+        <input type="text" id="searchTitle" class="form-control" placeholder="Enter title">
+      </div>
+
+      <div class="form-group" id="searchIsbnGroup" style="display: none;">
+        <label for="searchIsbn">ISBN</label>
+        <input type="text" id="searchIsbn" class="form-control" placeholder="Enter ISBN">
+      </div>
+
+      <div class="form-group" id="searchAlternativeTitleGroup" style="display: none;">
+        <label for="searchAlternativeTitle">Alternative Title</label>
+        <input type="text" id="searchAlternativeTitle" class="form-control" placeholder="Enter alternative title">
+      </div>
+
+      <div class="form-group" id="searchAuthorGroup" style="display: none;">
+        <label for="searchAuthor">Author</label>
+        <input type="text" id="searchAuthor" class="form-control" placeholder="Enter author">
+      </div>
+
+      <div class="form-group" id="searchAllkindsGroup" style="display: none;">
+        <label for="searchAllkinds">All</label>
+        <input type="text" id="searchAllkinds" class="form-control" placeholder="Enter value">
+      </div>
+
+      <!-- Existing form groups for other filters -->
+      <div class="form-group">
+        <label for="publisher">Publisher</label>
+        <select id="publisher" name="publisher" class="form-control">
+          <option value="" th:selected="${publisher == null}">All kinds</option>
+          <th:block th:each="pub : ${publishers}">
+            <option th:value="${pub}" th:text="${pub}" th:selected="${pub == publisher}"></option>
+          </th:block>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="sourceType">Source Type</label>
+        <select id="sourceType" name="sourceType" class="form-control">
+          <option value="" th:selected="${sourceType == null}">All kinds</option>
+          <th:block th:each="type : ${sourceTypes}">
+            <option th:value="${type}" th:text="${type}" th:selected="${type == sourceType}"></option>
+          </th:block>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="language">Language</label>
+        <select id="language" name="language" class="form-control">
+          <option value="" th:selected="${language == null}">All kinds</option>
+          <th:block th:each="lang : ${languages}">
+            <option th:value="${lang}" th:text="${lang}" th:selected="${lang == language}"></option>
+          </th:block>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="published">Published</label>
+        <select id="published" name="published" class="form-control">
+          <option value="" th:selected="${published == null}">All kinds</option>
+          <th:block th:each="pubDate : ${publisheds}">
+            <option th:value="${pubDate}" th:text="${pubDate}" th:selected="${pubDate == published}"></option>
+          </th:block>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status</label>
+        <select id="status" name="status" class="form-control">
+          <option value="" th:selected="${status == null}">All kinds</option>
+          <th:block th:each="stat : ${statuses}">
+            <option th:value="${stat}" th:text="${stat}" th:selected="${stat == status}"></option>
+          </th:block>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="databaseId">Database</label>
+        <select id="databaseId" name="databaseId" class="form-control">
+          <option value="" th:selected="${databaseId == null}">All kinds</option>
+          <th:block th:each="entry : ${databaseMap}">
+            <option th:value="${entry.key}" th:text="${entry.value}" th:selected="${entry.key == databaseId}"></option>
+          </th:block>
+        </select>
+      </div>
+
+      <!-- Hidden field to store search value -->
+      <input type="hidden" id="searchValue" name="searchValue">
+
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+
+  <!-- 搜索结果表格 -->
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+      <tr>
+        <th>ISBN</th>
+        <th>Title</th>
+        <th>Alternate Title</th>
+        <th>Authors</th>
+        <th>Publisher</th>
+        <th>Published</th>
+        <th>Source Type</th>
+        <th>Pdf</th>
+        <th>Database</th>
+        <th>Status</th>
+        <th>View Online</th>
+        <th>Download</th>
+        <th>Borrow</th>
+        <th>Loan Status</th>
+        <th>Operate</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="book : ${books}">
+        <td th:text="${book.isbn}">ISBN</td>
+        <td th:text="${book.title}">Title</td>
+        <td th:text="${book.alternativeTitle}">Alternative Title</td>
+        <td th:text="${book.author}">Author</td>
+        <td th:text="${book.publisher}">Publisher</td>
+        <td th:text="${book.published}">Published</td>
+        <td th:text="${book.sourceType}">Source Type</td>
+        <td>
+          <a th:if="${book.downloadLink != null && !book.downloadLink.isEmpty()}" th:href="@{/downloadfiles/{bookId}(bookId=${book.id})}">Download</a>
+          <span th:if="${book.downloadLink == null || book.downloadLink.isEmpty()}">Not available</span>
+        </td>
+        <td th:text="${book.resourcesId}">Resources ID</td>
+        <td>
+          <span th:text="${book.status}">Status</span>
+          <button class="btn btn-link edit-button"
+                  th:attr="data-id=${book.id}, data-type='status', data-value=${book.status}"
+                  onclick="showEditModal(this)">edit</button>
+        </td>
+        <td>
+          <span th:text="${book.view}">View</span>
+          <button class="btn btn-link edit-button"
+                  th:attr="data-id=${book.id}, data-type='view', data-value=${book.view}"
+                  onclick="showEditModal(this)">edit</button>
+        </td>
+        <td>
+          <span th:text="${book.download}">Download</span>
+          <button class="btn btn-link edit-button"
+                  th:attr="data-id=${book.id}, data-type='download', data-value=${book.download}"
+                  onclick="showEditModal(this)">edit</button>
+        </td>
+        <td>
+          <span th:text="${book.loaned}">Loan Label</span>
+          <button class="btn btn-link edit-button"
+                  th:attr="data-id=${book.id}, data-type='loan', data-value=${book.loaned}"
+                  onclick="showLoanEditModal(this)">Edit</button>
+        </td>
+
+        <td th:text="${book.loanLabel}">Loaned</td>
+        <td>
+          <form th:action="@{/test/deleteList/{fileID}(fileID=${book.id})}" method="post" style="display:inline;">
+            <input type="hidden" name="title" th:value="${title}">
+            <input type="hidden" name="publisher" th:value="${publisher}">
+            <input type="hidden" name="sourceType" th:value="${sourceType}">
+            <input type="hidden" name="language" th:value="${language}">
+            <input type="hidden" name="published" th:value="${published}">
+            <input type="hidden" name="status" th:value="${status}">
+            <input type="hidden" name="databaseId" th:value="${databaseId}">
+            <button type="submit" class="btn btn-danger btn-spacing">delete</button>
+          </form>
+          <form th:action="@{book/{fileID}(fileID=${book.id})}" method="get" style="display:inline;">
+            <input type="hidden" name="title" th:value="${title}">
+            <input type="hidden" name="publisher" th:value="${publisher}">
+            <input type="hidden" name="sourceType" th:value="${sourceType}">
+            <input type="hidden" name="language" th:value="${language}">
+            <input type="hidden" name="published" th:value="${published}">
+            <input type="hidden" name="status" th:value="${status}">
+            <input type="hidden" name="databaseId" th:value="${databaseId}">
+            <button type="submit" class="btn btn-success btn-spacing">edit</button>
+          </form>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 返回搜索页面的链接 -->
+  <a href="/test/searchPage" class="btn btn-secondary mt-3">返回搜索页面</a>
+
+  <!-- 模态框 -->
+  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editModalLabel">编辑</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="editForm" method="post" th:action="@{/test/updateField}">
+            <input type="hidden" id="editId" name="id">
+            <input type="hidden" id="editType" name="editType">
+            <div class="form-group">
+              <label for="editField">Value</label>
+              <select class="form-control" id="editField" name="editField"></select>
+            </div>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="loanEditModal" tabindex="-1" aria-labelledby="loanEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="loanEditModalLabel">Edit Loan Duration</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="loanEditForm" method="post" th:action="@{/test/updateField}">
+            <input type="hidden" id="loanEditId" name="id">
+            <input type="hidden" id="loanEditType" name="editType">
+            <div class="form-group">
+              <label for="loanEditField">Loan Duration (days)</label>
+              <input type="number" class="form-control" id="loanEditField" name="editField">
+            </div>
+            <button type="submit" class="btn btn-primary">Save changes</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="../static/js/admin/searchResults.js"></script>
+</div>
+</body>
+</html>

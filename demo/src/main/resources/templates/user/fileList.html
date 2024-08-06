@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File List</title>
+    <link rel="stylesheet" href="/static/css/user/fileList.css">
+</head>
+<body>
+<div class="container">
+    <div class="header">
+        <input id="keyword" placeholder="Enter keyword" />
+        <button id="search-button">Search</button>
+    </div>
+    <div class="content">
+        <div class="aside">
+            <div class="refine-results">
+                <h2>Refine Results</h2>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Series</h3>
+                    <ul class="refine-list">
+                        <li>
+                            <input type="checkbox" id="series1" value="series1" onclick="applyFilter('series', this.value)">
+                            <label for="series1">Series 1</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="series2" value="series2" onclick="applyFilter('series', this.value)">
+                            <label for="series2">Series 2</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="series3" value="Others" onclick="applyFilter('series', this.value)">
+                            <label for="series3">Others</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Publisher</h3>
+                    <ul class="refine-list">
+                        <li>
+                            <input type="checkbox" id="publisher1" value="IGI Global" onclick="applyFilter('publisher', this.value)">
+                            <label for="publisher1">IGI Global</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="publisher2" value="IGI Global (701 E. Chocolate Avenue Hershey Pennsylvania 17033 USA)" onclick="applyFilter('publisher', this.value)">
+                            <label for="publisher2">IGI Global (701 E. Chocolate Avenue Hershey Pennsylvania 17033 USA)</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="publisher3" value="Others" onclick="applyFilter('publisher', this.value)">
+                            <label for="publisher3">Others</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Year</h3>
+                    <div class="refine-list">
+                        <label>
+                            <input type="radio" name="yearType" value="range" checked onclick="toggleYearInputs(this.value)"> Range
+                        </label>
+                        <label>
+                            <input type="radio" name="yearType" value="single" onclick="toggleYearInputs(this.value)"> Single Year
+                        </label>
+                        <div id="rangeInputs">
+                            <input type="number" id="publishedFrom" placeholder="Year" min="1893" max="2024" step="1">
+                            <input type="number" id="publishedTo" placeholder="Year" min="1893" max="2024" step="1">
+                        </div>
+                        <div id="singleInput" style="display: none;">
+                            <label for="publishedYear">Year:</label>
+                            <input type="number" id="publishedYear" placeholder="Year" min="1893" max="2024" step="1">
+                        </div>
+                        <button onclick="applyPublishedFilter()">Apply</button>
+                        <button onclick="clearPublishedFilter()">Clear</button>
+                    </div>
+                </div>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Subjects</h3>
+                    <ul class="refine-list">
+                        <li>
+                            <input type="checkbox" id="subject1" value="Government information Data protection Computer networks" onclick="applyFilter('subject', this.value)">
+                            <label for="subject1">Government information Data protection Computer networks</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="subject2" value="Network performance (Telecommunication) Big data." onclick="applyFilter('subject', this.value)">
+                            <label for="subject2">Network performance (Telecommunication) Big data.</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="subject3" value="Others" onclick="applyFilter('subject', this.value)">
+                            <label for="subject3">Others</label>
+                        </li>
+                    </ul>
+                </div>
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Databases</h3>
+                    <ul class="refine-list">
+                        <li>
+                            <input type="checkbox" id="database1" value="test" onclick="applyFilter('database', this.value)">
+                            <label for="database1">test</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="database2" value="database2" onclick="applyFilter('database', this.value)">
+                            <label for="database2">Database 2</label>
+                        </li>
+                        <li>
+                            <input type="checkbox" id="database3" value="Others" onclick="applyFilter('database', this.value)">
+                            <label for="database3">Others</label>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="main">
+            <div id="results">
+                <div id="results-info">
+                    <p id="results-count"></p>
+                    <div id="active-filters"></div>
+                </div>
+                <div id="no-files" style="display: none;">
+                    <p>No files found for the given keyword.</p>
+                </div>
+                <div id="item-list"></div>
+                <ul id="pagination" class="pagination"></ul>
+            </div>
+        </div>
+    </div>
+    <div class="footer">
+        <button onclick="window.location.href='/userhome'">Go to User Home</button>
+    </div>
+</div>
+<script src="/static/js/user/fileList.js"></script>
+</body>
+</html>

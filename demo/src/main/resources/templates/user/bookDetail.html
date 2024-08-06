@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Book Detail</title>
+    <link rel="stylesheet" href="/static/css/user/bookDetails.css">
+</head>
+<body>
+<div class="container">
+    <button id="back-button" class="btn btn-secondary" onclick="goBack()">Back</button>
+    <div class="book-details" id="book-details">
+        <img id="source-image" src="../static/images/book.png" alt="Source Type">
+        <h1 id="book-title">Book Title</h1>
+        <p id="authors-container"><strong>Authors:</strong> <span id="authors"></span></p>
+        <p id="editors-container"><strong>Editors:</strong> <span id="editors"></span></p>
+        <p id="series-container"><strong>Series:</strong> <span id="series"></span></p>
+        <p id="isbn-container"><strong>ISBN:</strong> <span id="isbn"></span></p>
+        <p id="publisher-container"><strong>Publisher:</strong> <span id="publisher"></span></p>
+        <p id="published-container"><strong>Published:</strong> <span id="published"></span></p>
+        <p id="edition-container"><strong>Edition:</strong> <span id="edition"></span></p>
+        <p id="copyright-declaration-container"><strong>Copyright Declaration:</strong> <span id="copyright-declaration"></span></p>
+        <p id="pages-container"><strong>Pages:</strong> <span id="pages"></span></p>
+        <p id="subjects-container"><strong>Subjects:</strong> <span id="subjects"></span></p>
+        <p id="description-container"><strong>Description:</strong> <span id="description"></span></p>
+        <p id="loan-period-container"><strong>Loan Period:</strong> <span id="loan-period"></span></p>
+        <input type="hidden" id="fileId" th:value="${fileId}">
+    </div>
+</div>
+
+<script src="/static/js/user/bookDetails.js"></script>
+</body>
+</html>
