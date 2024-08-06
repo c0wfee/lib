@@ -20,7 +20,7 @@ public class UserViewController {
 
     @GetMapping("/banUser")
     public String banUserPage() {
-        return "banUser"; // 这里的"banUser"应该对应的是banUser.html
+        return "admin/banUser"; // 这里的"banUser"应该对应的是banUser.html
     }
 
     @PostMapping("/banUser")

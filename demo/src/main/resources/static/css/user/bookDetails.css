@@ -1,0 +1,39 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+#back-button {
+    margin-bottom: 20px;
+}
+
+.book-details {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.book-details img {
+    max-width: 100px;
+    margin-bottom: 20px;
+}
+
+.book-details h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.book-details p {
+    margin: 5px 0;
+}
+
+.book-details strong {
+    display: inline-block;
+    width: 200px;
+}

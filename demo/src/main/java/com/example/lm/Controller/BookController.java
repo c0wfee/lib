@@ -12,7 +12,7 @@ public class BookController {
     public String bookDetail(@RequestParam(name = "id") String id, Model model) {
         System.out.println("id: " + id);
         model.addAttribute("fileId", id);
-        return "bookDetail";
+        return "user/bookDetail";
     }
 
 }

@@ -7,41 +7,14 @@
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Nunito:400,600,700,800|Roboto:400,500,700" rel="stylesheet">
     <!-- Plugins -->
-    <link rel="stylesheet" href="../static/vendor/animate/animate.min.css" type="text/css">
+    <link rel="stylesheet" href="/static/vendor/animate/animate.min.css" type="text/css">
     <!-- Theme CSS -->
-    <link type="text/css" href="../static/css/theme.css" rel="stylesheet">
+    <link type="text/css" href="/static/css/theme.css" rel="stylesheet">
     <!-- Demo CSS - No need to use these in your project -->
-    <link rel="stylesheet" href="../static/vendor/jquery-scrollbar/css/jquery-scrollbar.css">
-    <link type="text/css" href="../static/vendor/highlight/css/highlight.min.css" rel="stylesheet">
-    <link type="text/css" href="../static/css/demo.css" rel="stylesheet">
-    <style>
-        .table-container {
-            display: flex;
-            justify-content: center;
-        }
-
-        table {
-            width: 80%;
-            color: #212529;
-        }
-
-        th, td {
-            padding: 0.5rem;
-            text-align: center;
-            vertical-align: middle;
-            border-top: 1px solid #dee2e6;
-        }
-
-        .btn {
-            padding: 5px 10px;
-            font-size: 0.875rem;
-        }
-
-        .modal-header, .modal-footer {
-            border-bottom: none;
-            border-top: none;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/vendor/jquery-scrollbar/css/jquery-scrollbar.css">
+    <link type="text/css" href="/static/vendor/highlight/css/highlight.min.css" rel="stylesheet">
+    <link type="text/css" href="/static/css/demo.css" rel="stylesheet">
+    <link type="text/css" href="/static/css/admin/sourceDatabase.css" rel="stylesheet">
 </head>
 <body>
 <div class="container mt-5">
@@ -51,16 +24,13 @@
             <a href="/adminHome" class="btn btn-secondary mb-4">Back to Home</a>
         </div>
         <div class="col text-right">
-            <button class="btn btn-sm btn-primary mb-4" data-toggle="modal" data-target="#addFolderModal">Add
-                Databases
-            </button>
+            <button class="btn btn-sm btn-primary mb-4" data-toggle="modal" data-target="#addFolderModal">Add Databases</button>
         </div>
     </div>
     <!-- 搜索表单 -->
     <form th:action="@{/resourcesLib}" method="get" class="row mb-4">
         <div class="col">
-            <input type="text" name="query" class="form-control"
-                   placeholder="Search by Database Name, Alternate Name, or Description">
+            <input type="text" name="query" class="form-control" placeholder="Search by Database Name, Alternate Name, or Description">
         </div>
         <div class="col">
             <select name="type" class="form-control">
@@ -112,21 +82,16 @@
                 <td>
                     <a th:href="@{/listPDFs(databaseId=${folder.id})}" th:text="${folder.pdfCount}">PDF Count</a>
                 </td>
-<!--                <td th:text="${folder.pdfCount}">PDF Count</td>-->
                 <td th:text="${folder.epubCount}">EPUB Count</td>
-
                 <td><a class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal"
                        th:data-id="${folder.id}" th:data-name="${folder.name}"
                        th:data-alternate-names="${folder.alternateName}"
                        th:data-description="${folder.description}" th:data-type="${folder.type}">Edit Details</a>
-
                 </td>
                 <td>
-                    <a th:href="@{/table(folderId=${folder.id})}"
-                       class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
+                    <a th:href="@{/table(folderId=${folder.id})}" class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
                 </td>
                 <td>
-
                     <div class="dropdown">
                         <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="fileDropdown"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -143,8 +108,6 @@
                                data-target="#uploadEPUBModal" th:attr="data-id=${folder.id}">Upload EPUB</a>
                         </div>
                     </div>
-
-
                     <div th:if="${invalidFiles != null and folderIdWithInvalidFiles != null and folderIdWithInvalidFiles == folder.id}">
                         <h6 class="text-danger">Invalid Files:</h6>
                         <ul>
@@ -183,10 +146,8 @@
                             <span th:text="${folder.download}">Download</span>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="downloadDropdown">
-                            <a class="dropdown-item"
-                               th:onclick="'performAction(\'cancelDownload\', ' + ${folder.id} + ')'">Disable</a>
-                            <a class="dropdown-item"
-                               th:onclick="'performAction(\'ableDownload\', ' + ${folder.id} + ')'">Enable</a>
+                            <a class="dropdown-item" th:onclick="'performAction(\'cancelDownload\', ' + ${folder.id} + ')'">Disable</a>
+                            <a class="dropdown-item" th:onclick="'performAction(\'ableDownload\', ' + ${folder.id} + ')'">Enable</a>
                         </div>
                     </div>
                 </td>
@@ -197,14 +158,12 @@
                             <span th:text="${folder.borrow > 0 ? 'Enable' : 'Disable'}"></span>
                         </button>
                         <div class="dropdown-menu" aria-labelledby="borrowDropdown">
-                            <a class="dropdown-item"
-                               th:onclick="'performAction(\'cancelBorrow\', ' + ${folder.id} + ')'">Disable</a>
+                            <a class="dropdown-item" th:onclick="'performAction(\'cancelBorrow\', ' + ${folder.id} + ')'">Disable</a>
                             <a class="dropdown-item" th:onclick="'performAction(\'ableBorrow\', ' + ${folder.id} + ')'">Enable</a>
                         </div>
                     </div>
                 </td>
-                <td><a th:href="@{/deleteFolder(folderId=${folder.id})}"
-                       class="btn btn-sm btn-danger edit-marc-info">Delete</a></td>
+                <td><a th:href="@{/deleteFolder(folderId=${folder.id})}" class="btn btn-sm btn-danger edit-marc-info">Delete</a></td>
             </tr>
             </tbody>
         </table>
@@ -212,8 +171,7 @@
 </div>
 
 <!-- Add Folder Modal -->
-<div class="modal fade" id="addFolderModal" tabindex="-1" role="dialog" aria-labelledby="addFolderModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="addFolderModal" tabindex="-1" role="dialog" aria-labelledby="addFolderModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form id="addFolderForm" th:action="@{/addDatabases}" method="post" enctype="multipart/form-data" onsubmit="updateBorrowField()">
@@ -244,8 +202,7 @@
                         </div>
                         <div class="form-group">
                             <label for="databaseDescription">Database Description</label>
-                            <textarea class="form-control" id="databaseDescription" name="databaseDescription"
-                                      required></textarea>
+                            <textarea class="form-control" id="databaseDescription" name="databaseDescription" required></textarea>
                         </div>
                         <div class="form-group">
                             <label for="status">Status (Published or Unpublished)</label>
@@ -318,10 +275,8 @@
     </div>
 </div>
 
-
 <!-- Rename Folder Modal -->
-<div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="renameFolderModal" tabindex="-1" role="dialog" aria-labelledby="renameFolderModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form th:action="@{/rename-folder}" method="post">
@@ -338,8 +293,7 @@
                     </div>
                     <div class="form-group">
                         <label for="newAlternateNames">New Alternate Names</label>
-                        <input type="text" class="form-control" id="newAlternateNames" name="newAlternateNames"
-                               required>
+                        <input type="text" class="form-control" id="newAlternateNames" name="newAlternateNames" required>
                     </div>
                     <div class="form-group">
                         <label for="newType">New Type</label>
@@ -361,15 +315,12 @@
                     <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
 
-
 <!-- Upload Marc Modal -->
-<div class="modal fade" id="uploadMarcModal" tabindex="-1" role="dialog" aria-labelledby="uploadMarcModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="uploadMarcModal" tabindex="-1" role="dialog" aria-labelledby="uploadMarcModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form th:action="@{/uploadMARC}" method="post" enctype="multipart/form-data" onsubmit="updateBorrowField1()">
@@ -394,12 +345,12 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <label for="view1">View</label>
-                        <select class="form-control" id="view1" name="view" required>
-                            <option value="" disabled selected>Select the option</option>
-                            <option value="Disable">Disable</option>
-                            <option value="Enable">Enable</option>
-                        </select>
+                        <label for="view1">View</select>
+                            <select class="form-control" id="view1" name="view" required>
+                                <option value="" disabled selected>Select the option</option>
+                                <option value="Disable">Disable</option>
+                                <option value="Enable">Enable</option>
+                            </select>
                     </div>
                     <div class="form-group">
                         <label for="download1">Download</label>
@@ -429,8 +380,7 @@
 </div>
 
 <!-- Upload EXCEL Modal -->
-<div class="modal fade" id="uploadEXCELModal" tabindex="-1" role="dialog" aria-labelledby="uploadEXCELModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="uploadEXCELModal" tabindex="-1" role="dialog" aria-labelledby="uploadEXCELModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form th:action="@{/saveExcel}" method="post" enctype="multipart/form-data" onsubmit="updateBorrowField2()">
@@ -490,8 +440,7 @@
 </div>
 
 <!-- Upload PDF Modal -->
-<div class="modal fade" id="uploadPdfModal" tabindex="-1" role="dialog" aria-labelledby="uploadPdfModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="uploadPdfModal" tabindex="-1" role="dialog" aria-labelledby="uploadPdfModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form th:action="@{/uploadPDF}" method="post" enctype="multipart/form-data">
@@ -518,8 +467,7 @@
 </div>
 
 <!-- Upload EPUB Modal -->
-<div class="modal fade" id="uploadEPUBModal" tabindex="-1" role="dialog" aria-labelledby="uploadEXCELModalLabel"
-     aria-hidden="true">
+<div class="modal fade" id="uploadEPUBModal" tabindex="-1" role="dialog" aria-labelledby="uploadEXCELModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form th:action="@{/uploadEPUB}" method="post" enctype="multipart/form-data">
@@ -544,239 +492,24 @@
         </div>
     </div>
 </div>
+
 <!-- Core -->
-<script src="../static/vendor/jquery/jquery.min.js"></script>
-<script src="../static/vendor/popper/popper.min.js"></script>
-<script src="../static/js/bootstrap/bootstrap.min.js"></script>
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/vendor/popper/popper.min.js"></script>
+<script src="/static/js/bootstrap/bootstrap.min.js"></script>
 <!-- FontAwesome 5 -->
-<script src="../static/vendor/fontawesome/js/fontawesome-all.min.js" defer></script>
+<script src="/static/vendor/fontawesome/js/fontawesome-all.min.js" defer></script>
 <!-- Scripts used only for this demo only - Remove these in your project -->
-<script src="../static/vendor/jquery-scrollbar/js/jquery-scrollbar.min.js"></script>
-<script src="../static/vendor/jquery-scrollLock/jquery-scrollLock.min.js"></script>
-<script src="../static/vendor/sticky-kit/sticky-kit.min.js"></script>
-<script src="../static/vendor/highlight/js/highlight.min.js"></script>
-<script src="../static/vendor/clipboard-js/clipboard.min.js"></script>
-<script src="../static/vendor/holderjs/holder.min.js"></script>
-<script src="../static/js/demo.js"></script>
-<script src="../static/vendor/textarea-autosize/textarea-autosize.min.js"></script>
+<script src="/static/vendor/jquery-scrollbar/js/jquery-scrollbar.min.js"></script>
+<script src="/static/vendor/jquery-scrollLock/jquery-scrollLock.min.js"></script>
+<script src="/static/vendor/sticky-kit/sticky-kit.min.js"></script>
+<script src="/static/vendor/highlight/js/highlight.min.js"></script>
+<script src="/static/vendor/clipboard-js/clipboard.min.js"></script>
+<script src="/static/vendor/holderjs/holder.min.js"></script>
+<script src="/static/js/demo.js"></script>
+<script src="/static/vendor/textarea-autosize/textarea-autosize.min.js"></script>
 <!-- Theme JS -->
-<script src="../static/js/theme.js"></script>
-<script th:inline="javascript">
-    $(document).ready(function () {
-        $('#uploadMarcModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var folderId = button.data('id');
-            var modal = $(this);
-            modal.find('#uploadMarcFolderId1').val(folderId);
-        });
-
-        $('#uploadEXCELModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var folderId = button.data('id');
-            var modal = $(this);
-            modal.find('#uploadEXCELFolderId').val(folderId);
-        });
-
-        $('#uploadEPUBModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var folderId = button.data('id');
-            var modal = $(this);
-            modal.find('#uploadEPUBFolderId').val(folderId);
-        });
-
-        $('#renameFolderModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var folderId = button.data('id');
-            var folderName = button.data('name');
-            var alternateNames = button.data('alternate-names');
-            var description = button.data('description');
-            var type = button.data('type');
-
-            var modal = $(this);
-            modal.find('#renameFolderId').val(folderId);
-            modal.find('#newFolderName').val(folderName);
-            modal.find('#newAlternateNames').val(alternateNames);
-            modal.find('#newType').val(type);
-            modal.find('#newDescription').val(description);
-        });
-
-
-        $('#uploadPdfModal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var folderId = button.data('id');
-            var modal = $(this);
-            modal.find('#uploadPdfFolderId1').val(folderId);
-        });
-
-        // Handle form submission
-        $('#addFolderForm').on('submit', function (event) {
-            event.preventDefault();
-
-            var form = $(this);
-            var formData = new FormData(this);
-
-            // Remove file inputs from FormData if they are empty
-            if (!$('#marcFile')[0].files.length) {
-                formData.delete('file');
-            }
-            if (!$('#excelFile1')[0].files.length) {
-                formData.delete('excel');
-            }
-            if (!$('#pdfFiles')[0].files.length) {
-                formData.delete('files');
-            }
-            if (!$('#epubFile1')[0].files.length) {
-                formData.delete('epub');
-            }
-            console.log(formData);
-            $.ajax({
-                url: form.attr('action'),
-                type: form.attr('method'),
-                data: formData,
-                processData: false,
-                contentType: false,
-                success: function (response) {
-                    window.location.href = "/resourcesLib";
-                },
-                error: function (error) {
-                    alert("Error submitting the form");
-                    console.error("Error:", error);
-                }
-            });
-        });
-
-
-    });
-</script>
-<script>
-    function performAction(action, folderId) {
-        let urlMap = {
-            'hideBook': '/hideBook',
-            'showBook': '/showBook',
-            'cancelView': '/cancelView',
-            'ableView': '/AbleView',
-            'cancelDownload': '/cancelDownload',
-            'ableDownload': '/ableDownload',
-            'cancelBorrow': '/cancelBorrow',
-            'ableBorrow': '/ableBorrow'
-        };
-
-        let url = urlMap[action];
-        if (!url) {
-            console.error('Invalid action:', action);
-            return;
-        }
-
-        let data = new URLSearchParams();
-        data.append('folderId', folderId);
-
-        if (action === 'ableBorrow') {
-            let period = prompt("Please enter the borrow period (days):", "30");
-            if (period != null) {
-                data.append('borrow_period', period);
-            } else {
-                return; // User cancelled the prompt
-            }
-        }
-
-        fetch(url, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: data
-        })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Success:', data);
-                location.reload();
-                alert('Operation successful');
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-                alert('Operation failed');
-            });
-    }
-
-    function handleBorrowChange(selectElement) {
-        if (selectElement.value === 'Enable') {
-            let period = prompt("Please enter the borrow period (days):", "30");
-            if (period != null && !isNaN(period)) {
-                document.getElementById('borrowHidden').value = period;
-                selectElement.options[selectElement.selectedIndex].text = 'Enable (' + period + ' days)';
-            } else {
-                selectElement.value = ""; // Reset to default if invalid input
-                document.getElementById('borrowHidden').value = "";
-                alert("Please enter a valid number.");
-            }
-        } else {
-            document.getElementById('borrowHidden').value = selectElement.value;
-        }
-    }
-
-    function updateBorrowField() {
-        const borrowSelect = document.getElementById('borrow');
-        const borrowHidden = document.getElementById('borrowHidden');
-        if (borrowSelect.value === 'Enable') {
-            borrowHidden.name = 'borrow'; // Change the name to ensure it's sent as 'borrow'
-        } else {
-            borrowHidden.name = ''; // Reset name to avoid sending it
-        }
-    }
-
-    function handleBorrowChange1(selectElement) {
-        if (selectElement.value === 'Enable') {
-            let period = prompt("Please enter the borrow period (days):", "30");
-            if (period != null && !isNaN(period)) {
-                document.getElementById('borrowHidden1').value = period;
-                selectElement.options[selectElement.selectedIndex].text = 'Enable (' + period + ' days)';
-            } else {
-                selectElement.value = ""; // Reset to default if invalid input
-                document.getElementById('borrowHidden1').value = "";
-                alert("Please enter a valid number.");
-            }
-        } else {
-            document.getElementById('borrowHidden1').value = selectElement.value;
-        }
-    }
-
-    function updateBorrowField1() {
-        const borrowSelect1 = document.getElementById('borrow1');
-        const borrowHidden1 = document.getElementById('borrowHidden1');
-        if (borrowSelect1.value === 'Enable') {
-            borrowHidden1.name = 'borrow'; // Change the name to ensure it's sent as 'borrow'
-        } else {
-            borrowHidden1.name = ''; // Reset name to avoid sending it
-        }
-    }
-
-    function handleBorrowChange2(selectElement) {
-        if (selectElement.value === 'Enable') {
-            let period = prompt("Please enter the borrow period (days):", "30");
-            if (period != null && !isNaN(period)) {
-                document.getElementById('borrowHidden2').value = period;
-                selectElement.options[selectElement.selectedIndex].text = 'Enable (' + period + ' days)';
-            } else {
-                selectElement.value = ""; // Reset to default if invalid input
-                document.getElementById('borrowHidden2').value = "";
-                alert("Please enter a valid number.");
-            }
-        } else {
-            document.getElementById('borrowHidden2').value = selectElement.value;
-        }
-    }
-
-    function updateBorrowField2() {
-        const borrowSelect2 = document.getElementById('borrow2');
-        const borrowHidden2 = document.getElementById('borrowHidden2');
-        if (borrowSelect2.value === 'Enable') {
-            borrowHidden2.name = 'borrow'; // Change the name to ensure it's sent as 'borrow'
-        } else {
-            borrowHidden2.name = ''; // Reset name to avoid sending it
-        }
-    }
-</script>
-
-
+<script src="/static/js/theme.js"></script>
+<script src="/static/js/admin/sourceDatabase.js"></script>
 </body>
 </html>

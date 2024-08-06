@@ -4,51 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Login</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-        }
-        .login-container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            width: 300px;
-        }
-        .login-container h1 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .login-container input {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .login-container button {
-            width: 100%;
-            padding: 10px;
-            background-color: #5cb85c;
-            border: none;
-            border-radius: 5px;
-            color: white;
-            font-size: 16px;
-        }
-        .login-container button:hover {
-            background-color: #4cae4c;
-        }
-        .error-message {
-            color: red;
-            text-align: center;
-        }
-    </style>
+    <link rel="stylesheet" href="/static/css/admin/adminLogin.css">
 </head>
 <body>
 <div class="login-container">
@@ -60,47 +16,6 @@
     </form>
     <div class="error-message" id="error-message"></div>
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const loginForm = document.getElementById('loginForm');
-        const errorMessage = document.getElementById('error-message');
-
-        loginForm.addEventListener('submit', function(event) {
-            event.preventDefault();
-            const username = document.getElementById('login-username').value;
-            const password = document.getElementById('login-password').value;
-
-            // 发送登录请求到服务器
-            fetch(`http://8.130.130.240:8088/api/user/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ username, password })
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log('Response data:', data); // 打印收到的响应数据
-                    if (data.code === 20000) { // 假设返回的成功状态码为20000
-                        // 登录成功，保存 token 和用户信息到 localStorage
-                        const user = {
-                            username: data.data.name,
-                            token: data.data.token,
-                            id: data.data.id
-                        };
-                        localStorage.setItem('user', JSON.stringify(user));
-                        window.location.href = '/adminHome';
-                    } else {
-                        // 处理登录失败情况
-                        errorMessage.textContent = 'Login failed: ' + data.data.error;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error during login:', error);
-                    errorMessage.textContent = 'Login failed. Please try again.';
-                });
-        });
-    });
-</script>
+<script src="/static/js/admin/adminLogin.js"></script>
 </body>
 </html>

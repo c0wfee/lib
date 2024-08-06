@@ -543,17 +543,17 @@ public class MainController {
 
     @GetMapping("/adminHome")
     public String adminHome(HttpSession session, Model model) {
-        return "adminHome";  // 返回adminHome视图
+        return "admin/adminHome";  // 返回adminHome视图
     }
 
     @GetMapping("/adminLogin")
     public String adminLogin(HttpSession session, Model model) {
-        return "adminLogin";  // 返回adminLogin视图
+        return "admin/adminLogin";  // 返回adminLogin视图
     }
 
     @GetMapping("/fileList")
     public String UserSearch(HttpSession session, Model model) {
-        return "fileList";  // 返回adminLogin视图
+        return "user/fileList";  // 返回adminLogin视图
     }
 
 

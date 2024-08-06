@@ -142,7 +142,7 @@ public class ListBookController {
         model.addAttribute("statuses", statuses);
         model.addAttribute("databaseMap", databaseInfoMap);
 
-        return "searchresults";  // Return view name
+        return "admin/searchResults";  // Return view name
     }
 
     @PostMapping("test/deleteList/{fileID}")

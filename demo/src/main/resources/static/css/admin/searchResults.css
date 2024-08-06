@@ -1,0 +1,11 @@
+.table {
+    font-size: 12px; /* 调整表格字体大小 */
+}
+
+.btn-spacing {
+    margin-right: 10px; /* 调整按钮之间的间距 */
+}
+
+.table-responsive {
+    overflow-x: auto;
+}

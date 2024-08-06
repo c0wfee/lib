@@ -1,0 +1,291 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.header {
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+}
+
+.header input {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.header button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.header button:hover {
+    background-color: #0056b3;
+}
+
+.content {
+    display: flex;
+    flex: 1;
+}
+
+.aside {
+    width: 300px;
+    border-right: 1px solid #ccc;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.main {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+}
+
+.refine-results h2 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.refine-section {
+    margin-bottom: 20px;
+}
+
+.refine-section h3 {
+    font-size: 16px;
+    margin-bottom: 10px;
+    cursor: pointer;
+}
+
+.refine-list {
+    list-style: none;
+    padding-left: 20px;
+    display: none;
+}
+
+.refine-list li {
+    margin-bottom: 5px;
+}
+
+.item {
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin: 10px 0;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+}
+
+.item-details {
+    display: flex;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.source-type-image {
+    width: 100px;
+    height: auto;
+    margin-right: 15px;
+}
+
+.item-content {
+    flex-grow: 1;
+}
+
+.item-details h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.item-details p {
+    margin: 5px 0;
+}
+
+.item-meta {
+    margin-top: 15px;
+}
+
+.item-meta a {
+    color: #007bff;
+    text-decoration: none;
+}
+
+.item-meta a:hover {
+    text-decoration: underline;
+}
+
+.item-meta button {
+    margin-right: 10px;
+    padding: 5px 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.item-meta button:hover {
+    background-color: #0056b3;
+}
+
+#no-files {
+    color: red;
+    font-weight: bold;
+}
+
+.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination button {
+    margin: 0 2px;
+    padding: 5px 10px;
+    border: 1px solid #007bff;
+    background-color: white;
+    cursor: pointer;
+}
+
+.pagination button.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination button:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+}
+
+.footer {
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-top: 1px solid #ccc;
+    text-align: right;
+}
+
+.footer button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.footer button:hover {
+    background-color: #0056b3;
+}
+
+#results-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+#results-count {
+    flex: 1;
+    font-size: 16px;
+    margin: 0;
+}
+
+#active-filters {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-badge {
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    background-color: #e0e0e0;
+    border-radius: 20px;
+    font-size: 14px;
+}
+
+.filter-badge button {
+    background: none;
+    border: none;
+    margin-left: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #007bff;
+}
+
+.filter-badge button:hover {
+    text-decoration: underline;
+}
+
+.refine-section {
+    margin: 10px 0;
+}
+
+.refine-list {
+    display: none;
+    margin-top: 10px;
+}
+
+.refine-list label {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.refine-list input[type="number"] {
+    width: 80px;
+    margin-right: 10px;
+    display: inline-block;
+}
+
+.refine-list button {
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.refine-section.active .refine-list {
+    display: block;
+}
+
+.button-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.button-container button {
+    width: auto;
+}
+
+.button-container button[disabled] {
+    background-color: grey;
+    color: white;
+}
+
+.item-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
