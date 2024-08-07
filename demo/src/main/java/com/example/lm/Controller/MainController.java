@@ -82,7 +82,7 @@ public class MainController {
         return "lists";
     }
 
-    @GetMapping("/sourceDatabases")
+    @GetMapping("/resourcesLib")
     public String getFileExplorer(@RequestParam(name = "query", required = false, defaultValue = "") String query,
                                   @RequestParam(name = "type", required = false, defaultValue = "") String type,
                                   @RequestParam(name = "display", required = false, defaultValue = "") String status,
