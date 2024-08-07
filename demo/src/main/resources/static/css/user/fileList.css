@@ -17,31 +17,48 @@ body {
     border-bottom: 1px solid #ccc;
     display: flex;
     align-items: center;
+    justify-content: space-between; /* 确保内容两端对齐 */
 }
 
-.header input {
+.logo img {
+    height: 40px; /* 调整 logo 的高度 */
+}
+
+.header-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.icon-button {
+    background: none;
+    border: none;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+.icon-button img {
+    height: 24px; /* 调整图标的高度 */
+    width: 24px; /* 调整图标的宽度 */
+}
+
+.search-bar {
+    display: none; /* 默认隐藏搜索框 */
+    flex: 1;
+    align-items: center;
+}
+
+.search-bar input {
     flex: 1;
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
     border-radius: 5px;
+    margin-right: 10px;
 }
 
-.header button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-left: 10px;
+.search-bar .icon-button {
+    margin-left: 0; /* 去除额外的左边距 */
 }
-
-.header button:hover {
-    background-color: #0056b3;
-}
-
 .content {
     display: flex;
     flex: 1;

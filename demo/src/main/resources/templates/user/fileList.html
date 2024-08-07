@@ -9,8 +9,26 @@
 <body>
 <div class="container">
     <div class="header">
-        <input id="keyword" placeholder="Enter keyword" />
-        <button id="search-button">Search</button>
+        <div class="logo">
+            <img src="/static/images/LibraryLogo.png" alt="Logo" />
+        </div>
+        <div class="header-buttons">
+            <button id="search-button" class="icon-button" onclick="toggleSearch()">
+                <img src="/static/images/search-icon.png" alt="Search" />
+            </button>
+            <button onclick="window.location.href='/userHome'" class="icon-button">
+                <img src="/static/images/home-icon.png" alt="Home" />
+            </button>
+        </div>
+        <div class="search-bar" id="search-bar">
+            <input id="keyword" placeholder="Enter keyword" />
+            <button id="close-search" class="icon-button" onclick="toggleSearch()">
+                <img src="/static/images/close-icon.png" alt="Close" />
+            </button>
+            <button id="execute-search" class="icon-button" onclick="executeSearch()">
+                <img src="/static/images/search-icon.png" alt="Search" />
+            </button>
+        </div>
     </div>
     <div class="content">
         <div class="aside">
@@ -120,9 +138,6 @@
                 <ul id="pagination" class="pagination"></ul>
             </div>
         </div>
-    </div>
-    <div class="footer">
-        <button onclick="window.location.href='/userhome'">Go to User Home</button>
     </div>
 </div>
 <script src="/static/js/user/fileList.js"></script>

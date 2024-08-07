@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    margin: 0;
+    background-color: #fff;
+    color: #000;
+    flex-direction: column;
+    height: 100vh;
+}
+
+#pdfControls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 10px;
+    flex-wrap: wrap;
+}
+
+#pdfControls button, #pdfControls input {
+    margin: 5px;
+}
+
+.pdf-viewer {
+    width: 100%;
+    background-color: #fff;
+    padding: 0;
+    margin: 0 auto;
+    overflow-y: auto;
+    height: 90vh; /* Adjust height as needed */
+}
+
+canvas {
+    display: block;
+    margin: 20px auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+}
+
+#searchText, #searchButton {
+    display: none;
+}

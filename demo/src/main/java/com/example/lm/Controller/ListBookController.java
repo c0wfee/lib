@@ -329,7 +329,7 @@ public class ListBookController {
 
     @GetMapping("/files-view")
     public String fileList() {
-        return "fileList";  // 这里返回的是视图名称，不包括.html扩展名
+        return "user/fileList";  // 这里返回的是视图名称，不包括.html扩展名
     }
 
 

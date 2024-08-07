@@ -12,6 +12,20 @@ let currentPage = 1;
 const pageSize = 10;
 let filters = {};
 
+function toggleSearch() {
+    const searchBar = document.getElementById('search-bar');
+    if (searchBar.style.display === 'none' || searchBar.style.display === '') {
+        searchBar.style.display = 'flex';
+    } else {
+        searchBar.style.display = 'none';
+    }
+}
+
+function executeSearch() {
+    currentPage = 1;
+    searchFiles(currentPage, pageSize);
+}
+
 function searchFiles(page, size) {
     console.log('searchFiles function called');
     console.log(filters);
@@ -60,11 +74,12 @@ function searchFiles(page, size) {
 
             if (data.content.length > 0) {
                 data.content.forEach(file => {
+                    console.log(file); // 显示每个 file 的内容
                     const item = document.createElement('div');
                     item.className = 'item';
                     const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
                     const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>View Online</button>` : '';
-                    const downloadButton = file.download !== "Disable" ? `<button onclick="toggleDownloadOptions('${file.id}', this)">Download</button>` : '';
+                    const downloadButton = file.download !== "Disable" ? `<button onclick="toggleDownloadOptions('${file.id}', this)" ${file.download === 'Disable' ? 'style="display: none;"' : ''}>Download</button>` : '';
 
                     // 默认的 loanPeriod 文本
                     let loanPeriod = file.loanLabel === 'Borrowed' ? `Borrowed (Return by ${file.returnDate || 'Loading...'})` : file.loanLabel || 'N/A';
@@ -85,11 +100,11 @@ function searchFiles(page, size) {
                             <p>${file.description || ''}</p>
                             <div class="item-meta">
                                 <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
-                                <a href="${file.url || '#'}" target="_blank">URL: ${file.url || 'N/A'}</a>
+                                <a href="${file.url || '#'}" target="_blank" style="display: none;">URL: ${file.url || 'N/A'}</a>
                                 <div class="button-container">
-                                    ${viewButton}
+                                     ${file.view !== 'Disable' ? viewButton : ''}
+                                    ${file.download !== 'Disable' ? downloadButton : ''}
                                     <button onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>
-                                    ${downloadButton}
                                 </div>
                             </div>
                         </div>
@@ -148,6 +163,111 @@ function searchFiles(page, size) {
         .catch(error => {
             console.error('Error fetching files:', error);
         });
+}
+
+
+// 修改部分：确保图片字段列表默认显示所有字段，避免空白页
+function displayBookInfo(file) {
+    const item = document.createElement('div');
+    item.className = 'item';
+    const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
+    const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>View Online</button>` : '';
+    const downloadButton = file.download !== "Disable" ? `<button onclick="toggleDownloadOptions('${file.id}', this)" ${file.download === 'Disable' ? 'style="display: none;"' : ''}>Download</button>` : '';
+
+    let loanPeriod = file.loanLabel === 'Borrowed' ? `Borrowed (Return by ${file.returnDate || 'Loading...'})` : file.loanLabel || 'N/A';
+
+    item.innerHTML = `
+        <div class="item-details">
+            <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
+            <div class="item-content">
+                <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
+                <p><strong>Alternate Title:</strong> ${file.alternativeTitle || 'N/A'}</p>
+                <p><strong>Source Type:</strong> ${file.sourceType || 'N/A'}</p>
+                <p><strong>Authors:</strong> ${file.authors || 'N/A'}</p>
+                <p><strong>ISBN:</strong> ${file.isbn || 'N/A'}</p>
+                <p><strong>Publisher:</strong> ${file.publisher || 'N/A'}</p>
+                <p><strong>Published:</strong> ${file.published || 'N/A'}</p>
+                <p><strong>Status:</strong> ${file.status || 'N/A'}</p>
+                <p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${loanPeriod}</p>
+                <p>${file.description || ''}</p>
+                <div class="item-meta">
+                    <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
+                    <a href="${file.url || '#'}" target="_blank">URL: ${file.url || 'N/A'}</a>
+                    <div class="button-container">
+                         ${viewButton}
+                         ${downloadButton}
+                        <button onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    return item;
+}
+
+// 修改部分：筛选器字段参照实际数据动态生成
+function createFilterOptions(filterType, options) {
+    const filterList = document.querySelector(`#${filterType}-list`);
+    filterList.innerHTML = '';
+    options.forEach(option => {
+        const li = document.createElement('li');
+        li.innerHTML = `<input type="checkbox" id="${filterType}-${option}" value="${option}" onclick="applyFilter('${filterType}', this.value)">
+                        <label for="${filterType}-${option}">${option}</label>`;
+        filterList.appendChild(li);
+    });
+}
+
+// 在搜索时动态生成筛选器选项
+function updateFilters(data) {
+    createFilterOptions('series', data.seriesOptions);
+    createFilterOptions('publisher', data.publisherOptions);
+    createFilterOptions('subject', data.subjectOptions);
+    createFilterOptions('database', data.databaseOptions);
+}
+
+fetch(`http://${API_BASE_URL}/search`, {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(filterData)
+})
+    .then(response => response.json())
+    .then(data => {
+        updateFilters(data);
+        displayResults(data);
+    })
+    .catch(error => console.error('Error fetching files:', error));
+
+// 修改部分：确保Published字段选择时间范围
+function applyPublishedFilter() {
+    const yearType = document.querySelector('input[name="yearType"]:checked').value;
+
+    if (yearType === 'range') {
+        const fromYear = document.getElementById('publishedFrom').value;
+        const toYear = document.getElementById('publishedTo').value;
+
+        if (fromYear >= 1893 && toYear <= 2024 && fromYear <= toYear) {
+            filters['publishedFrom'] = fromYear;
+            filters['publishedTo'] = toYear;
+            filters['publishedYear'] = null; // 清空单年值
+        } else {
+            alert('Please enter a valid year range: From year >= 1893, To year <= 2024, and From year <= To year.');
+            return;
+        }
+    } else if (yearType === 'single') {
+        const year = document.getElementById('publishedYear').value;
+
+        if (year >= 1893 && year <= 2024) {
+            filters['publishedYear'] = year;
+            filters['publishedFrom'] = null; // 清空范围年值
+            filters['publishedTo'] = null;
+        } else {
+            alert('Please enter a valid year: between 1893 and 2024.');
+            return;
+        }
+    }
+    searchFiles(1, 10);
 }
 
 function removeFilter(filterType) {
@@ -337,36 +457,6 @@ function toggleYearInputs(value) {
         document.getElementById('rangeInputs').style.display = 'none';
         document.getElementById('singleInput').style.display = 'block';
     }
-}
-
-function applyPublishedFilter() {
-    const yearType = document.querySelector('input[name="yearType"]:checked').value;
-
-    if (yearType === 'range') {
-        const fromYear = document.getElementById('publishedFrom').value;
-        const toYear = document.getElementById('publishedTo').value;
-
-        if (fromYear >= 1893 && toYear <= 2024 && fromYear <= toYear) {
-            filters['publishedFrom'] = fromYear;
-            filters['publishedTo'] = toYear;
-            filters['publishedYear'] = null; // 清空单年值
-        } else {
-            alert('Please enter a valid year range: From year >= 1893, To year <= 2024, and From year <= To year.');
-            return;
-        }
-    } else if (yearType === 'single') {
-        const year = document.getElementById('publishedYear').value;
-
-        if (year >= 1893 && year <= 2024) {
-            filters['publishedYear'] = year;
-            filters['publishedFrom'] = null; // 清空范围年值
-            filters['publishedTo'] = null;
-        } else {
-            alert('Please enter a valid year: between 1893 and 2024.');
-            return;
-        }
-    }
-    searchFiles(1,10)
 }
 
 function clearPublishedFilter() {
