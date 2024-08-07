@@ -11,8 +11,8 @@ public class BorrowViewController {
         return "admin/adminBorrow";
     }
 
-    @GetMapping("/userhome")
+    @GetMapping("/userHome")
     public String getUserHomePage() {
-        return "userHome"; // This should match the name of your HTML file without the .html extension
+        return "user/userHome"; // This should match the name of your HTML file without the .html extension
     }
 }
