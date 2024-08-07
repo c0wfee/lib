@@ -560,7 +560,7 @@ public class MainController {
     @GetMapping("/pdf")
     public String viewPdf(@RequestParam("fileId") String fileId, Model model) {
         model.addAttribute("fileId", fileId);
-        return "pdf";  // 返回 pdf.html 视图
+        return "user/pdf";  // 返回 pdf.html 视图
     }
 
     @GetMapping("/getMarcNum")
