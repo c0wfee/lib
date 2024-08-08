@@ -4,10 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="整理代码结构">
+    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改fileList页面">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/user/bookDetails.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/user/bookDetails.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/user/fileList.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/user/fileList.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/user/fileList.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/user/fileList.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/user/userHome.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/user/userHome.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -160,7 +160,7 @@
       <workItem from="1723104143233" duration="3970000" />
       <workItem from="1723117627541" duration="378000" />
       <workItem from="1723120832977" duration="1074000" />
-      <workItem from="1723133371076" duration="635000" />
+      <workItem from="1723133371076" duration="1273000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>
@@ -292,7 +292,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723036404422</updated>
     </task>
-    <option name="localTasksCounter" value="18" />
+    <task id="LOCAL-00018" summary="修改fileList页面">
+      <option name="closed" value="true" />
+      <created>1723134082821</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1723134082821</updated>
+    </task>
+    <option name="localTasksCounter" value="19" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -317,7 +325,8 @@
     <MESSAGE value="修改下拉选框及在线浏览" />
     <MESSAGE value="修改controller" />
     <MESSAGE value="整理代码结构" />
-    <option name="LAST_COMMIT_MESSAGE" value="整理代码结构" />
+    <MESSAGE value="修改fileList页面" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改fileList页面" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
