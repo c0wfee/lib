@@ -3,7 +3,12 @@ document.addEventListener('DOMContentLoaded', function() {
     console.log('Book ID:', bookId);
     if (bookId !== 'default_id') {
         fetch(`http://8.130.130.240:8088/book/${bookId}`)
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 document.getElementById('source-image').src = '../static/images/book.png';
                 updateField('book-title', data.title);
@@ -22,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
             })
             .catch(error => {
                 console.error('Error fetching book details:', error);
+                alert(`Error fetching book details: ${error.message}`);
             });
     } else {
         console.error('No book ID provided in URL');
