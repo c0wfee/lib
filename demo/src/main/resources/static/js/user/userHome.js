@@ -1,14 +1,45 @@
-async function fetchBooks(username) {
+document.addEventListener('DOMContentLoaded', () => {
+    loadCurrentBorrowing(); // 页面加载时默认加载当前借阅的书目
+
+    // Tab切换时加载相应的数据
+    document.getElementById('current-borrowing-tab').addEventListener('click', () => {
+        loadCurrentBorrowing();
+    });
+
+    document.getElementById('borrowing-history-tab').addEventListener('click', () => {
+        loadBorrowingHistory();
+    });
+});
+
+function loadCurrentBorrowing() {
+    fetchBooks('admin', false); // 'admin' 是当前用户名，false 表示加载当前借阅的书目
+}
+
+function loadBorrowingHistory() {
+    fetchBooks('admin', true); // 'admin' 是当前用户名，true 表示加载历史借阅的书目
+}
+
+async function fetchBooks(username, isHistory = false) {
     try {
         const response = await fetch(`/api/borrows/${username}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
         const books = await response.json();
-        const currentBorrowing = books.filter(book => !book.returnedDate);
-        const borrowingHistory = books.filter(book => book.returnedDate);
-        displayBooks(currentBorrowing, 'current-borrowing-container');
-        displayBooks(borrowingHistory, 'borrowing-history-container', true);
+        console.log('Fetched Books:', books);
+
+        const currentDate = new Date();
+
+        let filteredBooks;
+        if (isHistory) {
+            filteredBooks = books.filter(book => new Date(book.loanEndTime) < currentDate);
+
+        } else {
+            filteredBooks = books.filter(book => new Date(book.loanEndTime) >= currentDate);
+
+        }
+
+        displayBooks(filteredBooks, isHistory ? 'borrowing-history-container' : 'current-borrowing-container', isHistory);
     } catch (error) {
         console.error('Error fetching books:', error);
     }
@@ -16,7 +47,7 @@ async function fetchBooks(username) {
 
 function displayBooks(books, containerId, isHistory = false) {
     const container = document.getElementById(containerId);
-    container.innerHTML = ''; // Clear the existing content
+    container.innerHTML = '';
     if (books.length === 0) {
         container.innerHTML = '<p class="text-center">No books borrowed.</p>';
         return;
@@ -47,7 +78,7 @@ function displayBooks(books, containerId, isHistory = false) {
         if (isHistory) {
             const returnedDate = document.createElement('p');
             returnedDate.className = 'card-text';
-            returnedDate.textContent = 'Returned Date: ' + book.returnedDate;
+            returnedDate.textContent = 'Returned Date: ' + book.loanEndTime;
             cardBody.appendChild(returnedDate);
         } else {
             const loanEndTime = document.createElement('p');
@@ -83,25 +114,7 @@ function displayBooks(books, containerId, isHistory = false) {
 
 function viewBook(bookId) {
     console.log('View book with ID:', bookId);
-    const display = null; // Adjust this based on your needs
-    if (display == null) {
-        window.location.href = `/pdf?fileId=${encodeURIComponent(bookId)}`;
-    } else {
-        fetch(`http://8.130.130.240:8088/downloadfiles/${encodeURIComponent(bookId)}`, {responseType: 'blob'})
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const url = window.URL.createObjectURL(blob);
-                window.open(url);
-            })
-            .catch(error => {
-                console.error('Error downloading book:', error);
-            });
-    }
+    window.location.href = `/pdf?fileId=${encodeURIComponent(bookId)}`;
 }
 
 function returnBook(bookId) {
@@ -118,16 +131,10 @@ function returnBook(bookId) {
         .then(data => {
             console.log('Success:', data);
             alert('Operation successful');
-            const username = 'admin'; // Replace this with the actual username
-            fetchBooks(username);
+            loadCurrentBorrowing();
         })
         .catch((error) => {
             console.error('Error:', error);
             alert('Operation failed');
         });
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    const username = 'admin'; // Replace this with the actual username
-    fetchBooks(username);
-});

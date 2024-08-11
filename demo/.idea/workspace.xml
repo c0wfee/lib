@@ -4,9 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改fileList页面">
+    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改userHome页面,分为两个Tab">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/user/fileList.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/user/fileList.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/application.properties" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/application.properties" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/user/userHome.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/user/userHome.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/templates/user/userHome.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/user/userHome.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -160,7 +161,8 @@
       <workItem from="1723104143233" duration="3970000" />
       <workItem from="1723117627541" duration="378000" />
       <workItem from="1723120832977" duration="1074000" />
-      <workItem from="1723133371076" duration="1273000" />
+      <workItem from="1723133371076" duration="1499000" />
+      <workItem from="1723380212531" duration="4665000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>
@@ -300,7 +302,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723134082821</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="修改userHome页面,分为两个Tab">
+      <option name="closed" value="true" />
+      <created>1723134872377</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1723134872377</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -326,7 +336,8 @@
     <MESSAGE value="修改controller" />
     <MESSAGE value="整理代码结构" />
     <MESSAGE value="修改fileList页面" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改fileList页面" />
+    <MESSAGE value="修改userHome页面,分为两个Tab" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改userHome页面,分为两个Tab" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

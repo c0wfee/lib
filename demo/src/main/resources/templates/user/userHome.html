@@ -12,10 +12,10 @@
     <h1 class="my-4 text-center">My Borrowing</h1>
     <ul class="nav nav-tabs" id="borrowingTabs" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" id="current-borrowing-tab" data-toggle="tab" href="#current-borrowing" role="tab" aria-controls="current-borrowing" aria-selected="true">Current Borrowing</a>
+            <a class="nav-link active" id="current-borrowing-tab" data-toggle="tab" href="#current-borrowing" role="tab" aria-controls="current-borrowing" aria-selected="true" onclick="loadCurrentBorrowing()">Current Borrowing</a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" id="borrowing-history-tab" data-toggle="tab" href="#borrowing-history" role="tab" aria-controls="borrowing-history" aria-selected="false">Borrowing History</a>
+            <a class="nav-link" id="borrowing-history-tab" data-toggle="tab" href="#borrowing-history" role="tab" aria-controls="borrowing-history" aria-selected="false" onclick="loadBorrowingHistory()">Borrowing History</a>
         </li>
     </ul>
     <div class="tab-content" id="borrowingTabsContent">
@@ -31,7 +31,12 @@
         </div>
     </div>
 </div>
+<!-- 引入 jQuery -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<!-- 引入 Bootstrap 的 JavaScript -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+
 <script src="/static/js/user/userHome.js"></script>
 </body>
 </html>
