@@ -7,7 +7,7 @@ const sourceTypeImages = {
     'Academic Journal': '../static/images/book.png',
 };
 
-const API_BASE_URL = "localhost:8088";
+
 let currentPage = 1;
 const pageSize = 10;
 let filters = {};
@@ -34,7 +34,7 @@ function searchFiles(page, size) {
         size: size
     };
 
-    fetch(`http://${API_BASE_URL}/search`, {
+    fetch(`/search`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -88,7 +88,7 @@ function searchFiles(page, size) {
                     itemList.appendChild(item);
 
                     if (file.loanLabel === 'Borrowed') {
-                        fetch(`http://${API_BASE_URL}/borrow/${file.id}`, {
+                        fetch(`http://8.130.130.240:8088/borrow/${file.id}`, {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json'
