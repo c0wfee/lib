@@ -222,3 +222,22 @@ document.addEventListener('DOMContentLoaded', function () {
         searchFiles(currentPage, pageSize);
     });
 });
+
+function applyPublishedFilter() {
+    const yearType = document.querySelector('input[name="yearType"]:checked').value;
+    if (yearType === 'range') {
+        const fromYear = document.getElementById('publishedFrom').value;
+        const toYear = document.getElementById('publishedTo').value;
+        if (fromYear && toYear) {
+            filters['publishedFrom'] = fromYear;
+            filters['publishedTo'] = toYear;
+        }
+    } else if (yearType === 'single') {
+        const year = document.getElementById('publishedYear').value;
+        if (year) {
+            filters['publishedFrom'] = year;
+            filters['publishedTo'] = year;
+        }
+    }
+    searchFiles(currentPage, pageSize);
+}
