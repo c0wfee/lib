@@ -1,8 +1,10 @@
+import { BASE_URL } from '../config.js';
+
 document.addEventListener('DOMContentLoaded', function() {
     const bookId = document.getElementById('fileId').value;
     console.log('Book ID:', bookId);
     if (bookId !== 'default_id') {
-        fetch(`http://8.130.130.240:8088/book/${bookId}`)
+        fetch(`${BASE_URL}/book/${bookId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Network response was not ok: ${response.statusText}`);
@@ -23,7 +25,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateField('pages', data.pages, 'pages-container');
                 updateField('subjects', data.subjects || 'N/A', 'subjects-container');
                 updateField('description', data.description || '', 'description-container');
-                updateField('loan-period', data.loan_label, 'loan-period-container');
+
+                // 处理借出信息
+                const loanPeriodElement = document.getElementById('loan-period-container');
+                const borrowButton = document.getElementById('borrow-button');
+
+                if (data.loan_label) {
+                    document.getElementById('loan-period').textContent = data.loan_label;
+                    borrowButton.textContent = 'Borrow';
+                    borrowButton.disabled = false;
+                } else {
+                    loanPeriodElement.style.display = 'none';
+                }
+
+                if (data.isOnLoan) { // 假设你有一个字段表示书籍是否已被借出
+                    borrowButton.disabled = true;
+                    borrowButton.textContent = `On Loan, unavailable until ${data.returnDate}`;
+                    borrowButton.classList.add('disabled'); // 可选：添加类用于样式上的变化
+                }
             })
             .catch(error => {
                 console.error('Error fetching book details:', error);

@@ -1,3 +1,5 @@
+import { BASE_URL } from '../config.js';
+
 document.addEventListener('DOMContentLoaded', function () {
     const loginForm = document.getElementById('loginForm');
     const errorMessage = document.getElementById('error-message');
@@ -8,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const password = document.getElementById('login-password').value;
 
         // 发送登录请求到服务器
-        fetch(`http://8.130.130.240:8088/api/user/login`, {
+        fetch(`${BASE_URL}/api/user/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

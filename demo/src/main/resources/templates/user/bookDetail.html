@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="container">
-    <button id="back-button" class="btn btn-secondary" onclick="window.location.href='fileList'">Back</button>
+    <button id="back-button" class="btn btn-secondary" onclick="window.location.href='fileList.html'">Back</button>
     <div class="book-details" id="book-details">
         <img id="source-image" src="../static/images/book.png" alt="Source Type">
         <h1 id="book-title">Book Title</h1>
@@ -24,9 +24,12 @@
         <p id="description-container"><strong>Description:</strong> <span id="description"></span></p>
         <p id="loan-period-container"><strong>Loan Period:</strong> <span id="loan-period"></span></p>
         <input type="hidden" id="fileId" th:value="${fileId}">
+        <button id="borrow-button" class="btn btn-primary">Borrow</button>
     </div>
 </div>
 
-<script src="/static/js/user/bookDetails.js"></script>
+<!-- 使用type="module"来支持ES模块 -->
+<script type="module" src="/static/js/config.js"></script>
+<script type="module" src="/static/js/user/bookDetails.js"></script>
 </body>
 </html>

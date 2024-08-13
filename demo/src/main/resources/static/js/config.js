@@ -1,5 +1,3 @@
 // config.js
-export const API_BASE_URL = 'localhost:8088';
-
-
-
+const BASE_URL = 'http://localhost:8088';
+export { BASE_URL };
