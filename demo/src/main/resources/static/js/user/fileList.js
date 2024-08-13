@@ -7,11 +7,11 @@ const sourceTypeImages = {
     'Academic Journal': '../static/images/book.png',
 };
 
-
 let currentPage = 1;
 const pageSize = 10;
 let filters = {};
 
+// 显示和隐藏搜索栏
 function toggleSearch() {
     const searchBar = document.getElementById('search-bar');
     if (searchBar.style.display === 'none' || searchBar.style.display === '') {
@@ -21,17 +21,52 @@ function toggleSearch() {
     }
 }
 
+// 显示和隐藏筛选列表
+function toggleList(headerElement) {
+    const list = headerElement.nextElementSibling;
+    if (list.style.display === 'none' || list.style.display === '') {
+        list.style.display = 'block';
+    } else {
+        list.style.display = 'none';
+    }
+}
+
+// 执行搜索并应用筛选条件
 function executeSearch() {
     currentPage = 1;
     searchFiles(currentPage, pageSize);
 }
 
+// 应用筛选条件并更新filters对象
+function applyFilter(filterType, value) {
+    if (!filters[filterType]) {
+        filters[filterType] = [];
+    }
+    const index = filters[filterType].indexOf(value);
+    if (index > -1) {
+        filters[filterType].splice(index, 1);
+    } else {
+        filters[filterType].push(value);
+    }
+    searchFiles(currentPage, pageSize);
+}
+
+// 搜索文件并应用所有筛选条件
 function searchFiles(page, size) {
     const keyword = document.getElementById('keyword').value;
+
     const filterData = {
         keyword: keyword,
         page: page,
-        size: size
+        size: size,
+        series: filters['series'] || [],
+        publisher: filters['publisher'] || [],
+        yearRange: {
+            from: filters['publishedFrom'] || '',
+            to: filters['publishedTo'] || ''
+        },
+        subject: filters['subject'] || [],
+        database: filters['database'] || []
     };
 
     fetch(`/search`, {
@@ -59,36 +94,36 @@ function searchFiles(page, size) {
                     let loanInfo = file.loanLabel === 'Borrowed' ? `On Loan, unavailable until ${file.returnDate || 'Loading...'}` : '';
 
                     item.innerHTML = `
-                <div class="item-details">
-                    <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
-                    <div class="item-content">
-                        <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
-                        <p><strong>Alternate Title:</strong> ${file.alternativeTitle || 'N/A'}</p>
-                        <p><strong>Source Type:</strong> ${file.sourceType || 'N/A'}</p>
-                        ${file.authors ? `<p><strong>Authors:</strong> ${file.authors}</p>` : `<p><strong>Editors:</strong> ${file.editors || 'N/A'}</p>`}
-                        <p><strong>ISBN:</strong> ${file.isbn || 'N/A'}</p>
-                        <p><strong>Publisher:</strong> ${file.publisher || 'N/A'}</p>
-                        <p><strong>Published:</strong> ${file.published || 'N/A'}</p>
-                        <p><strong>Status:</strong> ${file.status || 'N/A'}</p>
-                        <p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${loanInfo}</p>
-                        <p>${file.description || ''}</p>
-                        <div class="item-meta">
-                            <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
-                            <a href="${file.url || '#'}" target="_blank" style="display: none;">URL: ${file.url || 'N/A'}</a>
-                            <div class="button-container">
-                                ${file.view !== 'Disable' ? viewButton : ''}
-                                ${file.download !== 'Disable' ? downloadButton : ''}
-                                <button id="borrow-button-${file.id}" onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>
-                                <span id="loan-info-${file.id}" style="color: grey; margin-left: 10px;"></span>
+                    <div class="item-details">
+                        <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
+                        <div class="item-content">
+                            <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
+                            <p><strong>Alternate Title:</strong> ${file.alternativeTitle || 'N/A'}</p>
+                            <p><strong>Source Type:</strong> ${file.sourceType || 'N/A'}</p>
+                            ${file.authors ? `<p><strong>Authors:</strong> ${file.authors}</p>` : `<p><strong>Editors:</strong> ${file.editors || 'N/A'}</p>`}
+                            <p><strong>ISBN:</strong> ${file.isbn || 'N/A'}</p>
+                            <p><strong>Publisher:</strong> ${file.publisher || 'N/A'}</p>
+                            <p><strong>Published:</strong> ${file.published || 'N/A'}</p>
+                            <p><strong>Status:</strong> ${file.status || 'N/A'}</p>
+                            <p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${loanInfo}</p>
+                            <p>${file.description || ''}</p>
+                            <div class="item-meta">
+                                <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
+                                <a href="${file.url || '#'}" target="_blank" style="display: none;">URL: ${file.url || 'N/A'}</a>
+                                <div class="button-container">
+                                    ${file.view !== 'Disable' ? viewButton : ''}
+                                    ${file.download !== 'Disable' ? downloadButton : ''}
+                                    <button id="borrow-button-${file.id}" onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>
+                                    <span id="loan-info-${file.id}" style="color: grey; margin-left: 10px;"></span>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
                 `;
                     itemList.appendChild(item);
 
                     if (file.loanLabel === 'Borrowed') {
-                        fetch(`http://8.130.130.240:8088/borrow/${file.id}`, {
+                        fetch(`http://localhost:8088/borrow/${file.id}`, {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -130,6 +165,7 @@ function searchFiles(page, size) {
         });
 }
 
+// 创建分页
 function createPagination(totalElements, currentPage, size) {
     const paginationContainer = document.getElementById('pagination');
     paginationContainer.innerHTML = '';
@@ -174,55 +210,10 @@ function createPagination(totalElements, currentPage, size) {
     paginationContainer.appendChild(nextButton);
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('search-button').addEventListener('click', () => {
-        currentPage = 1;
-        searchFiles(currentPage, pageSize);
-    });
-});
-
-function createPagination(totalElements, currentPage, size) {
-    const paginationContainer = document.getElementById('pagination');
-    paginationContainer.innerHTML = '';
-    const totalPages = Math.ceil(totalElements / size);
-
-    const prevButton = document.createElement('button');
-    prevButton.innerText = 'Previous';
-    prevButton.disabled = currentPage === 1;
-    prevButton.onclick = () => {
-        searchFiles(currentPage - 1, size);
-        window.scrollTo(0, 0);
-    };
-    paginationContainer.appendChild(prevButton);
-
-    let startPage, endPage;
-    if (currentPage === 1 || currentPage === 2) {
-        startPage = 1;
-        endPage = Math.min(5, totalPages);
-    } else {
-        startPage = Math.max(1, currentPage - 2);
-        endPage = Math.min(totalPages, currentPage + 2);
-    }
-
-    for (let i = startPage; i <= endPage; i++) {
-        const pageButton = document.createElement('button');
-        pageButton.innerText = i;
-        pageButton.className = currentPage === i ? 'active' : '';
-        pageButton.onclick = () => {
-            searchFiles(i, size);
-            window.scrollTo(0, 0);
-        };
-        paginationContainer.appendChild(pageButton);
-    }
-
-    const nextButton = document.createElement('button');
-    nextButton.innerText = 'Next';
-    nextButton.disabled = currentPage === totalPages;
-    nextButton.onclick = () => {
-        searchFiles(currentPage + 1, size);
-        window.scrollTo(0, 0);
-    };
-    paginationContainer.appendChild(nextButton);
+// 移除筛选条件
+function removeFilter(filterType) {
+    delete filters[filterType];
+    searchFiles(currentPage, pageSize);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
