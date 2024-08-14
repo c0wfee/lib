@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="container">
-    <button id="back-button" class="btn btn-secondary" onclick="window.location.href='fileList.html'">Back</button>
+    <button id="back-button" class="btn btn-secondary" onclick="window.location.href='fileList'">Back</button>
     <div class="book-details" id="book-details">
         <img id="source-image" src="../static/images/book.png" alt="Source Type">
         <h1 id="book-title">Book Title</h1>
@@ -21,8 +21,8 @@
         <p id="copyright-declaration-container"><strong>Copyright Declaration:</strong> <span id="copyright-declaration"></span></p>
         <p id="pages-container"><strong>Pages:</strong> <span id="pages"></span></p>
         <p id="subjects-container"><strong>Subjects:</strong> <span id="subjects"></span></p>
-        <p id="description-container"><strong>Description:</strong> <span id="description"></span></p>
         <p id="loan-period-container"><strong>Loan Period:</strong> <span id="loan-period"></span></p>
+        <p id="description-container"><strong>Description:</strong> <span id="description"></span></p>
         <input type="hidden" id="fileId" th:value="${fileId}">
         <button id="borrow-button" class="btn btn-primary">Borrow</button>
     </div>

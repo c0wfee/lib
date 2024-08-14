@@ -30,18 +30,25 @@ document.addEventListener('DOMContentLoaded', function() {
                 const loanPeriodElement = document.getElementById('loan-period-container');
                 const borrowButton = document.getElementById('borrow-button');
 
-                if (data.loan_label) {
-                    document.getElementById('loan-period').textContent = data.loan_label;
+                if (data.borrowPeriod > 0) {
+                    document.getElementById('loan-period').textContent = `${data.borrowPeriod} Days`;
                     borrowButton.textContent = 'Borrow';
                     borrowButton.disabled = false;
-                } else {
-                    loanPeriodElement.style.display = 'none';
-                }
 
-                if (data.isOnLoan) { // 假设你有一个字段表示书籍是否已被借出
-                    borrowButton.disabled = true;
-                    borrowButton.textContent = `On Loan, unavailable until ${data.returnDate}`;
-                    borrowButton.classList.add('disabled'); // 可选：添加类用于样式上的变化
+                    // 如果书籍已被借出，禁用按钮并显示返回日期
+                    if (data.isOnLoan) {
+                        borrowButton.disabled = true;
+                        borrowButton.textContent = `On Loan, unavailable until ${data.returnDate}`;
+                        borrowButton.classList.add('disabled'); // 可选：添加类用于样式上的变化
+                    } else {
+                        borrowButton.onclick = function() {
+                            borrowBook(bookId);
+                        };
+                    }
+                } else {
+                    // 如果 borrowPeriod 为 0，隐藏借书按钮和借阅期信息
+                    loanPeriodElement.style.display = 'none';
+                    borrowButton.style.display = 'none';
                 }
             })
             .catch(error => {
@@ -62,6 +69,50 @@ function updateField(elementId, value, containerId = null) {
     }
 }
 
-function goBack() {
-    window.location.href = 'fileList.html';
+async function borrowBook(id) {
+    try {
+        let periodUrl = `/getBookPeriod?bookID=${id}`;
+        let periodResponse = await fetch(periodUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!periodResponse.ok) {
+            throw new Error('Failed to fetch borrow period');
+        }
+
+        let borrowPeriodText = await periodResponse.text();
+        let borrowPeriod = parseInt(borrowPeriodText, 10);
+
+        let data = new URLSearchParams();
+        data.append('bookID', id);
+        data.append('borrow_period', borrowPeriod);
+
+        let borrowResponse = await fetch("/borrowBook", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: data
+        });
+
+        if (!borrowResponse.ok) {
+            throw new Error('Failed to borrow book');
+        }
+
+        let borrowData = await borrowResponse.json();
+        console.log('Success:', borrowData);
+        alert('Operation successful');
+
+        // 刷新页面以反映借书操作
+        window.location.reload();
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Operation failed');
+    }
 }
+
+
+

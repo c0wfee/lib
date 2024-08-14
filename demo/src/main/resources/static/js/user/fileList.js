@@ -1,8 +1,8 @@
-import { BASE_URL } from '../config.js';
+import {BASE_URL} from '../config.js';
 
 const API_BASE_URL = BASE_URL;
 
-window.onload = function() {
+window.onload = function () {
     searchFiles(1, 10); // 设置默认的page和size值
 };
 
@@ -119,38 +119,50 @@ function searchFiles(page, size) {
 
             if (data.content.length > 0) {
                 data.content.forEach(file => {
-                    console.log(file); // 打印每个文件对象到控制台
                     const item = document.createElement('div');
                     item.className = 'item';
                     const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
-                    const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>View Online</button>` : '';
-                    const downloadButton = file.download !== "Disable" ? `<button onclick="toggleDownloadOptions('${file.id}', this)" ${file.download === 'Disable' ? 'style="display: none;"' : ''}>Download</button>` : '';
+                    const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})" ${file.loanLabel === 'Borrowed'}>View Online</button>` : '';
+                    const downloadButton = file.download !== "Disable" ? `<button onclick="toggleDownloadOptions('${file.id}', this)">Download</button>` : '';
 
                     // 默认的借阅信息
-                    let loanInfo = file.loanLabel === 'Borrowed' ? `On Loan, unavailable until ${file.returnDate || 'Loading...'}` : '';
+                    let loanInfo = file.loanLabel === 'Borrowed' ? `On Loan, unavailable until ${file.returnDate || 'Loading...'}` : file.loanLabel || 'Available';
+
+                    // 生成借书按钮的逻辑，借书期为0时隐藏按钮
+                    const borrowButton = file.borrowPeriod <= 0
+                        ? ''  // 如果借书期为0，则不生成按钮
+                        : `<button id="borrow-button-${file.id}" onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>`;
+
+                    // 生成 loan-period 元素的逻辑，借书期为0时隐藏该元素
+                    const loanPeriodElement = file.borrowPeriod > 0
+                        ? `<p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${file.borrowPeriod} Days</p>`
+                        : '';
+
+                    // 生成 loan-info 元素的逻辑，只有在借书期大于0且状态为Borrowed时才会显示该元素
+                    let loanInfoElement = '';
+                    if (file.borrowPeriod > 0 && file.loanLabel === 'Borrowed') {
+                        loanInfoElement = `<span id="loan-info-${file.id}" style="color: grey; margin-left: 10px;"></span>`;
+                    }
 
                     item.innerHTML = `
                     <div class="item-details">
                         <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
                         <div class="item-content">
                             <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
-                            <p><strong>Alternate Title:</strong> ${file.alternativeTitle || 'N/A'}</p>
-                            <p><strong>Source Type:</strong> ${file.sourceType || 'N/A'}</p>
                             ${file.authors ? `<p><strong>Authors:</strong> ${file.authors}</p>` : `<p><strong>Editors:</strong> ${file.editors || 'N/A'}</p>`}
                             <p><strong>ISBN:</strong> ${file.isbn || 'N/A'}</p>
                             <p><strong>Publisher:</strong> ${file.publisher || 'N/A'}</p>
                             <p><strong>Published:</strong> ${file.published || 'N/A'}</p>
-                            <p><strong>Status:</strong> ${file.status || 'N/A'}</p>
-                            <p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${loanInfo}</p>
+                            ${loanPeriodElement}
                             <p>${file.description || ''}</p>
                             <div class="item-meta">
                                 <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
                                 <a href="${file.url || '#'}" target="_blank" style="display: none;">URL: ${file.url || 'N/A'}</a>
                                 <div class="button-container">
-                                    ${file.view !== 'Disable' ? viewButton : ''}
-                                    ${file.download !== 'Disable' ? downloadButton : ''}
-                                    <button id="borrow-button-${file.id}" onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>
-                                    <span id="loan-info-${file.id}" style="color: grey; margin-left: 10px;"></span>
+                                    ${viewButton}
+                                    ${downloadButton}
+                                    ${borrowButton}
+                                    ${loanInfoElement}
                                 </div>
                             </div>
                         </div>
@@ -158,7 +170,8 @@ function searchFiles(page, size) {
                 `;
                     itemList.appendChild(item);
 
-                    if (file.loanLabel === 'Borrowed') {
+                    // 如果满足条件，获取还书日期并更新 loan-info 元素
+                    if (file.borrowPeriod > 0 && file.loanLabel === 'Borrowed') {
                         fetch(`${API_BASE_URL}/borrow/${file.id}`, {
                             method: 'GET',
                             headers: {
@@ -167,8 +180,12 @@ function searchFiles(page, size) {
                         })
                             .then(response => response.json())
                             .then(borrowData => {
-                                const returnDate = borrowData.loanEndTime || 'N/A';
-                                document.getElementById(`loan-info-${file.id}`).textContent = `On Loan, unavailable until ${returnDate}`;
+                                const loanInfoElem = document.getElementById(`loan-info-${file.id}`);
+                                if (borrowData.loanEndTime) {
+                                    loanInfoElem.textContent = `On Loan, unavailable until ${borrowData.loanEndTime}`;
+                                } else {
+                                    loanInfoElem.style.display = 'none';
+                                }
                             })
                             .catch(error => {
                                 console.error('Error fetching borrow details:', error);
@@ -200,6 +217,8 @@ function searchFiles(page, size) {
             console.error('Error fetching files:', error);
         });
 }
+
+
 
 // 创建分页
 function createPagination(totalElements, currentPage, size) {
@@ -270,7 +289,7 @@ function viewPDF(id, view) {
     if (view == null) {
         window.location.href = `/pdf?fileId=${encodeURIComponent(id)}`;
     } else {
-        fetch(`http://${API_BASE_URL}/downloadfiles/${encodeURIComponent(id)}`, { responseType: 'blob' })
+        fetch(`${API_BASE_URL}/downloadfiles/${encodeURIComponent(id)}`, {responseType: 'blob'})
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -286,6 +305,9 @@ function viewPDF(id, view) {
             });
     }
 }
+
+// 将 viewPDF 函数挂载到 window 对象上，使其在全局范围内可用
+window.viewPDF = viewPDF;
 
 function downloadBook(id) {
     const downloadOptions = `
@@ -304,7 +326,7 @@ function downloadBook(id) {
 }
 
 function downloadFile(id, format) {
-    const url = `http://${API_BASE_URL}/downloadpdfs/${encodeURIComponent(id)}?format=${format}`;
+    const url = `${API_BASE_URL}/downloadpdfs/${encodeURIComponent(id)}?format=${format}`;
     const xhr = new XMLHttpRequest();
     const progressContainer = document.getElementById(`progress-container-${id}`);
     const progressBar = document.getElementById(`progress-${id}`);
@@ -317,7 +339,7 @@ function downloadFile(id, format) {
     let previousLoaded = 0;
     let startTime = Date.now();
 
-    xhr.onprogress = function(event) {
+    xhr.onprogress = function (event) {
         if (event.lengthComputable) {
             const percentComplete = (event.loaded / event.total) * 100;
             progressBar.value = percentComplete;
@@ -333,11 +355,14 @@ function downloadFile(id, format) {
         }
     };
 
-    xhr.onloadstart = function() {
-        progressContainer.style.display = 'block';
+    xhr.onloadstart = function () {
+        const progressContainer = document.getElementById(`progress-container-${id}`);
+        if (progressContainer) {
+            progressContainer.style.display = 'block';
+        }
     };
 
-    xhr.onload = function() {
+    xhr.onload = function () {
         if (xhr.status === 200) {
             const blob = xhr.response;
             const downloadUrl = window.URL.createObjectURL(blob);
@@ -355,13 +380,16 @@ function downloadFile(id, format) {
         }
     };
 
-    xhr.onerror = function() {
+    xhr.onerror = function () {
         console.error('Download error:', xhr.statusText);
         progressContainer.style.display = 'none';
     };
 
     xhr.send();
 }
+
+// 将函数挂载到window对象上，使其在全局范围内可用
+window.downloadFile = downloadFile;
 
 
 function toggleDownloadOptions(id, button) {
@@ -417,8 +445,15 @@ async function borrowBook(id) {
         let borrowData = await borrowResponse.json();
         console.log('Success:', borrowData);
         alert('Operation successful');
+
+        // 刷新页面以反映借书操作
+        window.location.reload();
     } catch (error) {
         console.error('Error:', error);
         alert('Operation failed');
     }
 }
+
+// 将 borrowBook 函数挂载到 window 对象上，使其在全局范围内可用
+window.borrowBook = borrowBook;
+
