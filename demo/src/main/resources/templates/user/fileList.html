@@ -69,7 +69,7 @@
                     </ul>
                 </div>
                 <div class="refine-section">
-                    <h3 onclick="toggleList(this)">Year</h3>
+                    <h3>Year</h3>
                     <div class="refine-list">
                         <label>
                             <input type="radio" name="yearType" value="range" checked onclick="toggleYearInputs(this.value)"> Range
@@ -82,13 +82,13 @@
                             <input type="number" id="publishedTo" placeholder="Year" min="1893" max="2024" step="1">
                         </div>
                         <div id="singleInput" style="display: none;">
-                            <label for="publishedYear">Year:</label>
                             <input type="number" id="publishedYear" placeholder="Year" min="1893" max="2024" step="1">
                         </div>
                         <button onclick="applyPublishedFilter()">Apply</button>
                         <button onclick="clearPublishedFilter()">Clear</button>
                     </div>
                 </div>
+
                 <div class="refine-section">
                     <h3 onclick="toggleList(this)">Subjects</h3>
                     <ul class="refine-list">
@@ -140,6 +140,7 @@
         </div>
     </div>
 </div>
-<script src="/static/js/user/fileList.js"></script>
+<script type="module" src="/static/js/config.js"></script>
+<script src="/static/js/user/fileList.js" type="module"></script>
 </body>
 </html>

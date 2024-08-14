@@ -1,3 +1,7 @@
+import { BASE_URL } from '../config.js';
+
+const API_BASE_URL = BASE_URL;
+
 window.onload = function() {
     searchFiles(1, 10); // 设置默认的page和size值
 };
@@ -37,6 +41,38 @@ function executeSearch() {
     searchFiles(currentPage, pageSize);
 }
 
+// 应用年份筛选条件
+function applyPublishedFilter() {
+    const yearType = document.querySelector('input[name="yearType"]:checked').value;
+    if (yearType === 'range') {
+        const fromYear = document.getElementById('publishedFrom').value;
+        const toYear = document.getElementById('publishedTo').value;
+        if (fromYear && toYear) {
+            filters['publishedFrom'] = fromYear;
+            filters['publishedTo'] = toYear;
+        }
+    } else if (yearType === 'single') {
+        const year = document.getElementById('publishedYear').value;
+        if (year) {
+            filters['publishedFrom'] = year;
+            filters['publishedTo'] = year;
+        }
+    }
+    searchFiles(currentPage, pageSize);
+}
+
+// 清除年份筛选条件
+function clearPublishedFilter() {
+    document.getElementById('publishedFrom').value = '';
+    document.getElementById('publishedTo').value = '';
+    document.getElementById('publishedYear').value = '';
+
+    delete filters['publishedFrom'];
+    delete filters['publishedTo'];
+
+    searchFiles(currentPage, pageSize);
+}
+
 // 应用筛选条件并更新filters对象
 function applyFilter(filterType, value) {
     if (!filters[filterType]) {
@@ -69,7 +105,7 @@ function searchFiles(page, size) {
         database: filters['database'] || []
     };
 
-    fetch(`/search`, {
+    fetch(`${API_BASE_URL}/search`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -123,7 +159,7 @@ function searchFiles(page, size) {
                     itemList.appendChild(item);
 
                     if (file.loanLabel === 'Borrowed') {
-                        fetch(`http://localhost:8088/borrow/${file.id}`, {
+                        fetch(`${API_BASE_URL}/borrow/${file.id}`, {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -216,28 +252,173 @@ function removeFilter(filterType) {
     searchFiles(currentPage, pageSize);
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('search-button').addEventListener('click', () => {
-        currentPage = 1;
-        searchFiles(currentPage, pageSize);
-    });
-});
+// 切换年份输入框的显示
+function toggleYearInputs(yearType) {
+    const rangeInputs = document.getElementById('rangeInputs');
+    const singleInput = document.getElementById('singleInput');
 
-function applyPublishedFilter() {
-    const yearType = document.querySelector('input[name="yearType"]:checked').value;
     if (yearType === 'range') {
-        const fromYear = document.getElementById('publishedFrom').value;
-        const toYear = document.getElementById('publishedTo').value;
-        if (fromYear && toYear) {
-            filters['publishedFrom'] = fromYear;
-            filters['publishedTo'] = toYear;
-        }
+        rangeInputs.style.display = 'block';
+        singleInput.style.display = 'none';
     } else if (yearType === 'single') {
-        const year = document.getElementById('publishedYear').value;
-        if (year) {
-            filters['publishedFrom'] = year;
-            filters['publishedTo'] = year;
-        }
+        rangeInputs.style.display = 'none';
+        singleInput.style.display = 'block';
     }
-    searchFiles(currentPage, pageSize);
+}
+
+function viewPDF(id, view) {
+    if (view == null) {
+        window.location.href = `/pdf?fileId=${encodeURIComponent(id)}`;
+    } else {
+        fetch(`http://${API_BASE_URL}/downloadfiles/${encodeURIComponent(id)}`, { responseType: 'blob' })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                window.open(url);
+            })
+            .catch(error => {
+                console.error('Error downloading PDF:', error);
+            });
+    }
+}
+
+function downloadBook(id) {
+    const downloadOptions = `
+            <div id="download-options-${id}">
+                <button onclick="downloadFile('${id}', 'pdf')">Download PDF</button>
+                <button onclick="downloadFile('${id}', 'epub')">Download EPUB</button>
+                <div id="progress-container-${id}" style="margin-top: 10px; display: none;">
+                    <progress id="progress-${id}" value="0" max="100"></progress>
+                    <span id="progress-text-${id}">0%</span>
+                    <span id="speed-${id}"></span>
+                </div>
+            </div>
+        `;
+    const item = document.querySelector(`.item-meta button[onclick="downloadBook('${id}')"]`).parentNode;
+    item.innerHTML += downloadOptions;
+}
+
+function downloadFile(id, format) {
+    const url = `http://${API_BASE_URL}/downloadpdfs/${encodeURIComponent(id)}?format=${format}`;
+    const xhr = new XMLHttpRequest();
+    const progressContainer = document.getElementById(`progress-container-${id}`);
+    const progressBar = document.getElementById(`progress-${id}`);
+    const progressText = document.getElementById(`progress-text-${id}`);
+    const speedText = document.getElementById(`speed-${id}`);
+
+    xhr.open('GET', url, true);
+    xhr.responseType = 'blob';
+
+    let previousLoaded = 0;
+    let startTime = Date.now();
+
+    xhr.onprogress = function(event) {
+        if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            progressBar.value = percentComplete;
+            progressText.innerText = `${percentComplete.toFixed(2)}%`;
+
+            const currentTime = Date.now();
+            const elapsedTime = (currentTime - startTime) / 1000; // in seconds
+            const speed = ((event.loaded - previousLoaded) / 1024) / elapsedTime; // KB/s
+            speedText.innerText = `Speed: ${speed.toFixed(2)} KB/s`;
+
+            previousLoaded = event.loaded;
+            startTime = currentTime;
+        }
+    };
+
+    xhr.onloadstart = function() {
+        progressContainer.style.display = 'block';
+    };
+
+    xhr.onload = function() {
+        if (xhr.status === 200) {
+            const blob = xhr.response;
+            const downloadUrl = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = downloadUrl;
+            a.download = `${id}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(downloadUrl);
+            document.body.removeChild(a);
+            progressContainer.style.display = 'none';
+        } else {
+            console.error('Download failed:', xhr.statusText);
+        }
+    };
+
+    xhr.onerror = function() {
+        console.error('Download error:', xhr.statusText);
+        progressContainer.style.display = 'none';
+    };
+
+    xhr.send();
+}
+
+
+function toggleDownloadOptions(id, button) {
+    const existingOptions = document.querySelector('.download-options');
+    if (existingOptions) {
+        existingOptions.remove();
+    }
+    const downloadOptions = document.createElement('div');
+    downloadOptions.className = 'download-options';
+    downloadOptions.innerHTML = `
+        <button onclick="downloadFile('${id}', 'pdf')">Download PDF</button>
+        <button onclick="downloadFile('${id}', 'epub')">Download EPUB</button>
+    `;
+    button.parentNode.appendChild(downloadOptions);
+}
+
+// 如果你希望在模块中定义，但仍然让这个函数在全局可访问，可以使用以下方式
+window.toggleDownloadOptions = toggleDownloadOptions;
+
+async function borrowBook(id) {
+    try {
+        let periodUrl = `/getBookPeriod?bookID=${id}`;
+        let periodResponse = await fetch(periodUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (!periodResponse.ok) {
+            throw new Error('Failed to fetch borrow period');
+        }
+
+        let borrowPeriodText = await periodResponse.text();
+        let borrowPeriod = parseInt(borrowPeriodText, 10);
+
+        let data = new URLSearchParams();
+        data.append('bookID', id);
+        data.append('borrow_period', borrowPeriod);
+
+        let borrowResponse = await fetch("/borrowBook", {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: data
+        });
+
+        if (!borrowResponse.ok) {
+            throw new Error('Failed to borrow book');
+        }
+
+        let borrowData = await borrowResponse.json();
+        console.log('Success:', borrowData);
+        alert('Operation successful');
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Operation failed');
+    }
 }
