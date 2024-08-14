@@ -24,7 +24,11 @@
         <p id="loan-period-container"><strong>Loan Period:</strong> <span id="loan-period"></span></p>
         <p id="description-container"><strong>Description:</strong> <span id="description"></span></p>
         <input type="hidden" id="fileId" th:value="${fileId}">
-        <button id="borrow-button" class="btn btn-primary">Borrow</button>
+        <div class="button-container">
+            <button id="borrow-button" class="btn btn-primary">Borrow</button>
+            <span id="loan-info" style="color: grey; margin-left: 10px; display: none;"></span>
+        </div>
+
     </div>
 </div>
 

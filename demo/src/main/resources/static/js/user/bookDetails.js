@@ -26,29 +26,49 @@ document.addEventListener('DOMContentLoaded', function() {
                 updateField('subjects', data.subjects || 'N/A', 'subjects-container');
                 updateField('description', data.description || '', 'description-container');
 
-                // 处理借出信息
                 const loanPeriodElement = document.getElementById('loan-period-container');
                 const borrowButton = document.getElementById('borrow-button');
+                const loanInfoElement = document.getElementById('loan-info');
 
                 if (data.borrowPeriod > 0) {
                     document.getElementById('loan-period').textContent = `${data.borrowPeriod} Days`;
-                    borrowButton.textContent = 'Borrow';
-                    borrowButton.disabled = false;
 
-                    // 如果书籍已被借出，禁用按钮并显示返回日期
-                    if (data.isOnLoan) {
+                    if (data.loanLabel === 'Borrowed') {
                         borrowButton.disabled = true;
-                        borrowButton.textContent = `On Loan, unavailable until ${data.returnDate}`;
-                        borrowButton.classList.add('disabled'); // 可选：添加类用于样式上的变化
+                        borrowButton.textContent = 'Borrowed';
+                        borrowButton.classList.add('disabled');
                     } else {
+                        borrowButton.textContent = 'Borrow';
+                        borrowButton.disabled = false;
                         borrowButton.onclick = function() {
                             borrowBook(bookId);
                         };
                     }
+
+                    // Fetch loan info if the book is borrowed
+                    if (data.loanLabel === 'Borrowed') {
+                        fetch(`${BASE_URL}/borrow/${bookId}`)
+                            .then(response => response.json())
+                            .then(borrowData => {
+                                if (borrowData.loanEndTime) {
+                                    loanInfoElement.textContent = `On Loan, unavailable until ${borrowData.loanEndTime}`;
+                                    loanInfoElement.style.display = 'block';
+                                } else {
+                                    loanInfoElement.style.display = 'none';
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error fetching borrow details:', error);
+                                loanInfoElement.style.display = 'none';
+                            });
+                    } else {
+                        loanInfoElement.style.display = 'none';
+                    }
                 } else {
-                    // 如果 borrowPeriod 为 0，隐藏借书按钮和借阅期信息
+                    // Hide borrow button and loan period info if borrowPeriod is 0
                     loanPeriodElement.style.display = 'none';
                     borrowButton.style.display = 'none';
+                    loanInfoElement.style.display = 'none';
                 }
             })
             .catch(error => {
@@ -106,13 +126,10 @@ async function borrowBook(id) {
         console.log('Success:', borrowData);
         alert('Operation successful');
 
-        // 刷新页面以反映借书操作
+        // Refresh the page to reflect the borrow action
         window.location.reload();
     } catch (error) {
         console.error('Error:', error);
         alert('Operation failed');
     }
 }
-
-
-
