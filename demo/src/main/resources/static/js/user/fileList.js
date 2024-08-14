@@ -3,8 +3,56 @@ import {BASE_URL} from '../config.js';
 const API_BASE_URL = BASE_URL;
 
 window.onload = function () {
+    loadFilters(); // 加载筛选条件
     searchFiles(1, 10); // 设置默认的page和size值
 };
+
+function loadFilters() {
+    fetch(`${API_BASE_URL}/getPublisher`)
+        .then(response => response.json())
+        .then(data => populateFilterOptions('publisher-filter', data))
+        .catch(error => console.error('Error fetching publishers:', error));
+
+    fetch(`${API_BASE_URL}/getSeries`)
+        .then(response => response.json())
+        .then(data => populateFilterOptions('series-filter', data))
+        .catch(error => console.error('Error fetching series:', error));
+
+    fetch(`${API_BASE_URL}/getYear`)
+        .then(response => response.json())
+        .then(data => {
+            const minYear = Math.min(...data);
+            const maxYear = Math.max(...data);
+            document.getElementById('publishedFrom').placeholder = minYear;
+            document.getElementById('publishedTo').placeholder = maxYear;
+            document.getElementById('yearRange').textContent = `Year range: ${minYear} - ${maxYear}`;
+        })
+        .catch(error => console.error('Error fetching years:', error));
+
+    fetch(`${API_BASE_URL}/getDatabases`)
+        .then(response => response.json())
+        .then(data => populateFilterOptions('database-filter', data))
+        .catch(error => console.error('Error fetching databases:', error));
+}
+
+function populateFilterOptions(filterId, options) {
+    const filterElement = document.getElementById(filterId);
+    if (!filterElement) {
+        console.error(`Element with ID '${filterId}' not found.`);
+        return;
+    }
+    filterElement.innerHTML = ''; // 清空现有选项
+    options.forEach(option => {
+        const optionElement = document.createElement('li');
+        optionElement.innerHTML = `
+            <input type="checkbox" value="${option}" onclick="applyFilter('${filterId.split('-')[0]}', this.value)">
+            <label>${option}</label>
+        `;
+        filterElement.appendChild(optionElement);
+    });
+}
+
+
 
 const sourceTypeImages = {
     'Digitized eBook': '../static/images/book.png',
@@ -25,6 +73,8 @@ function toggleSearch() {
     }
 }
 
+window.toggleSearch = toggleSearch;
+
 // 显示和隐藏筛选列表
 function toggleList(headerElement) {
     const list = headerElement.nextElementSibling;
@@ -34,6 +84,8 @@ function toggleList(headerElement) {
         list.style.display = 'none';
     }
 }
+
+window.toggleList = toggleList;
 
 // 执行搜索并应用筛选条件
 function executeSearch() {
@@ -45,21 +97,19 @@ function executeSearch() {
 function applyPublishedFilter() {
     const yearType = document.querySelector('input[name="yearType"]:checked').value;
     if (yearType === 'range') {
-        const fromYear = document.getElementById('publishedFrom').value;
-        const toYear = document.getElementById('publishedTo').value;
-        if (fromYear && toYear) {
-            filters['publishedFrom'] = fromYear;
-            filters['publishedTo'] = toYear;
-        }
+        const fromYear = document.getElementById('publishedFrom').value || document.getElementById('publishedFrom').placeholder;
+        const toYear = document.getElementById('publishedTo').value || document.getElementById('publishedTo').placeholder;
+        filters['publishedFrom'] = fromYear;
+        filters['publishedTo'] = toYear;
     } else if (yearType === 'single') {
-        const year = document.getElementById('publishedYear').value;
-        if (year) {
-            filters['publishedFrom'] = year;
-            filters['publishedTo'] = year;
-        }
+        const year = document.getElementById('publishedYear').value || document.getElementById('publishedYear').placeholder;
+        filters['publishedFrom'] = year;
+        filters['publishedTo'] = year;
     }
     searchFiles(currentPage, pageSize);
 }
+
+
 
 // 清除年份筛选条件
 function clearPublishedFilter() {
@@ -87,6 +137,8 @@ function applyFilter(filterType, value) {
     searchFiles(currentPage, pageSize);
 }
 
+window.applyFilter = applyFilter;
+
 // 搜索文件并应用所有筛选条件
 function searchFiles(page, size) {
     const keyword = document.getElementById('keyword').value;
@@ -101,7 +153,6 @@ function searchFiles(page, size) {
             from: filters['publishedFrom'] || '',
             to: filters['publishedTo'] || ''
         },
-        subject: filters['subject'] || [],
         database: filters['database'] || []
     };
 
@@ -114,6 +165,7 @@ function searchFiles(page, size) {
     })
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             const itemList = document.getElementById('item-list');
             itemList.innerHTML = '';
 
