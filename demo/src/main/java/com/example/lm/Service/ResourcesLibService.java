@@ -115,4 +115,9 @@ public class ResourcesLibService {
     public void save(ResourcesLib rl){
         resourcesLibDao.save(rl);
     }
+
+    public List<String> getAllLib(){
+        return resourcesLibDao.getAll();
+
+    }
 }
