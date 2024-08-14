@@ -603,5 +603,31 @@ public class MainController {
         }
         return "redirect:/resourcesLib";
     }
+
+
+    @GetMapping("/getPublisher")
+    public ResponseEntity<?> getPublisher() {
+        List<String> publishers = fileService.getAllDistinctPublishers();
+        return ResponseEntity.ok(publishers);
+    }
+
+    @GetMapping("/getSeries")
+    public ResponseEntity<?> getSeries() {
+        List<String> series = fileService.findAllDistinctSeries();
+        return ResponseEntity.ok(series);
+    }
+
+    @GetMapping("/getYear")
+    public ResponseEntity<?> getYear() {
+        List<String> year = fileService.findAllDistinctCopyrightYear();
+        return ResponseEntity.ok(year);
+    }
+
+    @GetMapping("/getDatabases")
+    public ResponseEntity<?> getDatabases() {
+        List<String> databases = resourcesLibService.getAllLib();
+        return ResponseEntity.ok(databases);
+    }
+
 }
 

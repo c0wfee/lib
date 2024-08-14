@@ -602,6 +602,10 @@ public class FileService {
 
     public List<String> getAllDistinctStatus(){return fileInfoDao.findAllDistinctStatus();}
 
+    public List<String> findAllDistinctCopyrightYear(){return fileInfoDao.findAllDistinctCopyrightYear();}
+
+    public List<String> findAllDistinctSeries(){return fileInfoDao.findAllDistinctSeries();}
+
     public List<Integer> getAllDistinctDatabaseId(){return fileInfoDao.findAllDistinctDatabaseId();}
 
     public boolean isBookBorrowed(Integer bookId) {
