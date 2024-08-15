@@ -362,8 +362,8 @@ public class FileService {
 
     public Page<FileInfo> advancedSearch(String keyword, List<String> series, List<String> publisher, List<String> subjects, List<String> database, Integer publishedFrom, Integer publishedTo, Integer publishedYear, Pageable pageable) {
         String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
-        String jpql = "SELECT f FROM FileInfo f WHERE f.status = 'published'";
-        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.status = 'published'";
+        String jpql = "SELECT f FROM FileInfo f WHERE f.status = 'published' AND f.downloadLink IS NOT NULL";
+        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.status = 'published'AND f.downloadLink IS NOT NULL";
         List<Integer> databaseIds = null;
 
         if (database != null && !database.isEmpty()) {

@@ -1,7 +1,9 @@
 package com.example.lm.Service;
 
 import com.example.lm.Dao.BorrowRepository;
+import com.example.lm.Dao.FileInfoDao;
 import com.example.lm.Model.Borrow;
+import com.example.lm.Model.FileInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -43,8 +45,8 @@ public class BorrowService {
         return borrowRepository.findByBookId(bookId);
     }
 
-    public Borrow getBorrowInfoByBookId(Integer bookId) {
-        return borrowRepository.getBorrowByBookId(bookId);
+    public Borrow getBorrowByBorrowId(Integer bookId) {
+        return borrowRepository.getBorrowByBorrowId(bookId);
     }
 
     public Borrow saveInfo(Borrow borrow) {
