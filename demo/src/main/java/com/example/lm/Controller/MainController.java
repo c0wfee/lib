@@ -18,6 +18,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -38,6 +39,7 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -305,7 +307,16 @@ public class MainController {
         FileInfo pdf = fileService.getFileById(bookId);
         pdf.setLoanLabel("Returned");
         fileService.savePDF(pdf);
-        return ResponseEntity.ok(pdf);
+        Borrow borrow = borrowService.getBorrowInfoByBookId(bookId);
+        Date now = new Date();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedStartDate = sdf.format(now);
+        borrow.setReturnedDate(formattedStartDate);
+        borrow.setStatus("Returned");
+        borrowService.saveInfo(borrow);
+
+        return ResponseEntity.ok("Successfully Return Book");
     }
 
     @PostMapping("/borrowBook")
