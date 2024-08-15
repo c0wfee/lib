@@ -225,6 +225,8 @@ public class MainController {
 
     @PostMapping("/cancelView")
     public ResponseEntity<?> cancelViewBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setView("Disable");
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setView("Disable");
@@ -235,6 +237,8 @@ public class MainController {
 
     @PostMapping("/AbleView")
     public ResponseEntity<?> ableViewBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setView("Enable");
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setView("Enable");
@@ -250,6 +254,8 @@ public class MainController {
      */
     @PostMapping("/cancelDownload")
     public ResponseEntity<?> cancelDownloadBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setDownload("Disable");
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setDownload("Disable");
@@ -260,6 +266,8 @@ public class MainController {
 
     @PostMapping("/ableDownload")
     public ResponseEntity<?> ableDownloadBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setDownload("Enable");
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setDownload("Enable");
@@ -270,6 +278,8 @@ public class MainController {
 
     @PostMapping("/cancelBorrow")
     public ResponseEntity<?> cancelBorrowBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setBorrow(0);
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setBorrowPeriod(0);
@@ -280,6 +290,8 @@ public class MainController {
 
     @PostMapping("/ableBorrow")
     public ResponseEntity<?> ableBorrowBooks(@RequestParam("folderId") int libId, @RequestParam("borrow_period") int period) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setBorrow(period);
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setBorrowPeriod(period);
