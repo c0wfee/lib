@@ -43,5 +43,11 @@ public class BorrowService {
         return borrowRepository.findByBookId(bookId);
     }
 
-    // Other service methods can be added here
+    public Borrow getBorrowInfoByBookId(Integer bookId) {
+        return borrowRepository.getBorrowByBookId(bookId);
+    }
+
+    public Borrow saveInfo(Borrow borrow) {
+        return borrowRepository.save(borrow);
+    }
 }
