@@ -168,7 +168,6 @@ public class MainController {
 
 
     @PostMapping("/rename-folder")
-    @ResponseBody
     public String renameFolder(@RequestParam("folderId") int folderId,
                                @RequestParam(value = "newName", required = false) String newName,
                                @RequestParam(value = "newAlternateNames", required = false) String newAlternateNames,
