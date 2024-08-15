@@ -558,7 +558,7 @@ public class MainController {
         return "admin/adminHome";  // 返回adminHome视图
     }
 
-    @GetMapping("/adminLogin")
+    @GetMapping("/adminadmin1admin1")
     public String adminLogin(HttpSession session, Model model) {
         return "admin/adminLogin";  // 返回adminLogin视图
     }

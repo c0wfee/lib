@@ -4,10 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改filelist.js中的Year">
+    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改bookDetail界面,增加按钮">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/user/fileList.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/user/fileList.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/user/fileList.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/user/fileList.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -83,6 +81,7 @@
     &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
     &quot;service.view.auto.scroll.to.source&quot;: &quot;true&quot;,
     &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
     &quot;spring.configuration.checksum&quot;: &quot;fe01ce2a7fbac8fafaed7c982a04e229&quot;,
@@ -167,7 +166,10 @@
       <workItem from="1723446235257" duration="888000" />
       <workItem from="1723532740074" duration="52000" />
       <workItem from="1723533493957" duration="11490000" />
-      <workItem from="1723622519100" duration="4349000" />
+      <workItem from="1723622519100" duration="6478000" />
+      <workItem from="1723635575692" duration="5815000" />
+      <workItem from="1723654253705" duration="3867000" />
+      <workItem from="1723706312007" duration="1380000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>
@@ -347,7 +349,39 @@
       <option name="project" value="LOCAL" />
       <updated>1723536149423</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="修改filelist.js中的下载 pdf">
+      <option name="closed" value="true" />
+      <created>1723626967243</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1723626967243</updated>
+    </task>
+    <task id="LOCAL-00025" summary="修改filelist.js和fileList.html">
+      <option name="closed" value="true" />
+      <created>1723643040983</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1723643040983</updated>
+    </task>
+    <task id="LOCAL-00026" summary="修改bookDetail界面">
+      <option name="closed" value="true" />
+      <created>1723643591242</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1723643591242</updated>
+    </task>
+    <task id="LOCAL-00027" summary="修改bookDetail界面,增加按钮">
+      <option name="closed" value="true" />
+      <created>1723658150997</created>
+      <option name="number" value="00027" />
+      <option name="presentableId" value="LOCAL-00027" />
+      <option name="project" value="LOCAL" />
+      <updated>1723658150997</updated>
+    </task>
+    <option name="localTasksCounter" value="28" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -376,7 +410,11 @@
     <MESSAGE value="修改userHome页面,分为两个Tab" />
     <MESSAGE value="修改filelist.js" />
     <MESSAGE value="修改filelist.js中的Year" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改filelist.js中的Year" />
+    <MESSAGE value="修改filelist.js中的下载 pdf" />
+    <MESSAGE value="修改filelist.js和fileList.html" />
+    <MESSAGE value="修改bookDetail界面" />
+    <MESSAGE value="修改bookDetail界面,增加按钮" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改bookDetail界面,增加按钮" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

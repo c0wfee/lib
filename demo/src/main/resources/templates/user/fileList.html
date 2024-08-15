@@ -36,39 +36,17 @@
                 <h2>Refine Results</h2>
                 <div class="refine-section">
                     <h3 onclick="toggleList(this)">Series</h3>
-                    <ul class="refine-list">
-                        <li>
-                            <input type="checkbox" id="series1" value="series1" onclick="applyFilter('series', this.value)">
-                            <label for="series1">Series 1</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="series2" value="series2" onclick="applyFilter('series', this.value)">
-                            <label for="series2">Series 2</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="series3" value="Others" onclick="applyFilter('series', this.value)">
-                            <label for="series3">Others</label>
-                        </li>
+                    <ul id="series-filter" class="refine-list">
+                        <!-- Series filter options will be populated here -->
                     </ul>
                 </div>
                 <div class="refine-section">
                     <h3 onclick="toggleList(this)">Publisher</h3>
-                    <ul class="refine-list">
-                        <li>
-                            <input type="checkbox" id="publisher1" value="IGI Global" onclick="applyFilter('publisher', this.value)">
-                            <label for="publisher1">IGI Global</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="publisher2" value="IGI Global (701 E. Chocolate Avenue Hershey Pennsylvania 17033 USA)" onclick="applyFilter('publisher', this.value)">
-                            <label for="publisher2">IGI Global (701 E. Chocolate Avenue Hershey Pennsylvania 17033 USA)</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="publisher3" value="Others" onclick="applyFilter('publisher', this.value)">
-                            <label for="publisher3">Others</label>
-                        </li>
+                    <ul id="publisher-filter" class="refine-list">
+                        <!-- Publisher filter options will be populated here -->
                     </ul>
                 </div>
-                <div class="refine-section">
+                <div class="refine-section" id="year-filter">
                     <h3>Year</h3>
                     <div class="refine-list">
                         <label>
@@ -77,6 +55,7 @@
                         <label>
                             <input type="radio" name="yearType" value="single" onclick="toggleYearInputs(this.value)"> Single Year
                         </label>
+                        <div id="yearRange" style="margin: 10px 0;">Year range: - </div>
                         <div id="rangeInputs">
                             <input type="number" id="publishedFrom" placeholder="Year" min="1893" max="2024" step="1">
                             <input type="number" id="publishedTo" placeholder="Year" min="1893" max="2024" step="1">
@@ -90,37 +69,9 @@
                 </div>
 
                 <div class="refine-section">
-                    <h3 onclick="toggleList(this)">Subjects</h3>
-                    <ul class="refine-list">
-                        <li>
-                            <input type="checkbox" id="subject1" value="Government information Data protection Computer networks" onclick="applyFilter('subject', this.value)">
-                            <label for="subject1">Government information Data protection Computer networks</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="subject2" value="Network performance (Telecommunication) Big data." onclick="applyFilter('subject', this.value)">
-                            <label for="subject2">Network performance (Telecommunication) Big data.</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="subject3" value="Others" onclick="applyFilter('subject', this.value)">
-                            <label for="subject3">Others</label>
-                        </li>
-                    </ul>
-                </div>
-                <div class="refine-section">
                     <h3 onclick="toggleList(this)">Databases</h3>
-                    <ul class="refine-list">
-                        <li>
-                            <input type="checkbox" id="database1" value="test" onclick="applyFilter('database', this.value)">
-                            <label for="database1">test</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="database2" value="database2" onclick="applyFilter('database', this.value)">
-                            <label for="database2">Database 2</label>
-                        </li>
-                        <li>
-                            <input type="checkbox" id="database3" value="Others" onclick="applyFilter('database', this.value)">
-                            <label for="database3">Others</label>
-                        </li>
+                    <ul id="database-filter" class="refine-list">
+                        <!-- Database filter options will be populated here -->
                     </ul>
                 </div>
             </div>
