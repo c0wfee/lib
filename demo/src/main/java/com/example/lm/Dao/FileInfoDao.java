@@ -96,11 +96,21 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
             "AND (:databaseId IS NULL OR b.resourcesId = :databaseId)")
     List<FileInfo> findPDFs(@Param("databaseId") Integer databaseId);
 
+    @Query("SELECT DISTINCT b FROM FileInfo b WHERE b.epubPath IS NOT NULL " +
+            "AND b.epubPath <> '' " +
+            "AND (:databaseId IS NULL OR b.resourcesId = :databaseId)")
+    List<FileInfo> findEpubs(@Param("databaseId") Integer databaseId);
+
 
     @Modifying
     @Transactional
     @Query("UPDATE FileInfo b SET b.downloadLink = NULL WHERE b.downloadLink = :pdfID")
     void updateDownloadLinkToNull(String pdfID);
+
+    @Modifying
+    @Transactional
+    @Query("UPDATE FileInfo b SET b.epubPath = NULL WHERE b.epubPath = :pdfID")
+    void updateEpubPathToNull(String pdfID);
 
     @Query("SELECT f FROM FileInfo f WHERE " +
             "(:title IS NULL OR f.title LIKE %:title%) " +

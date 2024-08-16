@@ -6,6 +6,7 @@ import com.example.lm.Model.ResourcesLib;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,6 +74,15 @@ public class ResourcesLibService {
     public Map<Integer, ResourcesLib> findResourcesLibByIds(Set<Integer> ids) {
         List<ResourcesLib> resourcesLibs = resourcesLibDao.findByIdIn(ids);
         return resourcesLibs.stream().collect(Collectors.toMap(ResourcesLib::getId, Function.identity()));
+    }
+
+    public Map<Integer, String> getAllDatabaseIdsAndNames() {
+        List<ResourcesLib> databases = resourcesLibDao.findAll();
+        Map<Integer, String> idNameMap = new HashMap<>();
+        for (ResourcesLib database : databases) {
+            idNameMap.put(database.getId(), database.getName());
+        }
+        return idNameMap;
     }
 
     public void updateFolderDetails(int folderId, String newName, String newAlternateNames, String newType, String newDescription) {

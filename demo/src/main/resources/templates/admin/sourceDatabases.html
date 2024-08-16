@@ -82,7 +82,11 @@
                 <td>
                     <a th:href="@{/listPDFs(databaseId=${folder.id})}" th:text="${folder.pdfCount}">PDF Count</a>
                 </td>
-                <td th:text="${folder.epubCount}">EPUB Count</td>
+<!--                <td th:text="${folder.epubCount}">EPUB Count</td>-->
+                <td>
+                    <a th:href="@{/listEpubs(databaseId=${folder.id})}" th:text="${folder.epubCount}">EPUB Count</a>
+                </td>
+
                 <td><a class="btn btn-sm btn-primary" data-toggle="modal" data-target="#renameFolderModal"
                        th:data-id="${folder.id}" th:data-name="${folder.name}"
                        th:data-alternate-names="${folder.alternateName}"

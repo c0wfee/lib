@@ -7,18 +7,13 @@ import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
 import java.net.URLEncoder;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -55,11 +50,15 @@ public class ListBookController {
         String isbn = null;
         String alternativeTitle = null;
         String author = null;
-        List<FileInfo> fileInfos;
+        List<FileInfo> fileInfos = new ArrayList<>();
         if ("allkinds".equalsIgnoreCase(searchType) && searchValue != null) {
             fileInfos = fileService.findByAllKinds(searchValue, searchValue, searchValue, searchValue, status, publisher, sourceType, language, published, databaseId);
 //            System.out.println(fileInfos);
-        } else {
+        }  else if ("id".equals(searchType)) {
+            FileInfo  file= fileService.getFileById(Integer.parseInt(searchValue));
+            fileInfos.add(file);
+        }
+        else {
             if ("title".equals(searchType)) {
                 title = searchValue;
             } else if ("isbn".equals(searchType)) {
@@ -204,17 +203,17 @@ public class ListBookController {
         return redirectUrl;
     }
 
-    @PutMapping("/updateStatus/{id}")
-    public ResponseEntity<String> updateStatus(@PathVariable int id, @RequestParam String newStatus) {
-        fileService.updateStatus(id, newStatus);
-        return ResponseEntity.ok("Status updated successfully");
-    }
-
-    @PutMapping("/updateLoan/{id}")
-    public ResponseEntity<String> updateLoan(@PathVariable int id, @RequestParam String newLoan) {
-        fileService.updateLoan(id, newLoan);
-        return ResponseEntity.ok("Loan updated successfully");
-    }
+//    @PutMapping("/updateStatus/{id}")
+//    public ResponseEntity<String> updateStatus(@PathVariable int id, @RequestParam String newStatus) {
+//        fileService.updateStatus(id, newStatus);
+//        return ResponseEntity.ok("Status updated successfully");
+//    }
+//
+//    @PutMapping("/updateLoan/{id}")
+//    public ResponseEntity<String> updateLoan(@PathVariable int id, @RequestParam String newLoan) {
+//        fileService.updateLoan(id, newLoan);
+//        return ResponseEntity.ok("Loan updated successfully");
+//    }
 
     @PostMapping("test/updateField")
     @ResponseBody
@@ -243,51 +242,102 @@ public class ListBookController {
         }
     }
 
-    @GetMapping("/downloadFromList/{bookId}")
-    public ResponseEntity<Resource> downloadFile2(@PathVariable int bookId) {
-        FileInfo f = fileService.getBookById(bookId);
-
-        // Use regex to split by spaces and parentheses, removing non-digit parts
-        String[] parts = f.getIsbn().replaceAll("[^\\d\\s]", "").split("\\s+");
-
-        List<String> resultList = new ArrayList<>(Arrays.asList(parts));
-        for (String part : parts) {
-            resultList.add(part + ".pdf");
-        }
-
-        for (String fileName : resultList) {
-            if (pdfRepository.existsByName(fileName)) {
-                System.out.println("Downloading file with name: " + fileName);
-                try {
-                    Path filePath = Paths.get(PDFUploadPath).resolve(fileName).normalize();
-                    Resource resource = new UrlResource(filePath.toUri());
-
-                    if (resource.exists()) {
-                        return ResponseEntity.ok()
-                                .contentType(MediaType.APPLICATION_PDF)
-                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-                                .body(resource);
-                    } else {
-                        return ResponseEntity.notFound().build();
-                    }
-                } catch (MalformedURLException ex) {
-                    return ResponseEntity.badRequest().build();
-                }
-            }
-        }
-
-        return ResponseEntity.notFound().build();
-    }
+//    @GetMapping("/downloadFromList/{bookId}")
+//    public ResponseEntity<Resource> downloadFile2(@PathVariable int bookId) {
+//        FileInfo f = fileService.getBookById(bookId);
+//
+//        // Use regex to split by spaces and parentheses, removing non-digit parts
+//        String[] parts = f.getIsbn().replaceAll("[^\\d\\s]", "").split("\\s+");
+//
+//        List<String> resultList = new ArrayList<>(Arrays.asList(parts));
+//        for (String part : parts) {
+//            resultList.add(part + ".pdf");
+//        }
+//
+//        for (String fileName : resultList) {
+//            if (pdfRepository.existsByName(fileName)) {
+//                System.out.println("Downloading file with name: " + fileName);
+//                try {
+//                    Path filePath = Paths.get(PDFUploadPath).resolve(fileName).normalize();
+//                    Resource resource = new UrlResource(filePath.toUri());
+//
+//                    if (resource.exists()) {
+//                        return ResponseEntity.ok()
+//                                .contentType(MediaType.APPLICATION_PDF)
+//                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
+//                                .body(resource);
+//                    } else {
+//                        return ResponseEntity.notFound().build();
+//                    }
+//                } catch (MalformedURLException ex) {
+//                    return ResponseEntity.badRequest().build();
+//                }
+//            }
+//        }
+//
+//        return ResponseEntity.notFound().build();
+//    }
 
     @GetMapping("/listPDFs")
-    public String getDistinctDownloadLinkBooks(@RequestParam Integer databaseId, Model model) {
+    public String getDistinctDownloadLinkBooks(@RequestParam Integer databaseId,
+                                               @RequestParam(required = false) String searchValue,
+                                               @RequestParam(required = false) String searchType,
+                                               Model model) {
+        // 获取所有 PDF 文件
         List<FileInfo> pdfList = fileService.getListPDFs(databaseId);
-        Map<String, List<FileInfo>> groupedByDownloadLink = pdfList.stream()
+
+        // 获取所有 PDF 的名称，通过 downloadLink 关联
+        List<String> downloadLinks = pdfList.stream()
+                .map(FileInfo::getDownloadLink)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<String, String> pdfNames = fileService.getPdfNamesByLinks(downloadLinks);
+
+        // 根据 searchType 和 searchValue 进行过滤
+        List<FileInfo> filteredPdfList;
+        if ("all".equalsIgnoreCase(searchType)) {
+            // 如果 searchType 为 "all"，在 name、title 和 isbn 中搜索 searchValue
+            filteredPdfList = pdfList.stream()
+                    .filter(fileInfo ->
+                            (searchValue == null ||
+                                    pdfNames.getOrDefault(fileInfo.getDownloadLink(), "").contains(searchValue) ||
+                                    fileInfo.getTitle().contains(searchValue) ||
+                                    fileInfo.getIsbn().contains(searchValue)))
+                    .collect(Collectors.toList());
+        } else if ("name".equalsIgnoreCase(searchType)) {
+            filteredPdfList = pdfList.stream()
+                    .filter(fileInfo -> searchValue == null ||
+                            pdfNames.getOrDefault(fileInfo.getDownloadLink(), "").contains(searchValue))
+                    .collect(Collectors.toList());
+        } else if ("title".equalsIgnoreCase(searchType)) {
+            filteredPdfList = pdfList.stream()
+                    .filter(fileInfo -> searchValue == null || fileInfo.getTitle().contains(searchValue))
+                    .collect(Collectors.toList());
+        } else if ("isbn".equalsIgnoreCase(searchType)) {
+            filteredPdfList = pdfList.stream()
+                    .filter(fileInfo -> searchValue == null || fileInfo.getIsbn().contains(searchValue))
+                    .collect(Collectors.toList());
+        } else {
+            filteredPdfList = pdfList;
+        }
+
+        // 按照 downloadLink 分组
+        Map<String, List<FileInfo>> groupedByDownloadLink = filteredPdfList.stream()
                 .collect(Collectors.groupingBy(FileInfo::getDownloadLink));
+
+        Set<Integer> uniqueNoTitles = groupedByDownloadLink.values().stream()
+                .map(List::size)
+                .collect(Collectors.toSet());
+        Map<Integer, String> allDatabase = resourcesLibService.getAllDatabaseIdsAndNames();
+
         model.addAttribute("pdfs", groupedByDownloadLink);
+        model.addAttribute("pdfNames", pdfNames);
         model.addAttribute("database", databaseId);
-        //System.out.println(groupedByDownloadLink.get("135").size());
-        return "pdfList";
+        model.addAttribute("uniqueNoTitles", uniqueNoTitles);
+        model.addAttribute("databaseName", resourcesLibService.findResourcesLibById(databaseId).getName());
+        model.addAttribute("allDatabase", allDatabase);
+
+        return "admin/pdfList";
     }
 
     @PostMapping("/deletePdf/{pdfID}")
@@ -303,30 +353,106 @@ public class ListBookController {
         return String.format("redirect:/listPDFs?databaseId=%s",databaseId);
     }
 
-//    @GetMapping("/listEpubs")
-//    public String getDistinctEpubBooks(@RequestParam Integer databaseId, Model model) {
-//        List<FileInfo> pdfList = fileService.getListEpubs(databaseId);
-//        Map<String, List<FileInfo>> groupedByDownloadLink = pdfList.stream()
-//                .collect(Collectors.groupingBy(FileInfo::getDownloadLink));
-//        model.addAttribute("epubs", groupedByDownloadLink);
-//        model.addAttribute("database", databaseId);
-//        //System.out.println(groupedByDownloadLink.get("135").size());
-//        return "pdfList";
-//    }
+    @PostMapping("deleteList2/{fileID}")
+    public String deleteFile2(@PathVariable("fileID") int fileID,
+                             @RequestParam Integer databaseId
+                             ) {
+        fileService.deleteBook(fileID);
+        return String.format("redirect:/listPDFs?databaseId=%s",databaseId);
+    }
+
+//    @PostMapping("/update")
+//    public String updateBook2(@ModelAttribute FileInfo fileInfo,
+//                              @RequestParam(required = false) String searchValue,
+//                              @RequestParam(required = false) String searchType) {
+//        fileService.updateBook(fileInfo);
 //
-//    @PostMapping("/deletePdf/{pdfID}")
-//    public String deleteEpub(@PathVariable String pdfID, @RequestParam Integer databaseId, Model model) {
-//        boolean isDeleted = fileService.deletePdfById(pdfID,databaseId);
-//        if (isDeleted) {
-//            model.addAttribute("message", "PDF deleted successfully.");
-//        } else {
-//            model.addAttribute("message", "Failed to delete PDF.");
-//        }
-//        // Optionally, add logic to refresh the list of PDFs or redirect to another page
-//
-//        return String.format("redirect:/listPDFs?databaseId=%s",databaseId);
+//        Integer databaseId = fileInfo.getResourcesId();
+//        return String.format("redirect:/listPDFs?databaseId=%s&sourceType=%s&sourceValue=%s",databaseId,searchType,searchValue);
 //    }
 
+    @GetMapping("/listEpubs")
+    public String getDistinctEpubs(@RequestParam Integer databaseId,
+                                               @RequestParam(required = false) String searchValue,
+                                               @RequestParam(required = false) String searchType,
+                                               Model model) {
+        // 获取所有 PDF 文件
+        List<FileInfo> pdfList = fileService.getListEpubs(databaseId);
+
+        // 获取所有 PDF 的名称，通过 downloadLink 关联
+        List<String> path = pdfList.stream()
+                .map(FileInfo::getEpubPath)
+                .distinct()
+                .collect(Collectors.toList());
+        Map<String, String> epubNames = fileService.getPdfNamesByLinks(path);
+
+        // 根据 searchType 和 searchValue 进行过滤
+        List<FileInfo> filteredPdfList;
+        if ("all".equalsIgnoreCase(searchType)) {
+            // 如果 searchType 为 "all"，在 name、title 和 isbn 中搜索 searchValue
+            filteredPdfList = pdfList.stream()
+                    .filter(fileInfo ->
+                            (searchValue == null ||
+                                    epubNames.getOrDefault(fileInfo.getEpubPath(), "").contains(searchValue) ||
+                                    fileInfo.getTitle().contains(searchValue) ||
+                                    fileInfo.getIsbn().contains(searchValue)))
+                    .collect(Collectors.toList());
+        } else if ("name".equalsIgnoreCase(searchType)) {
+            filteredPdfList = pdfList.stream()
+                    .filter(fileInfo -> searchValue == null ||
+                            epubNames.getOrDefault(fileInfo.getEpubPath(), "").contains(searchValue))
+                    .collect(Collectors.toList());
+        } else if ("title".equalsIgnoreCase(searchType)) {
+            filteredPdfList = pdfList.stream()
+                    .filter(fileInfo -> searchValue == null || fileInfo.getTitle().contains(searchValue))
+                    .collect(Collectors.toList());
+        } else if ("isbn".equalsIgnoreCase(searchType)) {
+            filteredPdfList = pdfList.stream()
+                    .filter(fileInfo -> searchValue == null || fileInfo.getIsbn().contains(searchValue))
+                    .collect(Collectors.toList());
+        } else {
+            filteredPdfList = pdfList;
+        }
+
+        // 按照 downloadLink 分组
+        Map<String, List<FileInfo>> groupedByepubPath = filteredPdfList.stream()
+                .collect(Collectors.groupingBy(FileInfo::getEpubPath));
+
+        Set<Integer> uniqueNoTitles = groupedByepubPath.values().stream()
+                .map(List::size)
+                .collect(Collectors.toSet());
+        Map<Integer, String> allDatabase = resourcesLibService.getAllDatabaseIdsAndNames();
+
+        model.addAttribute("pdfs", groupedByepubPath);
+        model.addAttribute("pdfNames", epubNames);
+        model.addAttribute("database", databaseId);
+        model.addAttribute("uniqueNoTitles", uniqueNoTitles);
+        model.addAttribute("databaseName", resourcesLibService.findResourcesLibById(databaseId).getName());
+        model.addAttribute("allDatabase", allDatabase);
+
+        return "admin/epubList";
+    }
+
+    @PostMapping("/deleteEpub/{pdfID}")
+    public String deleteEpub(@PathVariable String pdfID, @RequestParam Integer databaseId, Model model) {
+        boolean isDeleted = fileService.deleteEpubById(pdfID,databaseId);
+        if (isDeleted) {
+            model.addAttribute("message", "PDF deleted successfully.");
+        } else {
+            model.addAttribute("message", "Failed to delete PDF.");
+        }
+        // Optionally, add logic to refresh the list of PDFs or redirect to another page
+
+        return String.format("redirect:/listEpubs?databaseId=%s",databaseId);
+    }
+
+    @PostMapping("deleteList3/{fileID}")
+    public String deleteFile3(@PathVariable("fileID") int fileID,
+                              @RequestParam Integer databaseId
+    ) {
+        fileService.deleteBook(fileID);
+        return String.format("redirect:/listEpubs?databaseId=%s",databaseId);
+    }
     @GetMapping("/files-view")
     public String fileList() {
         return "user/fileList";  // 这里返回的是视图名称，不包括.html扩展名

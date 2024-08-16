@@ -48,6 +48,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 public class FileService {
@@ -133,7 +134,7 @@ public class FileService {
             }
 
             if (fileInfoDao.findByResourcesIdAndIsbnContaining(folderId, EPUBName).size() > 0) {
-                String uploadPDFPath = EPUBUploadPath;
+                String uploadPDFPath = EPUBUploadPath + folderId;
                 System.out.println(uploadPDFPath);
                 java.io.File uploadFile = new java.io.File(uploadPDFPath);
                 if (!uploadFile.exists()) {
@@ -335,7 +336,7 @@ public class FileService {
 
     public List<FileInfo> getListPDFs(Integer databaseId) {return fileInfoDao.findPDFs(databaseId);}
 
-
+    public List<FileInfo> getListEpubs(Integer databaseId) {return fileInfoDao.findEpubs(databaseId);}
     public Page<FileInfo> keywordSearch(String keyword, Pageable pageable) {
         String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
         String jpql = "SELECT f FROM FileInfo f WHERE f.title LIKE :keyword";
@@ -799,4 +800,39 @@ public class FileService {
         }
         return false;
     }
+
+    @Transactional
+    public boolean deleteEpubById(String pdfID, Integer databaseId) {
+        Optional<PDFs> fileOptional = pdfDao.findById(Integer.valueOf(pdfID));
+        if (fileOptional.isPresent()) {
+            PDFs pdf = fileOptional.get();
+            String fileName = pdf.getName();
+            pdfDao.delete(pdf);
+            // 更新 book 表中相应的 downloadLink 字段为空
+            fileInfoDao.updateEpubPathToNull(pdfID);
+
+            // 删除文件系统中的文件
+            try {
+                Path filePath = Paths.get(EPUBUploadPath+ databaseId +"/" + fileName);
+                Files.deleteIfExists(filePath);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public Map<String, String> getPdfNamesByLinks(List<String> links) {
+        List<Integer> ids = links.stream().map(Integer::parseInt).collect(Collectors.toList());
+        List<PDFs> pdfList = pdfDao.findByIdIn(ids);
+        return pdfList.stream().collect(Collectors.toMap(pdf -> String.valueOf(pdf.getId()), PDFs::getName));
+    }
+
+//    public Map<String, String> getepubNamesByLinks(List<String> links) {
+//        List<Integer> ids = links.stream().map(Integer::parseInt).collect(Collectors.toList());
+//        List<PDFs> pdfList = pdfDao.findByIdIn(ids);
+//        return pdfList.stream().collect(Collectors.toMap(pdf -> String.valueOf(pdf.getId()), PDFs::getName));
+//    }
 }

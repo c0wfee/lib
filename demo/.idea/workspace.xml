@@ -5,7 +5,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="整理代码结构">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/BorrowViewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/BorrowViewController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources.local.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/dataSources.local.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/dataSources/5656e9b0-aadb-413e-923d-60d1e8b6b7d1.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/demo.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Controller/ListBookController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/FileInfoDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/FileInfoDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/PDFDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Dao/PDFDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/FileService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/ResourcesLibService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/example/lm/Service/ResourcesLibService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/pdfList.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/pdfList.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/sourceDatabases.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/sourceDatabases.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,6 +33,11 @@
     </option>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
@@ -42,8 +58,6 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
-        <option name="customMavenHome" value="D:\Development\Maven\apache-maven-3.9.8" />
-        <option name="mavenHomeTypeForPersistence" value="CUSTOM" />
         <option name="userSettingsFile" value="D:\Development\Maven\apache-maven-3.9.8\conf\settings.xml" />
       </MavenGeneralSettings>
     </option>
@@ -57,43 +71,44 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;DefaultHtmlFileTemplate&quot;: &quot;HTML File&quot;,
-    &quot;Maven.LM [compile].executor&quot;: &quot;Run&quot;,
-    &quot;Maven.LM [install].executor&quot;: &quot;Run&quot;,
-    &quot;RequestMappingsPanelOrder0&quot;: &quot;0&quot;,
-    &quot;RequestMappingsPanelOrder1&quot;: &quot;1&quot;,
-    &quot;RequestMappingsPanelWidth0&quot;: &quot;75&quot;,
-    &quot;RequestMappingsPanelWidth1&quot;: &quot;75&quot;,
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;Spring Boot.LmApplication.executor&quot;: &quot;Run&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;gly&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/1Research/lib/lib/demo/src/main/resources/static/images&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
-    &quot;service.view.auto.scroll.to.source&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
-    &quot;spring.configuration.checksum&quot;: &quot;fe01ce2a7fbac8fafaed7c982a04e229&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "DefaultHtmlFileTemplate": "HTML File",
+    "Maven.LM [compile].executor": "Run",
+    "Maven.LM [install].executor": "Run",
+    "RequestMappingsPanelOrder0": "0",
+    "RequestMappingsPanelOrder1": "1",
+    "RequestMappingsPanelWidth0": "75",
+    "RequestMappingsPanelWidth1": "75",
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "Spring Boot.LmApplication.executor": "Run",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "gly",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/code/git/new/lib/demo/src/main/resources/templates/admin",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
+    "service.view.auto.scroll.to.source": "true",
+    "settings.editor.selected.configurable": "MavenSettings",
+    "spring.configuration.checksum": "fe01ce2a7fbac8fafaed7c982a04e229",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\code\git\new\lib\demo\src\main\resources\templates\admin" />
       <recent name="D:\1Research\lib\lib\demo\src\main\resources\static\images" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
@@ -107,10 +122,17 @@
       </set>
     </option>
   </component>
-  <component name="RunManager" selected="Spring Boot.LmApplication">
+  <component name="RunManager" selected="Spring Boot.LmApplication (1)">
     <configuration name="DemoApplication" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
       <module name="demo" />
       <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.demo.DemoApplication" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="LmApplication (1)" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <module name="demo" />
+      <option name="SPRING_BOOT_MAIN_CLASS" value="com.example.lm.LmApplication" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>

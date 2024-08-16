@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-  <title>PDFs</title>
+  <title>EPUBs</title>
   <!-- 引入Bootstrap CSS -->
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <style>
@@ -10,12 +10,12 @@
 </head>
 <body>
 <div class="container mt-5">
-  <h1 class="mb-4">PDF List</h1>
+  <h1 class="mb-4">EPUB List</h1>
   <a href="/adminHome" class="btn btn-secondary mb-3">Back to Home</a>
   <a href="/resourcesLib" class="btn btn-secondary mb-3">Back to Source Databases</a>
 
   <!-- 筛选器和搜索框 -->
-  <form id="searchForm" method="get" action="/listPDFs">
+  <form id="searchForm" method="get" action="/listEpubs">
     <input type="hidden" name="databaseId" th:value="${database}">
 
     <div class="form-group">
@@ -52,19 +52,19 @@
     <button type="submit" class="btn btn-primary">Search</button>
   </form>
 
-  <div id="pdfList">
+  <div id="epubList">
     <div th:each="entry : ${pdfs}">
       <div class="card mb-4">
         <div class="card-header">
           <h2 class="h5 d-inline">
-            PDF id: <span th:text="${entry.key}"></span>
+            EPUB id: <span th:text="${entry.key}"></span>
             name: <span th:text="${pdfNames[entry.key]}"></span>
             No. title: <span class="no-title" th:text="${#lists.size(entry.value)}"></span>
           </h2>
           <div class="float-right">
-            <a th:href="@{/downloadfiles/{bookId}(bookId=${entry.value[0].id})}" class="btn btn-primary btn-sm">View online</a>
-            <a th:href="@{/downloadpdfs/{bookId}(bookId=${entry.value[0].id}, format='pdf')}" class="btn btn-success btn-sm">Download</a>
-            <form th:action="@{/deletePdf/{pdfID}(pdfID=${entry.key})}" method="post" style="display:inline;">
+            <a th:href="@{/viewEpub/{bookId}(bookId=${entry.value[0].id})}" class="btn btn-primary btn-sm">View online</a>
+            <a th:href="@{/downloadpdfs/{bookId}(bookId=${entry.value[0].id}, format='epub')}" class="btn btn-success btn-sm">Download</a>
+            <form th:action="@{/deleteEpub/{pdfID}(pdfID=${entry.key})}" method="post" style="display:inline;">
               <input type="hidden" name="databaseId" th:value="${database}">
               <button type="submit" class="btn btn-danger btn-sm">Delete</button>
             </form>
@@ -86,10 +86,6 @@
               <td th:text="${file.title}"></td>
               <td th:text="${file.isbn}"></td>
               <td th:text="${databaseName}"></td>
-              <!--              <td>-->
-              <!--                <a th:href="@{/test/search2?searchType=id&searchValue=${entry.value[0].id}}"-->
-              <!--                   class="btn btn-info btn-sm">View information</a>-->
-              <!--              </td>-->
               <td>
                 <form th:action="@{/test/search2}" method="get" style="display:inline;">
                   <input type="hidden" name="searchType" th:value="id">
@@ -98,7 +94,7 @@
                 </form>
               </td>
               <td>
-                <form th:action="@{/deleteList2/{bookId}(bookId=${entry.value[0].id})}" method="post" style="display:inline;">
+                <form th:action="@{/deleteList3/{fileID}(fileID=${entry.value[0].id})}" method="post" style="display:inline;">
                   <input type="hidden" name="databaseId" th:value="${database}">
                   <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
@@ -119,13 +115,13 @@
   function filterByDatabase() {
     var databaseId = document.getElementById('databaseSelect').value;
     if (databaseId) {
-      window.location.href = '/listPDFs?databaseId=' + databaseId;
+      window.location.href = '/listEpubs?databaseId=' + databaseId;
     }
   }
 
   function filterByNoTitle() {
     var filterValue = document.getElementById('filterNoTitle').value;
-    var cards = document.querySelectorAll('#pdfList .card');
+    var cards = document.querySelectorAll('#epubList .card');
 
     cards.forEach(function(card) {
       var noTitle = card.querySelector('.no-title').innerText;
