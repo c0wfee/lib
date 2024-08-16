@@ -1,12 +1,10 @@
 package com.example.lm.Service;
 
-import com.example.lm.Dao.BorrowRepository;
-import com.example.lm.Dao.FileDao;
-import com.example.lm.Dao.FileInfoDao;
-import com.example.lm.Dao.PDFDao;
+import com.example.lm.Dao.*;
 import com.example.lm.Model.File;
 import com.example.lm.Model.FileInfo;
 import com.example.lm.Model.PDFs;
+import com.example.lm.Model.ResourcesLib;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -63,6 +61,9 @@ public class FileService {
 
     @Autowired
     private GridFSBucket gridFSBucket;
+
+    @Autowired
+    private ResourcesLibDao resourcesLibDao;
 
     @Autowired
     private PDFDao pdfDao;
@@ -253,6 +254,10 @@ public class FileService {
                 fileInfo.setDescription(getFieldData(record, "520", 'a'));
                 fileInfo.setChapters(getFieldData(record, "505", 'a'));
                 fileInfo.setResourcesId(folderId);
+
+                ResourcesLib rl = resourcesLibDao.findResourcesLibById(folderId);
+                fileInfo.setDatabaseName(rl.getName());
+
                 fileInfo.setStatus(status);
                 fileInfo.setView(view);
                 fileInfo.setDownload(download);
@@ -665,6 +670,11 @@ public class FileService {
                             bookMetadata.setDownload(download);
                             bookMetadata.setBorrowPeriod(borrow_period);
                             bookMetadata.setResourcesId(folderId);
+
+
+                            ResourcesLib rl = resourcesLibDao.findResourcesLibById(folderId);
+                            bookMetadata.setDatabaseName(rl.getName());
+
 
                             String cellValue = null;
                             if (cell.getCellType() == CellType.NUMERIC) {
