@@ -52,4 +52,9 @@ public class BorrowService {
     public Borrow saveInfo(Borrow borrow) {
         return borrowRepository.save(borrow);
     }
+
+    public String getLoanEndTime(int bookID) {
+        Borrow borrowInfo = borrowRepository.getLoanEndTime(bookID);
+        return borrowInfo.getLoanEndTime();
+    }
 }

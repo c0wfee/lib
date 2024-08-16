@@ -262,6 +262,7 @@ public class FileService {
                 fileInfo.setView(view);
                 fileInfo.setDownload(download);
                 fileInfo.setBorrowPeriod(borrow_period);
+                fileInfo.setLoanLabel("Returned");
                 fileInfoDao.save(fileInfo);
             }
         } catch (Exception e) {
@@ -671,7 +672,7 @@ public class FileService {
                             bookMetadata.setBorrowPeriod(borrow_period);
                             bookMetadata.setResourcesId(folderId);
 
-
+                            bookMetadata.setLoanLabel("Returned");
                             ResourcesLib rl = resourcesLibDao.findResourcesLibById(folderId);
                             bookMetadata.setDatabaseName(rl.getName());
 
