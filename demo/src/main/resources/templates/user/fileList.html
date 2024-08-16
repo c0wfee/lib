@@ -46,27 +46,29 @@
                         <!-- Publisher filter options will be populated here -->
                     </ul>
                 </div>
-                <div class="refine-section" id="year-filter">
-                    <h3>Year</h3>
-                    <div class="refine-list">
-                        <label>
-                            <input type="radio" name="yearType" value="range" checked onclick="toggleYearInputs(this.value)"> Range
-                        </label>
-                        <label>
-                            <input type="radio" name="yearType" value="single" onclick="toggleYearInputs(this.value)"> Single Year
-                        </label>
-                        <div id="yearRange" style="margin: 10px 0;">Year range: - </div>
-                        <div id="rangeInputs">
-                            <input type="number" id="publishedFrom" placeholder="Year" min="1893" max="2024" step="1">
-                            <input type="number" id="publishedTo" placeholder="Year" min="1893" max="2024" step="1">
+
+                <div class="refine-section">
+                    <h3 onclick="toggleList(this)">Year</h3>
+                    <div id="year-filter" class="refine-list">
+                        <div>
+                            <label><input type="radio" name="yearOption" value="single" checked onclick="toggleYearInputs('single')"> Single Year</label>
+                            <label><input type="radio" name="yearOption" value="range" onclick="toggleYearInputs('range')"> Year Range</label>
                         </div>
-                        <div id="singleInput" style="display: none;">
-                            <input type="number" id="publishedYear" placeholder="Year" min="1893" max="2024" step="1">
+                        <div id="singleInput">
+                            <input type="number" id="publishedYear" placeholder="Enter year">
                         </div>
-                        <button onclick="applyPublishedFilter()">Apply</button>
-                        <button onclick="clearPublishedFilter()">Clear</button>
+                        <div id="rangeInputs" style="display: none;">
+                            <input type="number" id="publishedFrom" placeholder="From">
+                            <input type="number" id="publishedTo" placeholder="To">
+                        </div>
+                        <div>
+                            <button onclick="applyPublishedFilter()">Apply</button>
+                            <button onclick="clearPublishedFilter()">Clear</button>
+                        </div>
+                        <p id="yearRange">Year range: Loading...</p>
                     </div>
                 </div>
+
 
                 <div class="refine-section">
                     <h3 onclick="toggleList(this)">Databases</h3>

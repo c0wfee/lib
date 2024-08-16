@@ -95,7 +95,7 @@ function executeSearch() {
 
 // 应用年份筛选条件
 function applyPublishedFilter() {
-    const yearType = document.querySelector('input[name="yearType"]:checked').value;
+    const yearType = document.querySelector('input[name="yearOption"]:checked').value;
     if (yearType === 'range') {
         const fromYear = document.getElementById('publishedFrom').value || document.getElementById('publishedFrom').placeholder;
         const toYear = document.getElementById('publishedTo').value || document.getElementById('publishedTo').placeholder;
@@ -109,7 +109,8 @@ function applyPublishedFilter() {
     searchFiles(currentPage, pageSize);
 }
 
-
+// 绑定函数到全局对象
+window.applyPublishedFilter = applyPublishedFilter;
 
 // 清除年份筛选条件
 function clearPublishedFilter() {
@@ -122,6 +123,10 @@ function clearPublishedFilter() {
 
     searchFiles(currentPage, pageSize);
 }
+
+
+// 绑定函数到全局对象
+window.clearPublishedFilter = clearPublishedFilter;
 
 // 应用筛选条件并更新filters对象
 function applyFilter(filterType, value) {
@@ -324,6 +329,7 @@ function removeFilter(filterType) {
 }
 
 // 切换年份输入框的显示
+
 function toggleYearInputs(yearType) {
     const rangeInputs = document.getElementById('rangeInputs');
     const singleInput = document.getElementById('singleInput');
@@ -336,6 +342,10 @@ function toggleYearInputs(yearType) {
         singleInput.style.display = 'block';
     }
 }
+
+
+// 绑定函数到全局对象
+window.toggleYearInputs = toggleYearInputs;
 
 function viewPDF(id, view) {
     if (view == null) {
