@@ -6,26 +6,22 @@ import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
 
 import com.example.lm.utils.FilterData;
-import com.example.lm.utils.SearchResult;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -35,7 +31,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -302,11 +297,8 @@ public class MainController {
     }
 
     @PostMapping("/returnBook")
-    public ResponseEntity<?> returnBook(@RequestParam("bookId") int bookId) {
-        FileInfo pdf = fileService.getFileById(bookId);
-        pdf.setLoanLabel("Returned");
-        fileService.savePDF(pdf);
-        Borrow borrow = borrowService.getBorrowInfoByBookId(bookId);
+    public ResponseEntity<?> returnBook(@RequestParam("borrow_id") int borrow_id) {
+        Borrow borrow = borrowService.getBorrowByBorrowId(borrow_id);
         Date now = new Date();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -315,6 +307,9 @@ public class MainController {
         borrow.setStatus("Returned");
         borrowService.saveInfo(borrow);
 
+        FileInfo pdf = fileService.getFileById(borrow.getBookId());
+        pdf.setLoanLabel("Returned");
+        fileService.savePDF(pdf);
         return ResponseEntity.ok("Successfully Return Book");
     }
 
@@ -527,7 +522,7 @@ public class MainController {
                 String possiblePath = fileInfo.getResourcesId() + "/" + isbn + ".pdf";
                 Path filePath = Paths.get(directory).resolve(possiblePath).normalize();
                 java.io.File file = filePath.toFile();
-                System.out.println(filePath);
+                System.out.println(file.getAbsoluteFile());
 
                 if (file.exists() && file.canRead()) {
                     return new InputStreamResource(new FileInputStream(file));
