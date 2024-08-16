@@ -6,12 +6,10 @@ import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
 
 import com.example.lm.utils.FilterData;
-import com.example.lm.utils.SearchResult;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -24,7 +22,6 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -34,10 +31,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -166,7 +163,6 @@ public class MainController {
 
 
     @PostMapping("/rename-folder")
-    @ResponseBody
     public String renameFolder(@RequestParam("folderId") int folderId,
                                @RequestParam(value = "newName", required = false) String newName,
                                @RequestParam(value = "newAlternateNames", required = false) String newAlternateNames,
@@ -225,6 +221,8 @@ public class MainController {
 
     @PostMapping("/cancelView")
     public ResponseEntity<?> cancelViewBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setView("Disable");
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setView("Disable");
@@ -235,6 +233,8 @@ public class MainController {
 
     @PostMapping("/AbleView")
     public ResponseEntity<?> ableViewBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setView("Enable");
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setView("Enable");
@@ -250,6 +250,8 @@ public class MainController {
      */
     @PostMapping("/cancelDownload")
     public ResponseEntity<?> cancelDownloadBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setDownload("Disable");
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setDownload("Disable");
@@ -260,6 +262,8 @@ public class MainController {
 
     @PostMapping("/ableDownload")
     public ResponseEntity<?> ableDownloadBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setDownload("Enable");
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setDownload("Enable");
@@ -270,6 +274,8 @@ public class MainController {
 
     @PostMapping("/cancelBorrow")
     public ResponseEntity<?> cancelBorrowBooks(@RequestParam("folderId") int libId) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setBorrow(0);
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setBorrowPeriod(0);
@@ -280,6 +286,8 @@ public class MainController {
 
     @PostMapping("/ableBorrow")
     public ResponseEntity<?> ableBorrowBooks(@RequestParam("folderId") int libId, @RequestParam("borrow_period") int period) {
+        ResourcesLib rl = resourcesLibService.findResourcesLibById(libId);
+        rl.setBorrow(period);
         List<FileInfo> list = fileService.getMarcDetailByID(libId);
         for (FileInfo pdf : list) {
             pdf.setBorrowPeriod(period);
@@ -289,11 +297,20 @@ public class MainController {
     }
 
     @PostMapping("/returnBook")
-    public ResponseEntity<?> returnBook(@RequestParam("bookId") int bookId) {
-        FileInfo pdf = fileService.getFileById(bookId);
+    public ResponseEntity<?> returnBook(@RequestParam("borrow_id") int borrow_id) {
+        Borrow borrow = borrowService.getBorrowByBorrowId(borrow_id);
+        Date now = new Date();
+
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        String formattedStartDate = sdf.format(now);
+        borrow.setReturnedDate(formattedStartDate);
+        borrow.setStatus("Returned");
+        borrowService.saveInfo(borrow);
+
+        FileInfo pdf = fileService.getFileById(borrow.getBookId());
         pdf.setLoanLabel("Returned");
         fileService.savePDF(pdf);
-        return ResponseEntity.ok(pdf);
+        return ResponseEntity.ok("Successfully Return Book");
     }
 
     @PostMapping("/borrowBook")
@@ -505,7 +522,7 @@ public class MainController {
                 String possiblePath = fileInfo.getResourcesId() + "/" + isbn + ".pdf";
                 Path filePath = Paths.get(directory).resolve(possiblePath).normalize();
                 java.io.File file = filePath.toFile();
-                System.out.println(filePath);
+                System.out.println(file.getAbsoluteFile());
 
                 if (file.exists() && file.canRead()) {
                     return new InputStreamResource(new FileInputStream(file));
@@ -546,7 +563,7 @@ public class MainController {
         return "admin/adminHome";  // 返回adminHome视图
     }
 
-    @GetMapping("/adminLogin")
+    @GetMapping("/adminadmin1admin1")
     public String adminLogin(HttpSession session, Model model) {
         return "admin/adminLogin";  // 返回adminLogin视图
     }
@@ -603,5 +620,31 @@ public class MainController {
         }
         return "redirect:/resourcesLib";
     }
+
+
+    @GetMapping("/getPublisher")
+    public ResponseEntity<?> getPublisher() {
+        List<String> publishers = fileService.getAllDistinctPublishers();
+        return ResponseEntity.ok(publishers);
+    }
+
+    @GetMapping("/getSeries")
+    public ResponseEntity<?> getSeries() {
+        List<String> series = fileService.findAllDistinctSeries();
+        return ResponseEntity.ok(series);
+    }
+
+    @GetMapping("/getYear")
+    public ResponseEntity<?> getYear() {
+        List<String> year = fileService.findAllDistinctCopyrightYear();
+        return ResponseEntity.ok(year);
+    }
+
+    @GetMapping("/getDatabases")
+    public ResponseEntity<?> getDatabases() {
+        List<String> databases = resourcesLibService.getAllLib();
+        return ResponseEntity.ok(databases);
+    }
+
 }
 

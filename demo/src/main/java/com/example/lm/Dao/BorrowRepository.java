@@ -9,6 +9,9 @@ import java.util.Optional;
 public interface BorrowRepository extends JpaRepository<Borrow, Integer> {
     Borrow findByBorrowId(Integer borrowId);
     Optional<Borrow> findByBookId(Integer bookId);
+
+    Borrow getBorrowByBorrowId(Integer borrow_id);
+
     List<Borrow> findByUsername(String username);
 
 

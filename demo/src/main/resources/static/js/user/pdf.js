@@ -11,7 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const API_BASE_URL = "8.130.130.240:8088";
-    const url = `http://${API_BASE_URL}/downloadfiles/${encodeURIComponent(fileId)}`;
+    //const url = `http://${API_BASE_URL}/downloadfiles/${encodeURIComponent(fileId)}`;
+    const url = `/downloadfiles/${(fileId)}`;
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
 

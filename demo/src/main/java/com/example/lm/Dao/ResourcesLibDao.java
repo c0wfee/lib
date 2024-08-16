@@ -47,4 +47,6 @@ public interface ResourcesLibDao extends JpaRepository<ResourcesLib, Integer> {
            "r.type = :type")
    List<ResourcesLib> searchResourcesByStatusAndType(String searchTerm, String status, String type);
 
+   @Query("SELECT e.name FROM ResourcesLib e")
+   List<String> getAll();
 }

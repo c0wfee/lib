@@ -1,3 +1,4 @@
+/* 全局样式 */
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -5,12 +6,17 @@ body {
     box-sizing: border-box;
 }
 
+/* 容器样式 */
 .container {
     display: flex;
     flex-direction: column;
     height: 100vh;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
+/* 头部样式 */
 .header {
     padding: 15px;
     background-color: #f1f1f1;
@@ -60,6 +66,7 @@ body {
     margin-left: 0;
 }
 
+/* 内容布局样式 */
 .content {
     display: flex;
     flex: 1;
@@ -78,6 +85,7 @@ body {
     overflow-y: auto;
 }
 
+/* 筛选条件样式 */
 .refine-results h2 {
     font-size: 18px;
     margin-bottom: 15px;
@@ -115,14 +123,14 @@ body {
     margin-right: 10px;
 }
 
-.refine-list label {
-    cursor: pointer;
-}
-
 .refine-list input[type="number"] {
     width: 80px;
     margin-right: 10px;
     display: inline-block;
+}
+
+.refine-list label {
+    cursor: pointer;
 }
 
 .refine-list button {
@@ -145,6 +153,38 @@ body {
     outline: none;
 }
 
+.refine-section.active .refine-list {
+    display: block;
+}
+
+/* 书籍详情样式 */
+.book-details {
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.book-details img {
+    max-width: 100px;
+    margin-bottom: 20px;
+}
+
+.book-details h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.book-details p {
+    margin: 5px 0;
+}
+
+.book-details strong {
+    display: inline-block;
+    width: 200px;
+}
+
+/* 列表项样式 */
 .item {
     border: 1px solid #ccc;
     padding: 15px;
@@ -179,6 +219,9 @@ body {
 }
 
 .item-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     margin-top: 15px;
 }
 
@@ -205,16 +248,7 @@ body {
     background-color: #0056b3;
 }
 
-#no-files {
-    color: red;
-    font-weight: bold;
-}
-
-.active {
-    background-color: #007bff;
-    color: white;
-}
-
+/* 分页样式 */
 .pagination button {
     margin: 0 2px;
     padding: 5px 10px;
@@ -234,27 +268,7 @@ body {
     cursor: not-allowed;
 }
 
-.footer {
-    padding: 15px;
-    background-color: #f1f1f1;
-    border-top: 1px solid #ccc;
-    text-align: right;
-}
-
-.footer button {
-    padding: 10px 20px;
-    font-size: 16px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-.footer button:hover {
-    background-color: #0056b3;
-}
-
+/* 结果信息样式 */
 #results-info {
     display: flex;
     align-items: center;
@@ -298,35 +312,13 @@ body {
     text-decoration: underline;
 }
 
-.refine-section {
-    margin: 10px 0;
+/* 错误信息样式 */
+#no-files {
+    color: red;
+    font-weight: bold;
 }
 
-.refine-list {
-    display: none;
-    margin-top: 10px;
-}
-
-.refine-list label {
-    display: inline-block;
-    margin-right: 5px;
-}
-
-.refine-list input[type="number"] {
-    width: 80px;
-    margin-right: 10px;
-    display: inline-block;
-}
-
-.refine-list button {
-    display: inline-block;
-    margin-right: 5px;
-}
-
-.refine-section.active .refine-list {
-    display: block;
-}
-
+/* 按钮样式 */
 .button-container {
     display: flex;
     flex-direction: row;
@@ -344,8 +336,42 @@ body {
     color: white;
 }
 
-.item-meta {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+/* 页脚样式 */
+.footer {
+    padding: 15px;
+    background-color: #f1f1f1;
+    border-top: 1px solid #ccc;
+    text-align: right;
+}
+
+.footer button {
+    padding: 10px 20px;
+    font-size: 16px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.footer button:hover {
+    background-color: #0056b3;
+}
+
+/* 媒体查询：适应不同屏幕大小 */
+@media (max-width: 768px) {
+    .content {
+        flex-direction: column;
+    }
+
+    .aside {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid #ccc;
+        margin-bottom: 20px;
+    }
+
+    .main {
+        padding: 15px 0;
+    }
 }

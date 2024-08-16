@@ -20,4 +20,6 @@ public class Borrow {
     private String loanStartTime;
     private String loanEndTime;
     private String bookTitle;
+    private String returnedDate;
+    private String status;
 }

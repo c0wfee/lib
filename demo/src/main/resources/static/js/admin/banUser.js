@@ -9,7 +9,7 @@ function searchUsers(page, size) {
     if (keyword) {
         console.log(`Searching for keyword: ${keyword}, page: ${page}, size: ${size}`);
 
-        fetch(`http://${API_BASE_URL}/searchUsers?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`)
+        fetch(`http://8.130.130.240:8088/searchUsers?keyword=${encodeURIComponent(keyword)}&page=${page}&size=${size}`)
             .then(response => {
                 console.log('Received response:', response);
                 if (!response.ok) {
