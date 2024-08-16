@@ -28,15 +28,13 @@ async function fetchBooks(username, isHistory = false) {
         const books = await response.json();
         console.log('Fetched Books:', books);
 
-        const currentDate = new Date();
-
         let filteredBooks;
         if (isHistory) {
-            filteredBooks = books.filter(book => new Date(book.loanEndTime) < currentDate);
-
+            // 筛选历史借阅书籍（status 为 "Returned"）
+            filteredBooks = books.filter(book => book.status === "Returned");
         } else {
-            filteredBooks = books.filter(book => new Date(book.loanEndTime) >= currentDate);
-
+            // 筛选当前借阅书籍（status 不为 "Returned"）
+            filteredBooks = books.filter(book => book.status !== "Returned");
         }
 
         displayBooks(filteredBooks, isHistory ? 'borrowing-history-container' : 'current-borrowing-container', isHistory);
@@ -44,6 +42,7 @@ async function fetchBooks(username, isHistory = false) {
         console.error('Error fetching books:', error);
     }
 }
+
 
 function displayBooks(books, containerId, isHistory = false) {
     const container = document.getElementById(containerId);
@@ -56,6 +55,7 @@ function displayBooks(books, containerId, isHistory = false) {
     books.forEach(book => {
         const card = document.createElement('div');
         card.className = 'card mb-3';
+        card.setAttribute('data-borrow-id', book.borrowId); // 将 borrow_id 存储在 data 属性中
 
         const cardHeader = document.createElement('div');
         cardHeader.className = 'card-header';
@@ -72,19 +72,20 @@ function displayBooks(books, containerId, isHistory = false) {
         loanStartTime.className = 'card-text';
         loanStartTime.textContent = 'Borrowed Date: ' + book.loanStartTime;
 
+        const loanEndTime = document.createElement('p');
+        loanEndTime.className = 'card-text';
+        loanEndTime.textContent = 'Due Date: ' + book.loanEndTime;
+
         cardBody.appendChild(author);
         cardBody.appendChild(loanStartTime);
+        cardBody.appendChild(loanEndTime);
 
         if (isHistory) {
             const returnedDate = document.createElement('p');
             returnedDate.className = 'card-text';
-            returnedDate.textContent = 'Returned Date: ' + book.loanEndTime;
+            returnedDate.textContent = 'Returned Date: ' + (book.returnedDate || 'N/A');
             cardBody.appendChild(returnedDate);
         } else {
-            const loanEndTime = document.createElement('p');
-            loanEndTime.className = 'card-text';
-            loanEndTime.textContent = 'Due Date: ' + book.loanEndTime;
-
             const viewButton = document.createElement('button');
             viewButton.className = 'btn btn-primary view-button mr-2';
             viewButton.textContent = 'View Online';
@@ -97,11 +98,11 @@ function displayBooks(books, containerId, isHistory = false) {
             returnButton.textContent = 'Return';
             returnButton.addEventListener('click', () => {
                 if (confirm('Are you sure you want to return this book?')) {
-                    returnBook(book.bookId);
+                    const borrowId = card.getAttribute('data-borrow-id'); // 获取存储的 borrow_id
+                    returnBook(borrowId);
                 }
             });
 
-            cardBody.appendChild(loanEndTime);
             cardBody.appendChild(viewButton);
             cardBody.appendChild(returnButton);
         }
@@ -112,14 +113,16 @@ function displayBooks(books, containerId, isHistory = false) {
     });
 }
 
+
 function viewBook(bookId) {
     console.log('View book with ID:', bookId);
     window.location.href = `/pdf?fileId=${encodeURIComponent(bookId)}`;
 }
 
-function returnBook(bookId) {
+function returnBook(borrowId) {
     let data = new URLSearchParams();
-    data.append('bookId', bookId);
+    data.append('borrow_id', borrowId); // 这里使用新的参数名 'borrow_id'
+
     fetch("/returnBook", {
         method: 'POST',
         headers: {
@@ -127,14 +130,20 @@ function returnBook(bookId) {
         },
         body: data
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text(); // 后端返回的是字符串，不是 JSON
+        })
         .then(data => {
             console.log('Success:', data);
-            alert('Operation successful');
-            loadCurrentBorrowing();
+            alert(data); // 提示成功信息
+            loadCurrentBorrowing(); // 重新加载当前借阅的书目
         })
         .catch((error) => {
             console.error('Error:', error);
             alert('Operation failed');
         });
 }
+
