@@ -97,6 +97,9 @@ public class FileInfo {
     @Column(name = "epub_path")
     private String epubPath;
 
+    @Column(name = "database_name")
+    private String databaseName;
+
     public String getDownloadLink() {
         return downloadLink;
     }
@@ -335,6 +338,14 @@ public class FileInfo {
 
     public void setEpubPath(String epubPath) {
         this.epubPath = epubPath;
+    }
+
+    public String getDatabaseName() {
+        return databaseName;
+    }
+
+    public void setDatabaseName(String databaseName) {
+        this.databaseName = databaseName;
     }
 
     @Override
