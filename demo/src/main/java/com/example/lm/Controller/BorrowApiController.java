@@ -2,7 +2,11 @@ package com.example.lm.Controller;
 
 import com.example.lm.Dao.BorrowRepository;
 import com.example.lm.Model.Borrow;
+import com.example.lm.Model.FileInfo;
+import com.example.lm.Service.BorrowService;
+import com.example.lm.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,6 +20,12 @@ public class BorrowApiController {
     @Autowired
     private BorrowRepository borrowRepository;
 
+    @Autowired
+    private FileService fileService;
+
+    @Autowired
+    private BorrowService borrowService;
+
     @GetMapping("/api/borrows")
     public List<Borrow> getAllBorrows() {
         return borrowRepository.findAll();
@@ -27,15 +37,15 @@ public class BorrowApiController {
     }
 
     @GetMapping("/borrow/{fileId}")
-    public Borrow getBorrowDetails(@PathVariable Integer fileId) {
-        Optional<Borrow> borrowOptional = borrowRepository.findByBookId(fileId);
-        Borrow borrow = borrowOptional.orElseGet(() -> {
-            Borrow defaultBorrow = new Borrow();
-            defaultBorrow.setBorrowId(0);
-            defaultBorrow.setUsername("Default Borrower");
-            return defaultBorrow;
-        });
-        System.out.println(borrow.getLoanEndTime());
-        return borrow;
+    public ResponseEntity<?> getBorrowDetails(@PathVariable Integer fileId) {
+        FileInfo file = fileService.getFileById(fileId);
+
+        if (file.getLoanLabel().equals("Returned")) {
+            return ResponseEntity.ok("NULL");
+        }
+        else {
+            return ResponseEntity.ok(borrowService.getLoanEndTime(fileId));
+        }
+
     }
 }
