@@ -42,13 +42,47 @@ function populateFilterOptions(filterId, options) {
         return;
     }
     filterElement.innerHTML = ''; // 清空现有选项
-    options.forEach(option => {
+
+    const maxItemsToShow = 5; // 初始显示的最大选项数
+
+    options.slice(0, maxItemsToShow).forEach(option => {
         const optionElement = document.createElement('li');
         optionElement.innerHTML = `
             <input type="checkbox" value="${option}" onclick="applyFilter('${filterId.split('-')[0]}', this.value)">
             <label>${option}</label>
         `;
         filterElement.appendChild(optionElement);
+    });
+
+    if (options.length > maxItemsToShow) {
+        const showMoreElement = document.createElement('li');
+        showMoreElement.innerHTML = `
+            <button onclick="showMoreOptions('${filterId}', ${maxItemsToShow})">Show More</button>
+        `;
+        filterElement.appendChild(showMoreElement);
+    }
+}
+
+// 显示更多选项
+function showMoreOptions(filterId, maxItemsToShow) {
+    const filterElement = document.getElementById(filterId);
+    const options = Array.from(filterElement.children);
+    const showMoreButton = options.pop(); // 获取“Show More”按钮并移除
+
+    // 清除当前选项，并显示所有选项
+    filterElement.innerHTML = '';
+    const allOptions = [...options, ...showMoreButton];
+
+    // 添加所有选项
+    allOptions.forEach(option => {
+        filterElement.appendChild(option);
+    });
+
+    // 再次生成所有选项，并且移除“Show More”按钮
+    allOptions.forEach(option => {
+        if (option.innerText === 'Show More') {
+            filterElement.removeChild(option);
+        }
     });
 }
 
