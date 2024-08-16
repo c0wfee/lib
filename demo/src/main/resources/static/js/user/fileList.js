@@ -8,17 +8,17 @@ window.onload = function () {
 };
 
 function loadFilters() {
-    fetch(`${API_BASE_URL}/getPublisher`)
+    fetch(`/getPublisher`)
         .then(response => response.json())
         .then(data => populateFilterOptions('publisher-filter', data))
         .catch(error => console.error('Error fetching publishers:', error));
 
-    fetch(`${API_BASE_URL}/getSeries`)
+    fetch(`/getSeries`)
         .then(response => response.json())
         .then(data => populateFilterOptions('series-filter', data))
         .catch(error => console.error('Error fetching series:', error));
 
-    fetch(`${API_BASE_URL}/getYear`)
+    fetch(`/getYear`)
         .then(response => response.json())
         .then(data => {
             const minYear = Math.min(...data);
@@ -29,7 +29,7 @@ function loadFilters() {
         })
         .catch(error => console.error('Error fetching years:', error));
 
-    fetch(`${API_BASE_URL}/getDatabases`)
+    fetch(`/getDatabases`)
         .then(response => response.json())
         .then(data => populateFilterOptions('database-filter', data))
         .catch(error => console.error('Error fetching databases:', error));
@@ -156,7 +156,7 @@ function searchFiles(page, size) {
         database: filters['database'] || []
     };
 
-    fetch(`${API_BASE_URL}/search`, {
+    fetch(`/search`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -224,7 +224,7 @@ function searchFiles(page, size) {
 
                     // 如果满足条件，获取还书日期并更新 loan-info 元素
                     if (file.borrowPeriod > 0 && file.loanLabel === 'Borrowed') {
-                        fetch(`${API_BASE_URL}/borrow/${file.id}`, {
+                        fetch(`/borrow/${file.id}`, {
                             method: 'GET',
                             headers: {
                                 'Content-Type': 'application/json'
@@ -341,7 +341,7 @@ function viewPDF(id, view) {
     if (view == null) {
         window.location.href = `/pdf?fileId=${encodeURIComponent(id)}`;
     } else {
-        fetch(`${API_BASE_URL}/downloadfiles/${encodeURIComponent(id)}`, {responseType: 'blob'})
+        fetch(`/downloadfiles/${encodeURIComponent(id)}`, {responseType: 'blob'})
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -378,7 +378,7 @@ function downloadBook(id) {
 }
 
 function downloadFile(id, format) {
-    const url = `${API_BASE_URL}/downloadpdfs/${encodeURIComponent(id)}?format=${format}`;
+    const url = `/downloadpdfs/${encodeURIComponent(id)}?format=${format}`;
     const xhr = new XMLHttpRequest();
     const progressContainer = document.getElementById(`progress-container-${id}`);
     const progressBar = document.getElementById(`progress-${id}`);

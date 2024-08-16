@@ -153,7 +153,7 @@ function toggleDownloadOptions(id, button) {
 }
 
 function downloadFile(id, format) {
-    const url = `${BASE_URL}/downloadpdfs/${encodeURIComponent(id)}?format=${format}`;
+    const url = `/downloadpdfs/${encodeURIComponent(id)}?format=${format}`;
     const xhr = new XMLHttpRequest();
     const progressContainer = document.getElementById(`progress-container-${id}`);
     const progressBar = document.getElementById(`progress-${id}`);
