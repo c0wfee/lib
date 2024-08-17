@@ -12,5 +12,6 @@ public interface PDFDao extends JpaRepository<PDFs, Integer> {
     List<PDFs> findByResourcesId(int resourcesID);
     boolean existsByName(String name);
     List<PDFs> findByIdIn(List<Integer> ids);
+    void deleteByName(String name);
 
 }

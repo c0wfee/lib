@@ -209,6 +209,7 @@
         <th>Published</th>
         <th>Source Type</th>
         <th>Pdf</th>
+        <th>Epub</th>
         <th>Database</th>
         <th>Status</th>
         <th>View Online</th>
@@ -228,34 +229,166 @@
         <td th:text="${book.published}">Published</td>
         <td th:text="${book.sourceType}">Source Type</td>
         <td>
-          <a th:if="${book.downloadLink != null && !book.downloadLink.isEmpty()}" th:href="@{/downloadfiles/{bookId}(bookId=${book.id})}">Download</a>
-          <span th:if="${book.downloadLink == null || book.downloadLink.isEmpty()}">Not available</span>
+          <a th:if="${book.downloadLink != null && !book.downloadLink.isEmpty()}"
+             th:href="@{/downloadfiles/{bookId}(bookId=${book.id})}">
+            Download
+          </a>
+          <span th:if="${book.downloadLink == null || book.downloadLink.isEmpty()}"
+                data-toggle="modal"
+                data-target="#uploadPdfModal"
+                th:data-id="${book.id}"
+                class="upload-link">
+      Not available (Upload)
+    </span>
         </td>
+
+        <!-- 模态框 -->
+        <div class="modal fade" id="uploadPdfModal" tabindex="-1" role="dialog" aria-labelledby="uploadPdfModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="uploadPdfModalLabel">Upload PDF</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <!-- 文件上传表单 -->
+                <form id="uploadPdfForm" enctype="multipart/form-data">
+                  <input type="hidden" id="bookIdField" name="id">
+                  <div class="form-group">
+                    <label for="fileInput">Choose PDF file</label>
+                    <input type="file" class="form-control-file" id="fileInput" name="file" accept=".pdf" required>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="uploadButton">Upload</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <td>
+          <a th:if="${book.epubPath != null && !book.epubPath.isEmpty()}"
+          th:href="@{/viewEpub/{bookId}(bookId=${book.id})}">
+            Download
+          </a>
+          <span th:if="${book.epubPath == null || book.epubPath.isEmpty()}"
+                data-toggle="modal"
+                data-target="#uploadEpubModal"
+                th:data-id="${book.id}"
+                class="upload-link">
+      Not available (Upload)
+    </span>
+        </td>
+
+        <div class="modal fade" id="uploadEpubModal" tabindex="-1" role="dialog" aria-labelledby="uploadEpubModalLabel" aria-hidden="true">
+          <div class="modal-dialog" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="uploadEpubModalLabel">Upload Epub</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                <!-- 文件上传表单 -->
+                <form id="uploadEpubForm" enctype="multipart/form-data">
+                  <input type="hidden" id="EpubIdField" name="id">
+                  <div class="form-group">
+                    <label for="fileInput">Choose Epub file</label>
+                    <input type="file" class="form-control-file" id="EpubfileInput" name="file" accept=".epub" required>
+                  </div>
+                </form>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="uploadEpubButton">Upload</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
         <td th:text="${book.resourcesId}">Resources ID</td>
         <td>
-          <span th:text="${book.status}">Status</span>
-          <button class="btn btn-link edit-button"
-                  th:attr="data-id=${book.id}, data-type='status', data-value=${book.status}"
-                  onclick="showEditModal(this)">edit</button>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="statusDropdown-${book.id}"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span th:text="${book.status == 'Published' ? 'Published' : 'Unpublished'}"></span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="statusDropdown-${book.id}">
+              <a class="dropdown-item"
+                 href="#"
+                 th:onclick="'updateField(' + ${book.id} + ', \'status\', \'Published\')'"
+                 th:text="'Published'"></a>
+              <a class="dropdown-item"
+                 href="#"
+                 th:onclick="'updateField(' + ${book.id} + ', \'status\', \'Unpublished\')'"
+                 th:text="'Unpublished'"></a>
+            </div>
+          </div>
+        </td>
+
+        <td>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="viewDropdown-${book.id}"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span th:text="${book.view}">View</span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="viewDropdown-${book.id}">
+              <a class="dropdown-item"
+                 href="#"
+                 th:onclick="'updateField(' + ${book.id} + ', \'view\', \'Enable\')'"
+                 th:text="'Enable'"></a>
+              <a class="dropdown-item"
+                 href="#"
+                 th:onclick="'updateField(' + ${book.id} + ', \'view\', \'Disable\')'"
+                 th:text="'Disable'"></a>
+            </div>
+          </div>
         </td>
         <td>
-          <span th:text="${book.view}">View</span>
-          <button class="btn btn-link edit-button"
-                  th:attr="data-id=${book.id}, data-type='view', data-value=${book.view}"
-                  onclick="showEditModal(this)">edit</button>
+          <div class="dropdown">
+            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="downloadDropdown-${book.id}"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span th:text="${book.download}">Download</span>
+            </button>
+            <div class="dropdown-menu" aria-labelledby="downloadDropdown-${book.id}">
+              <a class="dropdown-item"
+                 href="#"
+                 th:onclick="'updateField(' + ${book.id} + ', \'download\', \'Enable\')'"
+                 th:text="'Enable'"></a>
+              <a class="dropdown-item"
+                 href="#"
+                 th:onclick="'updateField(' + ${book.id} + ', \'download\', \'Disable\')'"
+                 th:text="'Disable'"></a>
+            </div>
+          </div>
         </td>
+
         <td>
-          <span th:text="${book.download}">Download</span>
-          <button class="btn btn-link edit-button"
-                  th:attr="data-id=${book.id}, data-type='download', data-value=${book.download}"
-                  onclick="showEditModal(this)">edit</button>
+          <div class="dropdown">
+            <!-- 下拉按钮 -->
+            <button class="btn btn-sm btn-primary dropdown-toggle" type="button" id="loanDropdown-${book.id}"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+              <span th:text="${book.loaned > 0 ? 'Enable' : 'Disable'}"></span>
+            </button>
+            <!-- 下拉菜单 -->
+            <div class="dropdown-menu" aria-labelledby="loanDropdown-${book.id}">
+              <a class="dropdown-item"
+                 href="#"
+                 th:onclick="'updateField(' + ${book.id} + ', \'loan\', \'0\')'"
+                 th:text="'Disable'"></a>
+              <a class="dropdown-item"
+                 href="#"
+                 th:onclick="'showLoanDaysPrompt(' + ${book.id} + ')'"
+                 th:text="'Enable'"></a>
+            </div>
+          </div>
         </td>
-        <td>
-          <span th:text="${book.loaned}">Loan Label</span>
-          <button class="btn btn-link edit-button"
-                  th:attr="data-id=${book.id}, data-type='loan', data-value=${book.loaned}"
-                  onclick="showLoanEditModal(this)">Edit</button>
-        </td>
+
 
         <td th:text="${book.loanLabel}">Loaned</td>
         <td>
@@ -285,74 +418,6 @@
     </table>
   </div>
 
-  <!-- 返回搜索页面的链接 -->
-  <!--  <a href="/test/searchPage" class="btn btn-secondary mt-3">返回搜索页面</a>-->
-
-  <!-- 模态框 -->
-  <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="editModalLabel">编辑</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="editForm" method="post" th:action="@{/test/updateField}">
-            <input type="hidden" id="editId" name="id">
-            <input type="hidden" id="editType" name="editType">
-            <div class="form-group">
-              <label for="editField">Value</label>
-              <select class="form-control" id="editField" name="editField"></select>
-            </div>
-            <button type="submit" class="btn btn-primary">Save changes</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal fade" id="loanEditModal" tabindex="-1" aria-labelledby="loanEditModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="loanEditModalLabel">Edit Loan Duration</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form id="loanEditForm" method="post" th:action="@{/test/updateField}">
-            <input type="hidden" id="loanEditId" name="id">
-            <input type="hidden" id="loanEditType" name="editType">
-            <div class="form-group">
-              <label for="loanEditField">Loan Duration (days)</label>
-              <input type="number" class="form-control" id="loanEditField" name="editField">
-            </div>
-            <button type="submit" class="btn btn-primary">Save changes</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    function showLoanEditModal(button) {
-      var id = button.getAttribute('data-id'); // 获取数据ID
-      var type = button.getAttribute('data-type'); // 获取数据类型
-      var value = button.getAttribute('data-value'); // 获取当前值
-
-      $('#loanEditId').val(id); // 将ID设置到隐藏字段
-      $('#loanEditType').val(type); // 将类型设置到隐藏字段
-
-      // Set the current value in the input field
-      $('#loanEditField').val(value); // 将当前值设置到输入字段
-
-      $('#loanEditModal').modal('show'); // 显示模态框
-    }
-  </script>
-
   <!-- Bootstrap JS -->
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
@@ -360,29 +425,147 @@
 
   <!-- 自定义JS -->
   <script>
-    function showEditModal(button) {
-      var id = button.getAttribute('data-id');
-      var type = button.getAttribute('data-type');
-      var value = button.getAttribute('data-value');
+    // function showEditModal(button) {
+    //   var id = button.getAttribute('data-id');
+    //   var type = button.getAttribute('data-type');
+    //   var value = button.getAttribute('data-value');
+    //
+    //   $('#editId').val(id);
+    //   $('#editType').val(type);
+    //
+    //   var select = $('#editField');
+    //   select.empty();  // Clear existing options
+    //
+    //   if (type === 'status') {
+    //     select.append('<option value="Published">Published</option>');
+    //     select.append('<option value="Unpublished">Unpublished</option>');
+    //   } else {
+    //     select.append('<option value="Enable">Enable</option>');
+    //     select.append('<option value="Disable">Disable</option>');
+    //   }
+    //
+    //   select.val(value);  // Set the current value
+    //   $('#editModal').modal('show');
+    // }
 
-      $('#editId').val(id);
-      $('#editType').val(type);
-
-      var select = $('#editField');
-      select.empty();  // Clear existing options
-
-      if (type === 'status') {
-        select.append('<option value="Published">Published</option>');
-        select.append('<option value="Unpublished">Unpublished</option>');
-      } else {
-        select.append('<option value="Enable">Enable</option>');
-        select.append('<option value="Disable">Disable</option>');
-      }
-
-      select.val(value);  // Set the current value
-      $('#editModal').modal('show');
+    function updateField(id, editType, editField) {
+      fetch('/test/updateField', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: new URLSearchParams({
+          id: id,
+          editType: editType,
+          editField: editField
+        })
+      })
+              .then(response => response.text())
+              .then(result => {
+                console.log(result);
+                // 处理成功响应，比如更新 UI 或显示提示弹窗
+                alert('Update successful!'); // 提示用户更新成功
+                location.reload(); // 可选：刷新页面
+              })
+              .catch(error => console.error('Error:', error));
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+      var uploadLinks = document.querySelectorAll('.upload-link');
+
+      uploadLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          var bookId = this.getAttribute('data-id');
+          document.getElementById('bookIdField').value = bookId;
+        });
+      });
+
+      document.getElementById('uploadButton').addEventListener('click', function() {
+        var form = document.getElementById('uploadPdfForm');
+        var formData = new FormData(form);
+
+        fetch('/uploadSinglePDF', {
+          method: 'POST',
+          body: formData
+        })
+                .then(response => response.text())
+                .then(data => {
+                  $('#uploadPdfModal').modal('hide');
+                  alert('Upload successful: ' + data);
+                  // 刷新页面
+                  window.location.reload();
+                })
+                .catch(error => {
+                  $('#uploadPdfModal').modal('hide');
+                  alert('Upload failed: ' + error.message);
+                  // 刷新页面
+                  window.location.reload();
+                });
+      });
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+      // 获取所有的 upload-link 元素
+      var uploadLinks = document.querySelectorAll('.upload-link');
+
+      // 为每个 upload-link 元素添加点击事件监听器
+      uploadLinks.forEach(function(link) {
+        link.addEventListener('click', function() {
+          var bookId = this.getAttribute('data-id');
+          document.getElementById('EpubIdField').value = bookId;
+        });
+      });
+
+      // 获取上传按钮元素
+      var uploadButton = document.getElementById('uploadEpubButton');
+
+      // 为上传按钮添加点击事件监听器
+      uploadButton.addEventListener('click', function() {
+        var form = document.getElementById('uploadEpubForm');
+        var formData = new FormData(form);
+
+        // 使用 fetch API 发送表单数据到服务器
+        fetch('/uploadSingleEpub', {
+          method: 'POST',
+          body: formData
+        })
+                .then(response => response.text())
+                .then(data => {
+                  // 处理成功响应
+                  $('#uploadEpubModal').modal('hide');
+                  alert('Upload successful: ' + data);
+                  window.location.reload(); // 刷新页面
+                })
+                .catch(error => {
+                  // 处理错误
+                  $('#uploadEpubModal').modal('hide');
+                  console.error('Fetch error: ', error);
+                  alert('Upload failed: ' + error.message);
+                  window.location.reload(); // 刷新页面
+                });
+      });
+    });
+
+
   </script>
 </div>
+<!-- Core -->
+<script src="/static/vendor/jquery/jquery.min.js"></script>
+<script src="/static/vendor/popper/popper.min.js"></script>
+<script src="/static/js/bootstrap/bootstrap.min.js"></script>
+<!-- FontAwesome 5 -->
+<script src="/static/vendor/fontawesome/js/fontawesome-all.min.js" defer></script>
+<!-- Scripts used only for this demo only - Remove these in your project -->
+<script src="/static/vendor/jquery-scrollbar/js/jquery-scrollbar.min.js"></script>
+<script src="/static/vendor/jquery-scrollLock/jquery-scrollLock.min.js"></script>
+<script src="/static/vendor/sticky-kit/sticky-kit.min.js"></script>
+<script src="/static/vendor/highlight/js/highlight.min.js"></script>
+<script src="/static/vendor/clipboard-js/clipboard.min.js"></script>
+<script src="/static/vendor/holderjs/holder.min.js"></script>
+<script src="/static/js/demo.js"></script>
+<script src="/static/vendor/textarea-autosize/textarea-autosize.min.js"></script>
+<!-- Theme JS -->
+<script src="/static/js/theme.js"></script>
+<script src="/static/js/admin/sourceDatabase.js"></script>
 </body>
 </html>

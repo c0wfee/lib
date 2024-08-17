@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Book Details</title>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  <link rel="stylesheet" href="../static/css/viewDetails.css">
+  <link rel="stylesheet" href="../static/css/admin/viewDetails.css">
 </head>
 <body>
 <div class="container mt-5">
@@ -40,8 +40,14 @@
   <div class="mb-4">
     <h3>Edit Book Details</h3>
     <form action="/book/update" method="post">
-      <!-- 隐藏域用于存储书籍ID -->
+      <!-- 隐藏域用于存储书籍ID以及不可修改值 -->
       <input type="hidden" name="id" th:value="${book.id}"/>
+      <input type="hidden" name="status" th:value="${book.status}"/>
+      <input type="hidden" name="view" th:value="${book.view}"/>
+      <input type="hidden" name="download" th:value="${book.download}"/>
+      <input type="hidden" name="downloadLink" th:value="${book.downloadLink}"/>
+      <input type="hidden" name="epubPath" th:value="${book.epubPath}"/>
+      <input type="hidden" name="loanLabel" th:value="${book.loanLabel}"/>
 
       <div class="form-group">
         <label for="title">Title</label>

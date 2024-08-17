@@ -51,6 +51,7 @@ public class MainController {
     private ResourcesLibService resourcesLibService;
 
     private final Path fileStorageLocation = Paths.get("demo/src/main/resources/static/PDFs").normalize();
+    private final Path epubStorageLocation = Paths.get("demo/src/main/resources/static/EPUBs").normalize();
 
     private static final String PDF_DIRECTORY = "demo/src/main/resources/static/PDFs/";
 
@@ -159,7 +160,6 @@ public class MainController {
 
         return "redirect:/resourcesLib";
     }
-
 
 
     @PostMapping("/rename-folder")
@@ -645,6 +645,47 @@ public class MainController {
         List<String> databases = resourcesLibService.getAllLib();
         return ResponseEntity.ok(databases);
     }
+
+    @GetMapping("/viewEpub/{fileId}")
+    public ResponseEntity<Resource> viewEpub(@PathVariable String fileId) {
+        System.out.println("Viewing file with id: " + fileId);
+
+        // 查询 FileInfo 实体
+        FileInfo fileInfo = fileService.getBookById(Integer.parseInt(fileId));
+        if (fileInfo == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        // 获取 ISBN 字符串并输出
+        String isbnString = fileInfo.getIsbn();
+        System.out.println("ISBN String: " + isbnString);
+
+        // 提取 ISBN 列表
+        List<String> isbns = extractIsbnNumbers(isbnString);
+
+        // 构造并检查每个 ISBN 的文件路径
+        for (String isbn : isbns) {
+            // 假设 EPUB 文件的扩展名是 ".epub"
+            String possiblePath = fileInfo.getResourcesId() + "/" + isbn + ".epub";
+            try {
+                Path filePath = this.epubStorageLocation.resolve(possiblePath).normalize();
+                System.out.println("Checking path: " + filePath.toString());
+                Resource resource = new UrlResource(filePath.toUri());
+
+                if (resource.exists() || resource.isReadable()) {
+                    return ResponseEntity.ok()
+                            .contentType(MediaType.parseMediaType("application/epub+zip")) // 使用合适的 MIME 类型
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                            .body(resource);
+                }
+            } catch (MalformedURLException ex) {
+                System.err.println("Malformed URL: " + ex.getMessage());
+            }
+        }
+
+        return ResponseEntity.notFound().build();
+    }
+
 
 }
 
