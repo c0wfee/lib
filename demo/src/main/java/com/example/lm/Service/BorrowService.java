@@ -57,4 +57,10 @@ public class BorrowService {
         Borrow borrowInfo = borrowRepository.getLoanEndTime(bookID);
         return borrowInfo.getLoanEndTime();
     }
+
+    public String deleteBorrowInfo(int borrowID) {
+        borrowRepository.deleteById(borrowID);
+        return "Successfully deleted";
+    }
+
 }
