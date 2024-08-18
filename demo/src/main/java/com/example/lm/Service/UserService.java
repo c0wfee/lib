@@ -12,11 +12,13 @@ import com.example.lm.Model.UserInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.core.mapping.TimeSeries;
 import org.springframework.stereotype.Service;
 
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -48,15 +50,22 @@ public class UserService {
     public Page<User> getUsersByKeyword2(String keyword, Pageable pageable) {
         return userRepositoryForLogin.findByUsernameContaining(keyword, pageable);
     }
+    public User save(User user) {
+        return userRepositoryForLogin.save(user);
+    }
+
+    public User findUser(String name) {
+        return userRepositoryForLogin.findByUsername(name);
+    }
 
     public void removeBan(Integer userId) {
         // 获取用户
         User user = userRepositoryForLogin.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // 移除封禁时间
-        Timestamp unbanTime = Timestamp.valueOf(LocalDateTime.now().minusDays(5));
-        user.setUnbanTime(unbanTime);
+        user.setBanTime(null);
+        user.setUnbanTime(null);
+        user.setStatus("Active");
 
         // 保存用户
         userRepositoryForLogin.save(user);
@@ -65,8 +74,12 @@ public class UserService {
 
     public void banUser(int userId, int banDuration) {
         User user = userRepositoryForLogin.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
         LocalDateTime unbanTime = LocalDateTime.now().plusDays(banDuration);
-        user.setUnbanTime(Timestamp.valueOf(unbanTime));
+        user.setBanTime(LocalDateTime.now().format(formatter));
+        user.setUnbanTime(unbanTime.format(formatter));
+        user.setStatus("Banned");
         userRepositoryForLogin.save(user);
         System.out.println("User banned: " + user.getUsername() + " until " + user.getUnbanTime());
     }
@@ -84,10 +97,14 @@ public class UserService {
 
             System.out.println("User unban time: " + user.getUnbanTime());
 
-            if (user.getUnbanTime() != null && user.getUnbanTime().after(new Timestamp(System.currentTimeMillis()))) {
-                System.out.println("User is banned until " + user.getUnbanTime());
-                throw new RuntimeException("User is banned until " + user.getUnbanTime());
+            if (user.getUnbanTime() != null) {
+                Timestamp unbanTime = Timestamp.valueOf(user.getUnbanTime());
+                if (unbanTime.after(new Timestamp(System.currentTimeMillis()))) {
+                    System.out.println("User is banned until " + unbanTime);
+                    throw new RuntimeException("User is banned until " + unbanTime);
+                }
             }
+
 
             return user;
         } catch (NullPointerException e) {
