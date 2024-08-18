@@ -6,6 +6,7 @@ import com.example.lm.Model.FileInfo;
 import com.example.lm.Service.BorrowService;
 import com.example.lm.Service.FileService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,8 +26,9 @@ public class BorrowApiController {
     private BorrowService borrowService;
 
     @GetMapping("/api/borrows")
-    public List<Borrow> getAllBorrows() {
-        return borrowRepository.findAll();
+    public Page<?> getAllBorrows(@RequestParam(defaultValue = "0") int page,
+                                      @RequestParam(defaultValue = "10") int size) {
+        return borrowService.getBorrowInfoForAdmin(page, size);
     }
 
     @GetMapping("/api/borrows/{username}")
