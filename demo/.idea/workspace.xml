@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改userHome的return功能">
+    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改fileList 命中数">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/admin/adminBorrow.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/admin/adminBorrow.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/adminBorrow.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/adminBorrow.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/adminHome.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/adminHome.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -85,7 +88,7 @@
     &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
     &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
     &quot;service.view.auto.scroll.to.source&quot;: &quot;true&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;MavenSettings&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.editor&quot;,
     &quot;spring.configuration.checksum&quot;: &quot;fe01ce2a7fbac8fafaed7c982a04e229&quot;,
     &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   },
@@ -166,6 +169,14 @@
       <workItem from="1722993109165" duration="1075000" />
       <workItem from="1723004466256" duration="11630000" />
       <workItem from="1723035576882" duration="806000" />
+      <workItem from="1723797838559" duration="2036000" />
+      <workItem from="1723803412331" duration="90000" />
+      <workItem from="1723803509934" duration="765000" />
+      <workItem from="1723805098669" duration="4872000" />
+      <workItem from="1723812891680" duration="948000" />
+      <workItem from="1723825269641" duration="1190000" />
+      <workItem from="1723871209433" duration="6493000" />
+      <workItem from="1723958037407" duration="1543000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>
@@ -305,7 +316,15 @@
       <option name="project" value="LOCAL" />
       <updated>1723797134525</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="修改fileList 命中数">
+      <option name="closed" value="true" />
+      <created>1723797637008</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1723797637008</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -332,7 +351,8 @@
     <MESSAGE value="整理代码结构" />
     <MESSAGE value="修改fileList界面的Year筛选功能" />
     <MESSAGE value="修改userHome的return功能" />
-    <option name="LAST_COMMIT_MESSAGE" value="修改userHome的return功能" />
+    <MESSAGE value="修改fileList 命中数" />
+    <option name="LAST_COMMIT_MESSAGE" value="修改fileList 命中数" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -343,5 +363,9 @@
         </breakpoint>
       </breakpoints>
     </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>

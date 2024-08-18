@@ -3,28 +3,99 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Borrowed Books</title>
+    <title>Loan Records</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/admin/adminBorrow.css">
 </head>
 <body>
-<div class="container table-container">
-    <h1 class="text-center mb-4">Borrowed Books</h1>
+<div class="container">
+    <h1 class="text-center mb-4">Loan Records</h1>
+
+    <!-- Back Button -->
+    <div class="mb-4">
+        <button id="back-button" class="btn btn-secondary" onclick="window.location.href = '/adminHome'">Back</button>
+    </div>
+
+
+    <!-- Search Bar -->
+    <div class="mb-4">
+        <div class="search-bar" id="search-bar">
+            <input id="keyword" placeholder="Enter keyword" />
+            <div>
+                <label><input type="checkbox" id="search-all" onclick="toggleAllSearch(this)"> All</label>
+                <label><input type="checkbox" id="search-title" checked> Title</label>
+                <label><input type="checkbox" id="search-isbn"> ISBN</label>
+                <label><input type="checkbox" id="search-borrower"> Borrower</label>
+            </div>
+            <button id="execute-search" class="icon-button" onclick="applySearchFilter()">
+                Search
+            </button>
+            <button id="clear-search" class="btn btn-secondary btn-sm ml-2" onclick="clearSearch()">Clear</button>
+        </div>
+    </div>
+
+    <!-- Filter Options -->
+    <div class="filters mb-4">
+        <div class="col-md-3">
+            <label for="database-select">Database:</label>
+            <button class="btn btn-link" onclick="toggleDatabaseSelect()">Select Database</button>
+            <div id="database-select-container" style="display:none;">
+                <select id="database-select" multiple class="form-control">
+                    <!-- 动态加载选项 -->
+                </select>
+                <button id="apply-database-filter" class="btn btn-primary mt-2">Apply Database Filter</button>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <label>Loan Status:</label>
+            <ul id="status-filter">
+                <li><input type="checkbox" value="Returned" onclick="applyFilter('loanLabel', this.value)"> Returned</li>
+                <li><input type="checkbox" value="On Loan" onclick="applyFilter('loanLabel', this.value)"> On Loan</li>
+            </ul>
+        </div>
+        <div class="col-md-3">
+            <label>Borrowed Date:</label>
+            <input type="date" id="borrowedFrom" placeholder="From" class="form-control mb-2">
+            <input type="date" id="borrowedTo" placeholder="To" class="form-control">
+            <button onclick="applyPublishedFilter()">Apply</button>
+            <button id="clear-borrowed-date" class="btn btn-secondary btn-sm ml-2">Clear</button>
+        </div>
+        <div class="col-md-3">
+            <label>Due Date:</label>
+            <input type="date" id="dueFrom" placeholder="From" class="form-control mb-2">
+            <input type="date" id="dueTo" placeholder="To" class="form-control">
+            <button onclick="applyPublishedFilter()">Apply</button>
+            <button id="clear-due-date" class="btn btn-secondary btn-sm ml-2">Clear</button>
+        </div>
+    </div>
+
+    <!-- Loan Records Table -->
     <table class="table table-bordered">
         <thead class="thead-dark">
         <tr>
             <th scope="col">Borrow ID</th>
-            <th scope="col">Username</th>
-            <th scope="col">Book ID</th>
-            <th scope="col">Loan Start Time</th>
-            <th scope="col">Loan End Time</th>
+            <th scope="col">ISBN</th>
             <th scope="col">Book Title</th>
+            <th scope="col">Database</th>
+            <th scope="col">Loan Status</th>
+            <th scope="col">Borrowed Date</th>
+            <th scope="col">Due Date</th>
+            <th scope="col">Returned Date</th>
+            <th scope="col">Borrower</th>
+            <th scope="col">Actions</th>
         </tr>
         </thead>
         <tbody id="books-table-body">
         <!-- Table rows will be inserted here dynamically -->
         </tbody>
     </table>
+
+    <!-- Pagination Buttons -->
+    <div class="pagination-buttons">
+        <button id="prev-page" class="btn btn-primary" onclick="changePage(-1)">Previous</button>
+        <button id="next-page" class="btn btn-primary" onclick="changePage(1)">Next</button>
+    </div>
 </div>
 
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
