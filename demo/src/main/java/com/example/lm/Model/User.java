@@ -25,6 +25,14 @@ public class User {
     private String password;
 
     @Column(name = "unban_time")
-    private Timestamp unbanTime;
+    private String unbanTime;
 
+    @Column(name = "ban_time")
+    private String banTime;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "total_borrowings")
+    private int totalBorrowings;
 }

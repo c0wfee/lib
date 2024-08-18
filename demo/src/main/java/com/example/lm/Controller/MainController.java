@@ -5,6 +5,7 @@ import com.example.lm.Service.BorrowService;
 import com.example.lm.Service.FileService;
 import com.example.lm.Service.ResourcesLibService;
 
+import com.example.lm.Service.UserService;
 import com.example.lm.utils.FilterData;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -49,6 +50,9 @@ public class MainController {
 
     @Autowired
     private ResourcesLibService resourcesLibService;
+
+    @Autowired
+    private UserService userService;
 
     private final Path fileStorageLocation = Paths.get("demo/src/main/resources/static/PDFs").normalize();
     private final Path epubStorageLocation = Paths.get("demo/src/main/resources/static/EPUBs").normalize();
@@ -322,10 +326,14 @@ public class MainController {
         Borrow borrow = new Borrow();
         borrow.setBookId(bookID);
         borrow.setBookTitle(pdf.getTitle());
-        borrow.setUsername("admin");
+        borrow.setUsername("admin1");
         borrow.setLoanStartTime(String.valueOf(System.currentTimeMillis()));
         borrow.setLoanEndTime(String.valueOf(System.currentTimeMillis() + period * 24 * 60 * 60 * 1000));
         borrowService.saveBorrow(borrow, period);
+
+        User user = userService.findUser("admin1");
+        user.setTotalBorrowings(user.getTotalBorrowings() + 1);
+        userService.save(user);
         return ResponseEntity.ok(pdf);
     }
 
