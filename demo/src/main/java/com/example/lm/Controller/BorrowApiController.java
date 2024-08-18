@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -49,6 +50,10 @@ public class BorrowApiController {
 
     }
 
+    @GetMapping("/borrow/count")
+    public Map<String, Long> getBorrowCountForCurrentYear() {
+        return borrowService.getBorrowCountByUserForCurrentYear();
+    }
 
     @PostMapping("deleteBorrowInfo")
     public ResponseEntity<?> deleteBorrow(@RequestParam("borrow_id") int borrowID) {
