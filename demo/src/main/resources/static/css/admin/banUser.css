@@ -4,18 +4,22 @@ body {
     padding: 0;
     box-sizing: border-box;
 }
+
 .container {
     display: flex;
     flex-direction: column;
     height: 100vh;
 }
+
 .header {
     padding: 15px;
     background-color: #f1f1f1;
     border-bottom: 1px solid #ccc;
     display: flex;
     align-items: center;
+    justify-content: space-between;
 }
+
 .header input {
     flex: 1;
     padding: 10px;
@@ -23,6 +27,7 @@ body {
     border: 1px solid #ccc;
     border-radius: 5px;
 }
+
 .header button {
     padding: 10px 20px;
     font-size: 16px;
@@ -33,18 +38,22 @@ body {
     cursor: pointer;
     margin-left: 10px;
 }
+
 .header button:hover {
     background-color: #0056b3;
 }
+
 .content {
     display: flex;
     flex: 1;
 }
+
 .main {
     flex: 1;
     padding: 15px;
     overflow-y: auto;
 }
+
 .item {
     border: 1px solid #ccc;
     padding: 15px;
@@ -52,24 +61,30 @@ body {
     border-radius: 5px;
     background-color: #f9f9f9;
 }
+
 .item-details {
     display: flex;
     align-items: flex-start;
     margin-top: 10px;
 }
+
 .item-content {
     flex-grow: 1;
 }
+
 .item-details h3 {
     font-size: 1.5em;
     margin-bottom: 10px;
 }
+
 .item-details p {
     margin: 5px 0;
 }
+
 .item-meta {
     margin-top: 15px;
 }
+
 .item-meta button {
     margin-right: 10px;
     padding: 5px 10px;
@@ -79,16 +94,20 @@ body {
     border-radius: 3px;
     cursor: pointer;
 }
+
 .item-meta button:hover {
     background-color: #0056b3;
 }
+
 .ban-options {
     margin-top: 10px;
 }
+
 #no-files {
     color: red;
     font-weight: bold;
 }
+
 .pagination button {
     margin: 0 2px;
     padding: 5px 10px;
@@ -96,21 +115,25 @@ body {
     background-color: white;
     cursor: pointer;
 }
+
 .pagination button.active {
     background-color: #007bff;
     color: white;
 }
+
 .pagination button:disabled {
-    background-color: #cccccc;
-    color: #666666;
+    background-color: #d3d3d3;
+    color: #ffffff;
     cursor: not-allowed;
 }
+
 .footer {
     padding: 15px;
     background-color: #f1f1f1;
     border-top: 1px solid #ccc;
     text-align: right;
 }
+
 .footer button {
     padding: 10px 20px;
     font-size: 16px;
@@ -120,6 +143,17 @@ body {
     border-radius: 5px;
     cursor: pointer;
 }
+
 .footer button:hover {
     background-color: #0056b3;
+}
+
+.disabled-button {
+    background-color: #d3d3d3 !important;
+    color: #ffffff !important;
+    cursor: not-allowed !important;
+}
+
+#home-button {
+    margin-right: auto;
 }

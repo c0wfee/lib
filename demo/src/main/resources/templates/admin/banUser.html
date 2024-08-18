@@ -9,11 +9,24 @@
 <body>
 <div class="container">
     <div class="header">
+        <button id="home-button" onclick="window.location.href='/userhome'">Go to User Home</button>
         <input id="keyword" placeholder="Enter keyword" />
         <button id="search-button">Search</button>
     </div>
+
+
     <div class="content">
         <div class="main">
+            <select id="status-filter">
+                <option value="">All Statuses</option>
+                <option value="Active">Active</option>
+                <option value="Banned">Banned</option>
+            </select>
+            <select id="sort-filter">
+                <option value="">Sort by</option>
+                <option value="totalBorrowings">Total Borrowings</option>
+                <option value="thisYearBorrowings">This Year's Borrowings</option>
+            </select>
             <div id="results">
                 <div id="no-files" style="display: none;">
                     <p>No users found for the given keyword.</p>
@@ -23,9 +36,6 @@
             </div>
         </div>
     </div>
-</div>
-<div class="footer" style="display: none;">
-    <button onclick="window.location.href='/userhome'">Go to User Home</button>
 </div>
 <script src="/static/js/admin/banUser.js"></script>
 </body>

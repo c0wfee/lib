@@ -4,8 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改userHome的return功能">
+    <list default="true" id="6862e292-f471-442e-9a88-10c4b1644af3" name="Changes" comment="修改admin borrow">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/css/admin/banUser.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/css/admin/banUser.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/static/js/admin/banUser.js" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/static/js/admin/banUser.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/templates/admin/banUser.html" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/templates/admin/banUser.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,6 +50,7 @@
   <component name="MavenImportPreferences">
     <option name="generalSettings">
       <MavenGeneralSettings>
+        <option name="mavenHomeTypeForPersistence" value="WRAPPER" />
         <option name="userSettingsFile" value="D:\Development\Maven\apache-maven-3.9.8\conf\settings.xml" />
       </MavenGeneralSettings>
     </option>
@@ -166,6 +170,7 @@
       <workItem from="1722993109165" duration="1075000" />
       <workItem from="1723004466256" duration="11630000" />
       <workItem from="1723035576882" duration="806000" />
+      <workItem from="1723970877716" duration="3936000" />
     </task>
     <task id="LOCAL-00001" summary="拦截+搜索访问@GetMapping(&quot;test/search2&quot;)">
       <created>1720963712259</created>
