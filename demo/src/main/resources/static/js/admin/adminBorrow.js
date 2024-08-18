@@ -51,30 +51,9 @@ async function fetchData() {
             }
         });
         const borrowData = await borrowResponse.json();
+        console.log(borrowData);  // 打印 /api/borrows 接口返回的数据
 
-        const searchResponse = await fetch('/search', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                page: 1,  // 请求所有数据
-                size: 1000  // 请求较大数量的数据
-            })
-        });
-
-        const searchData = await searchResponse.json();
-        console.log(searchData);
-        // 假设 searchData.content 是数组
-        const searchDataArray = searchData.content || [];
-
-        allData = borrowData.map(borrow => {
-            const bookInfo = searchDataArray.find(book => book.bookID === borrow.bookID);
-            return {
-                ...borrow,
-                ...bookInfo
-            };
-        });
+        allData = borrowData.content; // 使用接口返回的内容
 
         // 在数据加载完成后加载数据库选项
         loadDatabaseOptions();
