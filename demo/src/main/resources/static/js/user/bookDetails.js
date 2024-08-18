@@ -1,10 +1,8 @@
-import { BASE_URL } from '../config.js';
-
 document.addEventListener('DOMContentLoaded', function() {
     const bookId = document.getElementById('fileId').value;
     console.log('Book ID:', bookId);
     if (bookId !== 'default_id') {
-        fetch(`${BASE_URL}/book/${bookId}`)
+        fetch(`/book/${bookId}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`Network response was not ok: ${response.statusText}`);
@@ -48,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
                     // Fetch loan info if the book is borrowed
                     if (data.loanLabel === 'Borrowed') {
-                        fetch(`${BASE_URL}/borrow/${bookId}`)
+                        fetch(`/borrow/${bookId}`)
                             .then(response => response.json())
                             .then(borrowData => {
                                 if (borrowData.loanEndTime) {
@@ -116,7 +114,7 @@ function viewPDF(id, view) {
     if (view == null) {
         window.location.href = `/pdf?fileId=${encodeURIComponent(id)}`;
     } else {
-        fetch(`${BASE_URL}/downloadfiles/${encodeURIComponent(id)}`, { responseType: 'blob' })
+        fetch(`/downloadfiles/${encodeURIComponent(id)}`, { responseType: 'blob' })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');

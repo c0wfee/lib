@@ -1,27 +1,36 @@
 document.addEventListener('DOMContentLoaded', () => {
-    loadCurrentBorrowing(); // 页面加载时默认加载当前借阅的书目
+    const user = JSON.parse(localStorage.getItem('user'));  // 从 localStorage 获取用户信息
+    if (!user || !user.username) {
+        alert('User not logged in');
+        window.location.href = '/login';  // 如果没有登录，重定向到登录页面
+        return;
+    }
+
+    const username = user.username;
+
+    loadCurrentBorrowing(username); // 页面加载时默认加载当前借阅的书目
 
     // Tab切换时加载相应的数据
     document.getElementById('current-borrowing-tab').addEventListener('click', () => {
-        loadCurrentBorrowing();
+        loadCurrentBorrowing(username);
     });
 
     document.getElementById('borrowing-history-tab').addEventListener('click', () => {
-        loadBorrowingHistory();
+        loadBorrowingHistory(username);
     });
 });
 
-function loadCurrentBorrowing() {
-    fetchBooks('admin', false); // 'admin' 是当前用户名，false 表示加载当前借阅的书目
+function loadCurrentBorrowing(username) {
+    fetchBooks(username, false); // 使用从 localStorage 获取的用户名，false 表示加载当前借阅的书目
 }
 
-function loadBorrowingHistory() {
-    fetchBooks('admin', true); // 'admin' 是当前用户名，true 表示加载历史借阅的书目
+function loadBorrowingHistory(username) {
+    fetchBooks(username, true); // 使用从 localStorage 获取的用户名，true 表示加载历史借阅的书目
 }
 
 async function fetchBooks(username, isHistory = false) {
     try {
-        const response = await fetch(`/api/borrows/${username}`);
+        const response = await fetch(`/api/borrows/${encodeURIComponent(username)}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
@@ -42,7 +51,6 @@ async function fetchBooks(username, isHistory = false) {
         console.error('Error fetching books:', error);
     }
 }
-
 
 function displayBooks(books, containerId, isHistory = false) {
     const container = document.getElementById(containerId);
@@ -113,7 +121,6 @@ function displayBooks(books, containerId, isHistory = false) {
     });
 }
 
-
 function viewBook(bookId) {
     console.log('View book with ID:', bookId);
     window.location.href = `/pdf?fileId=${encodeURIComponent(bookId)}`;
@@ -139,11 +146,11 @@ function returnBook(borrowId) {
         .then(data => {
             console.log('Success:', data);
             alert(data); // 提示成功信息
-            loadCurrentBorrowing(); // 重新加载当前借阅的书目
+            const user = JSON.parse(localStorage.getItem('user'));  // 重新获取用户名
+            loadCurrentBorrowing(user.username); // 重新加载当前借阅的书目
         })
         .catch((error) => {
             console.error('Error:', error);
             alert('Operation failed');
         });
 }
-

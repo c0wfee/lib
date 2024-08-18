@@ -1,5 +1,3 @@
-import { BASE_URL } from '../config.js';
-
 document.addEventListener('DOMContentLoaded', function () {
     const loginForm = document.getElementById('loginForm');
     const errorMessage = document.getElementById('error-message');
@@ -10,7 +8,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const password = document.getElementById('login-password').value;
 
         // 发送登录请求到服务器
-        fetch(`${BASE_URL}/api/user/login`, {
+        fetch(`/api/user/login`, {  // 直接使用相对路径
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

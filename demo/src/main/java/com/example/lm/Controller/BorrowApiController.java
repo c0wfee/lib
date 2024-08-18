@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -38,17 +39,20 @@ public class BorrowApiController {
     }
 
     @GetMapping("/borrow/{fileId}")
-    public ResponseEntity<?> getBorrowDetails(@PathVariable Integer fileId) {
+    public ResponseEntity<Map<String, String>> getBorrowDetails(@PathVariable Integer fileId) {
         FileInfo file = fileService.getFileById(fileId);
 
+        Map<String, String> response = new HashMap<>();
         if (file.getLoanLabel().equals("Returned")) {
-            return ResponseEntity.ok("NULL");
-        }
-        else {
-            return ResponseEntity.ok(borrowService.getLoanEndTime(fileId));
+            response.put("loanEndTime", "NULL");
+        } else {
+            String loanEndTime = borrowService.getLoanEndTime(fileId);
+            response.put("loanEndTime", loanEndTime);
         }
 
+        return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/borrow/count")
     public Map<String, Long> getBorrowCountForCurrentYear() {
