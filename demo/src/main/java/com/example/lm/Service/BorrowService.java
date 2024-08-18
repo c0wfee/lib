@@ -3,19 +3,26 @@ package com.example.lm.Service;
 import com.example.lm.Dao.BorrowRepository;
 import com.example.lm.Dao.FileInfoDao;
 import com.example.lm.Model.Borrow;
+import com.example.lm.Model.BorrowDTO;
 import com.example.lm.Model.FileInfo;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class BorrowService {
     @Autowired
     private BorrowRepository borrowRepository;
+
+    @Autowired
+    FileInfoDao fileInfoDao;
 
     public Borrow saveBorrow(Borrow borrow, int borrowDays) {
         // 获取当前时间
@@ -63,4 +70,26 @@ public class BorrowService {
         return "Successfully deleted";
     }
 
+    public Page<BorrowDTO> getBorrowInfoForAdmin(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Borrow> borrows = borrowRepository.findAll(pageable);
+
+        List<BorrowDTO> borrowDTOList = new ArrayList<>();
+
+        for (Borrow borrow : borrows) {
+            int bookID = borrow.getBookId();
+            String bookTitle = borrow.getBookTitle();
+            // 查找book表中的ISBN和database_name
+            FileInfo book = fileInfoDao.findById(bookID);
+            String isbn = book.getIsbn();
+            String databaseName = book.getDatabaseName();
+
+            // 创建BorrowDTO对象并添加到列表中
+            BorrowDTO borrowDTO = new BorrowDTO(borrow.getBorrowId(), borrow.getUsername(), borrow.getBookId(), borrow.getLoanStartTime(), borrow.getLoanEndTime(),bookTitle, borrow.getReturnedDate(), borrow.getStatus(), isbn, databaseName);
+            borrowDTOList.add(borrowDTO);
+        }
+
+        // 将List<BorrowDTO>转换为Page<BorrowDTO>对象
+        return new PageImpl<>(borrowDTOList, pageable, borrows.getTotalElements());
+    }
 }
