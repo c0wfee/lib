@@ -532,9 +532,25 @@ public class FileService {
         return fileInfoDao.findByTitleContaining(title);
     }
 
-
+    @Transactional
     public void deleteBook(int id) {
+        FileInfo fileInfo = fileInfoDao.findById(id);
+        String pdfId = fileInfo.getDownloadLink();
+        int databaseId = fileInfo.getResourcesId();
         fileInfoDao.deleteById(id);
+        if (!fileInfoDao.existsByDownloadLink(pdfId)){
+            Optional<PDFs> fileOptional = pdfDao.findById(Integer.valueOf(pdfId));
+            if (fileOptional.isPresent()) {
+                String fileName =fileOptional.get().getName();
+                pdfDao.deleteByName(fileName);
+                try {
+                    Path filePath = Paths.get(PDFUploadPath+ databaseId +"/" + fileName);
+                    Files.deleteIfExists(filePath);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public void updateBook(FileInfo fileInfo) {
@@ -789,6 +805,9 @@ public class FileService {
         language = (language != null && language.isEmpty()) ? null : language;
         published = (published != null && published.isEmpty()) ? null : published;
 
+        System.out.println("?");
+        System.out.println(databaseId);
+
         return fileInfoDao.findByAllKinds(title, isbn, alternativeTitle, author, status, publisher, sourceType, language, published, databaseId);
 
     }
@@ -799,8 +818,10 @@ public class FileService {
         if (fileOptional.isPresent()) {
             PDFs pdf = fileOptional.get();
             String fileName = pdf.getName();
-            pdfDao.delete(pdf);
-            // 更新 book 表中相应的 downloadLink 字段为空
+            databaseId=pdf.getResourcesId();
+            pdfDao.deleteByName(fileName);
+//            System.out.println(fileName);
+            //fileInfoDao.deleteByDownloadLink(pdfID);
             fileInfoDao.updateDownloadLinkToNull(pdfID);
 
             // 删除文件系统中的文件
@@ -822,9 +843,13 @@ public class FileService {
         if (fileOptional.isPresent()) {
             PDFs pdf = fileOptional.get();
             String fileName = pdf.getName();
-            pdfDao.delete(pdf);
-            // 更新 book 表中相应的 downloadLink 字段为空
+            databaseId=pdf.getResourcesId();
+//            pdfDao.delete(pdf);
+//            // 更新 book 表中相应的 downloadLink 字段为空
             fileInfoDao.updateEpubPathToNull(pdfID);
+            pdfDao.deleteByName(fileName);
+            //fileInfoDao.deleteByEpubPath(pdfID);
+//            System.out.println(pdfID);
 
             // 删除文件系统中的文件
             try {
@@ -845,9 +870,92 @@ public class FileService {
         return pdfList.stream().collect(Collectors.toMap(pdf -> String.valueOf(pdf.getId()), PDFs::getName));
     }
 
-//    public Map<String, String> getepubNamesByLinks(List<String> links) {
-//        List<Integer> ids = links.stream().map(Integer::parseInt).collect(Collectors.toList());
-//        List<PDFs> pdfList = pdfDao.findByIdIn(ids);
-//        return pdfList.stream().collect(Collectors.toMap(pdf -> String.valueOf(pdf.getId()), PDFs::getName));
-//    }
+    public void uploadSingleFile(MultipartFile file, Integer id) throws IOException {
+//
+        Optional<FileInfo> fileInfo = fileInfoDao.findById(id);
+        if (fileInfo.isPresent()) {
+            FileInfo f = fileInfo.get();
+            int databaseId = f.getResourcesId();
+            String isbn = f.getIsbn();
+            String uploadPDFPath = PDFUploadPath + databaseId;
+
+            java.io.File uploadDir = new java.io.File(uploadPDFPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+            String PDFName = file.getOriginalFilename();
+
+            if (PDFName != null && PDFName.toLowerCase().endsWith(".pdf")) {
+                PDFName = PDFName.substring(0, PDFName.length() - 4);
+                System.out.println(isbn);
+                System.out.println(PDFName);
+                if (isbn.contains(PDFName)) {
+                    java.io.File targetFile = new java.io.File(uploadDir.getAbsolutePath() + "/" + PDFName + ".pdf");
+                    try {
+                        file.transferTo(targetFile);
+                        PDFs pdf = new PDFs();
+                        pdf.setName(file.getOriginalFilename());
+                        pdf.setAddress(targetFile.getAbsolutePath());
+                        pdf.setResourcesId(databaseId);
+                        pdfDao.save(pdf);
+
+                        f.setDownloadLink(Integer.toString(pdf.getId()));
+                        fileInfoDao.save(f);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }else {
+                    throw new IllegalArgumentException("wrong name");
+                }
+            }
+
+        }else {
+            throw new IllegalArgumentException("No id");
+        }
+    }
+
+
+    public void uploadSingleEpub(MultipartFile file, Integer id) throws IOException {
+//
+        Optional<FileInfo> fileInfo = fileInfoDao.findById(id);
+        if (fileInfo.isPresent()) {
+            FileInfo f = fileInfo.get();
+            int databaseId = f.getResourcesId();
+            String isbn = f.getIsbn();
+            String uploadPDFPath = EPUBUploadPath + databaseId;
+
+            java.io.File uploadDir = new java.io.File(uploadPDFPath);
+            if (!uploadDir.exists()) {
+                uploadDir.mkdirs();
+            }
+            String PDFName = file.getOriginalFilename();
+
+            if (PDFName != null && PDFName.toLowerCase().endsWith(".epub")) {
+                PDFName = PDFName.substring(0, PDFName.length() - 5);
+                System.out.println(isbn);
+                System.out.println(PDFName);
+                if (isbn.contains(PDFName)) {
+                    java.io.File targetFile = new java.io.File(uploadDir.getAbsolutePath() + "/" + PDFName + ".epub");
+                    try {
+                        file.transferTo(targetFile);
+                        PDFs pdf = new PDFs();
+                        pdf.setName(file.getOriginalFilename());
+                        pdf.setAddress(targetFile.getAbsolutePath());
+                        pdf.setResourcesId(databaseId);
+                        pdfDao.save(pdf);
+
+                        f.setEpubPath(Integer.toString(pdf.getId()));
+                        fileInfoDao.save(f);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+                }else {
+                    throw new IllegalArgumentException("wrong name");
+                }
+            }
+
+        }else {
+            throw new IllegalArgumentException("No id");
+        }
+    }
 }

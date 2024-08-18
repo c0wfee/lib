@@ -12,11 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -51,9 +51,8 @@ public class ListBookController {
         String alternativeTitle = null;
         String author = null;
         List<FileInfo> fileInfos = new ArrayList<>();
-        if ("allkinds".equalsIgnoreCase(searchType) && searchValue != null) {
+        if ("allkinds".equalsIgnoreCase(searchType) && searchValue != null && !searchValue.equals("")) {
             fileInfos = fileService.findByAllKinds(searchValue, searchValue, searchValue, searchValue, status, publisher, sourceType, language, published, databaseId);
-//            System.out.println(fileInfos);
         }  else if ("id".equals(searchType)) {
             FileInfo  file= fileService.getFileById(Integer.parseInt(searchValue));
             fileInfos.add(file);
@@ -93,11 +92,13 @@ public class ListBookController {
                     result.put("view", fileInfo.getView());
                     result.put("download", fileInfo.getDownload());
                     result.put("downloadLink", fileInfo.getDownloadLink());
+                    result.put("epubPath", fileInfo.getEpubPath());
 
                     // Get ResourcesLib object from the map
                     ResourcesLib resourcesLib = resourcesLibMap.get(fileInfo.getResourcesId());
                     String resourcesLibName = (resourcesLib != null) ? resourcesLib.getName() : "";
-                    result.put("resourcesId", resourcesLibName);
+                    result.put("resourcesId", resourcesLibName);//这个其实是名称
+                    result.put("resources", fileInfo.getResourcesId());//这个才是id
 
                     result.put("loanLabel", fileInfo.getLoanLabel());
                     int id = fileInfo.getId();
@@ -181,7 +182,7 @@ public class ListBookController {
             model.addAttribute("databaseId", databaseId);
             model.addAttribute("book", fileInfo);
 
-            return "viewDetails";  // 返回书籍详细信息的视图名称
+            return "admin/viewDetails";  // 返回书籍详细信息的视图名称
         } else {
             return "redirect:/test/searchresults";  // 如果找不到书籍，重定向回搜索结果页面
         }
@@ -198,22 +199,37 @@ public class ListBookController {
                              @RequestParam String databaseIdSearched) {
         fileService.updateBook(fileInfo);
 
-        String redirectUrl = String.format("redirect:/test/search2?title=%s&publisher=%s&sourceType=%s&language=%s&published=%s&status=%s&databaseId=%s",
+        return String.format("redirect:/test/search2?title=%s&publisher=%s&sourceType=%s&language=%s&published=%s&status=%s&databaseId=%s",
                 titleSearched, publisherSearched, sourceTypeSearched, languageSearched, publishedSearched, statusSearched, databaseIdSearched);
-        return redirectUrl;
     }
 
-//    @PutMapping("/updateStatus/{id}")
-//    public ResponseEntity<String> updateStatus(@PathVariable int id, @RequestParam String newStatus) {
-//        fileService.updateStatus(id, newStatus);
-//        return ResponseEntity.ok("Status updated successfully");
-//    }
-//
-//    @PutMapping("/updateLoan/{id}")
-//    public ResponseEntity<String> updateLoan(@PathVariable int id, @RequestParam String newLoan) {
-//        fileService.updateLoan(id, newLoan);
-//        return ResponseEntity.ok("Loan updated successfully");
-//    }
+    @PostMapping("/uploadSinglePDF")
+    @ResponseBody
+    public ResponseEntity<String> uploadPDF(@RequestParam("file") MultipartFile file,
+                                            @RequestParam("id") Integer id) {
+        System.out.println(id);
+        try {
+            fileService.uploadSingleFile(file, id);
+            return ResponseEntity.ok("File uploaded successfully.");
+        } catch (IOException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("File upload failed: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/uploadSingleEpub")
+    @ResponseBody
+    public ResponseEntity<String> uploadEpub(@RequestParam("file") MultipartFile file,
+                                            @RequestParam("id") Integer id) {
+        System.out.println(id);
+        try {
+            fileService.uploadSingleEpub(file, id);
+            return ResponseEntity.ok("File uploaded successfully.");
+        } catch (IOException | IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("File upload failed: " + e.getMessage());
+        }
+    }
 
     @PostMapping("test/updateField")
     @ResponseBody
@@ -235,56 +251,20 @@ public class ListBookController {
     }
 
     private String encodeParam(Object param) {
-        try {
-            return param == null ? "" : URLEncoder.encode(param.toString(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
-        }
+        return param == null ? "" : URLEncoder.encode(param.toString(), StandardCharsets.UTF_8);
     }
 
-//    @GetMapping("/downloadFromList/{bookId}")
-//    public ResponseEntity<Resource> downloadFile2(@PathVariable int bookId) {
-//        FileInfo f = fileService.getBookById(bookId);
-//
-//        // Use regex to split by spaces and parentheses, removing non-digit parts
-//        String[] parts = f.getIsbn().replaceAll("[^\\d\\s]", "").split("\\s+");
-//
-//        List<String> resultList = new ArrayList<>(Arrays.asList(parts));
-//        for (String part : parts) {
-//            resultList.add(part + ".pdf");
-//        }
-//
-//        for (String fileName : resultList) {
-//            if (pdfRepository.existsByName(fileName)) {
-//                System.out.println("Downloading file with name: " + fileName);
-//                try {
-//                    Path filePath = Paths.get(PDFUploadPath).resolve(fileName).normalize();
-//                    Resource resource = new UrlResource(filePath.toUri());
-//
-//                    if (resource.exists()) {
-//                        return ResponseEntity.ok()
-//                                .contentType(MediaType.APPLICATION_PDF)
-//                                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
-//                                .body(resource);
-//                    } else {
-//                        return ResponseEntity.notFound().build();
-//                    }
-//                } catch (MalformedURLException ex) {
-//                    return ResponseEntity.badRequest().build();
-//                }
-//            }
-//        }
-//
-//        return ResponseEntity.notFound().build();
-//    }
-
     @GetMapping("/listPDFs")
-    public String getDistinctDownloadLinkBooks(@RequestParam Integer databaseId,
+    public String getDistinctDownloadLinkBooks(@RequestParam(required = false) Integer databaseId,
                                                @RequestParam(required = false) String searchValue,
                                                @RequestParam(required = false) String searchType,
                                                Model model) {
-        // 获取所有 PDF 文件
-        List<FileInfo> pdfList = fileService.getListPDFs(databaseId);
+        List<FileInfo> pdfList;
+        if (databaseId == null) {
+            pdfList = fileService.getListPDFs(null); // 传递 null 给 service 方法处理所有数据库
+        } else {
+            pdfList = fileService.getListPDFs(databaseId);
+        }
 
         // 获取所有 PDF 的名称，通过 downloadLink 关联
         List<String> downloadLinks = pdfList.stream()
@@ -296,7 +276,6 @@ public class ListBookController {
         // 根据 searchType 和 searchValue 进行过滤
         List<FileInfo> filteredPdfList;
         if ("all".equalsIgnoreCase(searchType)) {
-            // 如果 searchType 为 "all"，在 name、title 和 isbn 中搜索 searchValue
             filteredPdfList = pdfList.stream()
                     .filter(fileInfo ->
                             (searchValue == null ||
@@ -325,59 +304,64 @@ public class ListBookController {
         Map<String, List<FileInfo>> groupedByDownloadLink = filteredPdfList.stream()
                 .collect(Collectors.groupingBy(FileInfo::getDownloadLink));
 
+        // 获取所有数据库的 ID 和名称的映射
+        Map<Integer, String> allDatabase = resourcesLibService.getAllDatabaseIdsAndNames();
+
+        // 为每个 FileInfo 查找对应的数据库名称，并将其添加到模型中
+        Map<String, String> fileInfoDatabaseNames = new HashMap<>();
+        for (FileInfo fileInfo : pdfList) {
+            String dbName = allDatabase.get(fileInfo.getResourcesId());
+            fileInfoDatabaseNames.put(fileInfo.getDownloadLink(), dbName);
+        }
+
         Set<Integer> uniqueNoTitles = groupedByDownloadLink.values().stream()
                 .map(List::size)
                 .collect(Collectors.toSet());
-        Map<Integer, String> allDatabase = resourcesLibService.getAllDatabaseIdsAndNames();
 
         model.addAttribute("pdfs", groupedByDownloadLink);
         model.addAttribute("pdfNames", pdfNames);
-        model.addAttribute("database", databaseId);
+        model.addAttribute("database", databaseId); // 始终添加 databaseId，即使是 null
         model.addAttribute("uniqueNoTitles", uniqueNoTitles);
-        model.addAttribute("databaseName", resourcesLibService.findResourcesLibById(databaseId).getName());
+        model.addAttribute("databaseNames", fileInfoDatabaseNames);
         model.addAttribute("allDatabase", allDatabase);
 
         return "admin/pdfList";
     }
 
     @PostMapping("/deletePdf/{pdfID}")
-    public String deletePdf(@PathVariable String pdfID, @RequestParam Integer databaseId, Model model) {
+    public String deletePdf(@PathVariable String pdfID, @RequestParam(required = false) Integer databaseId, Model model) {
         boolean isDeleted = fileService.deletePdfById(pdfID,databaseId);
         if (isDeleted) {
             model.addAttribute("message", "PDF deleted successfully.");
         } else {
             model.addAttribute("message", "Failed to delete PDF.");
         }
-        // Optionally, add logic to refresh the list of PDFs or redirect to another page
+        if (databaseId==null){
+            return "redirect:/listPDFs";
+        }
 
         return String.format("redirect:/listPDFs?databaseId=%s",databaseId);
     }
 
     @PostMapping("deleteList2/{fileID}")
-    public String deleteFile2(@PathVariable("fileID") int fileID,
+    public String deleteFile2(@PathVariable("fileID") Integer fileID,
                              @RequestParam Integer databaseId
                              ) {
         fileService.deleteBook(fileID);
+        if (databaseId==null){
+            return "redirect:/listPDFs";
+        }
         return String.format("redirect:/listPDFs?databaseId=%s",databaseId);
     }
 
-//    @PostMapping("/update")
-//    public String updateBook2(@ModelAttribute FileInfo fileInfo,
-//                              @RequestParam(required = false) String searchValue,
-//                              @RequestParam(required = false) String searchType) {
-//        fileService.updateBook(fileInfo);
-//
-//        Integer databaseId = fileInfo.getResourcesId();
-//        return String.format("redirect:/listPDFs?databaseId=%s&sourceType=%s&sourceValue=%s",databaseId,searchType,searchValue);
-//    }
-
     @GetMapping("/listEpubs")
-    public String getDistinctEpubs(@RequestParam Integer databaseId,
+    public String getDistinctEpubs(@RequestParam(required = false) Integer databaseId,
                                                @RequestParam(required = false) String searchValue,
                                                @RequestParam(required = false) String searchType,
                                                Model model) {
         // 获取所有 PDF 文件
         List<FileInfo> pdfList = fileService.getListEpubs(databaseId);
+        //System.out.println(pdfList);
 
         // 获取所有 PDF 的名称，通过 downloadLink 关联
         List<String> path = pdfList.stream()
@@ -423,26 +407,33 @@ public class ListBookController {
                 .collect(Collectors.toSet());
         Map<Integer, String> allDatabase = resourcesLibService.getAllDatabaseIdsAndNames();
 
+        // 为每个 FileInfo 查找对应的数据库名称，并将其添加到模型中
+        Map<String, String> fileInfoDatabaseNames = new HashMap<>();
+        for (FileInfo fileInfo : pdfList) {
+            String dbName = allDatabase.get(fileInfo.getResourcesId());
+            fileInfoDatabaseNames.put(fileInfo.getDownloadLink(), dbName);
+        }
         model.addAttribute("pdfs", groupedByepubPath);
         model.addAttribute("pdfNames", epubNames);
-        model.addAttribute("database", databaseId);
+        model.addAttribute("database", databaseId); // 始终添加 databaseId，即使是 null
         model.addAttribute("uniqueNoTitles", uniqueNoTitles);
-        model.addAttribute("databaseName", resourcesLibService.findResourcesLibById(databaseId).getName());
+        model.addAttribute("databaseNames", fileInfoDatabaseNames);
         model.addAttribute("allDatabase", allDatabase);
 
         return "admin/epubList";
     }
 
     @PostMapping("/deleteEpub/{pdfID}")
-    public String deleteEpub(@PathVariable String pdfID, @RequestParam Integer databaseId, Model model) {
+    public String deleteEpub(@PathVariable String pdfID, @RequestParam(required = false) Integer databaseId, Model model) {
         boolean isDeleted = fileService.deleteEpubById(pdfID,databaseId);
         if (isDeleted) {
             model.addAttribute("message", "PDF deleted successfully.");
         } else {
             model.addAttribute("message", "Failed to delete PDF.");
         }
-        // Optionally, add logic to refresh the list of PDFs or redirect to another page
-
+        if (databaseId==null){
+            return "redirect:/listEpubs";
+        }
         return String.format("redirect:/listEpubs?databaseId=%s",databaseId);
     }
 
@@ -450,9 +441,13 @@ public class ListBookController {
     public String deleteFile3(@PathVariable("fileID") int fileID,
                               @RequestParam Integer databaseId
     ) {
+        if (databaseId==null){
+            return "redirect:/listEpubs";
+        }
         fileService.deleteBook(fileID);
         return String.format("redirect:/listEpubs?databaseId=%s",databaseId);
     }
+
     @GetMapping("/files-view")
     public String fileList() {
         return "user/fileList";  // 这里返回的是视图名称，不包括.html扩展名

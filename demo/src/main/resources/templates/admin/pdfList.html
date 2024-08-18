@@ -20,8 +20,9 @@
 
     <div class="form-group">
       <label for="databaseSelect">Select Database:</label>
-      <select id="databaseSelect" class="form-control" onchange="filterByDatabase()">
+      <select id="databaseSelect" name="databaseSelect" class="form-control" onchange="filterByDatabase()">
         <option value="">Select a database</option>
+        <option value="all">All</option>
         <option th:each="entry : ${allDatabase}" th:value="${entry.key}" th:text="${entry.value}"></option>
       </select>
     </div>
@@ -57,9 +58,9 @@
       <div class="card mb-4">
         <div class="card-header">
           <h2 class="h5 d-inline">
-            PDF id: <span th:text="${entry.key}"></span>
-            name: <span th:text="${pdfNames[entry.key]}"></span>
-            No. title: <span class="no-title" th:text="${#lists.size(entry.value)}"></span>
+            ID <span th:text="${entry.key}"></span>
+            : <span th:text="${pdfNames[entry.key]}"></span>
+            (<span class="no-title" th:text="${#lists.size(entry.value)}"></span>)
           </h2>
           <div class="float-right">
             <a th:href="@{/downloadfiles/{bookId}(bookId=${entry.value[0].id})}" class="btn btn-primary btn-sm">View online</a>
@@ -85,21 +86,18 @@
             <tr th:each="file : ${entry.value}">
               <td th:text="${file.title}"></td>
               <td th:text="${file.isbn}"></td>
-              <td th:text="${databaseName}"></td>
-              <!--              <td>-->
-              <!--                <a th:href="@{/test/search2?searchType=id&searchValue=${entry.value[0].id}}"-->
-              <!--                   class="btn btn-info btn-sm">View information</a>-->
-              <!--              </td>-->
+              <td th:text="${allDatabase[file.resourcesId]}"></td>
               <td>
                 <form th:action="@{/test/search2}" method="get" style="display:inline;">
                   <input type="hidden" name="searchType" th:value="id">
-                  <input type="hidden" name="searchValue" th:value="${entry.value[0].id}">
+                  <input type="hidden" name="searchValue" th:value="${file.id}">
                   <button type="submit" class="btn btn-info btn-sm">View</button>
                 </form>
               </td>
               <td>
-                <form th:action="@{/deleteList2/{bookId}(bookId=${entry.value[0].id})}" method="post" style="display:inline;">
-                  <input type="hidden" name="databaseId" th:value="${database}">
+                <form th:action="@{/deleteList2/{bookId}(bookId=${file.id})}" method="post" style="display:inline;">
+                  <input type="hidden" name="databaseId" th:if="${database != null}" th:value="${database}">
+                  <input type="hidden" name="databaseId" th:if="${database == null}" value="">
                   <button type="submit" class="btn btn-danger btn-sm">Delete</button>
                 </form>
               </td>
@@ -117,9 +115,16 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
   function filterByDatabase() {
-    var databaseId = document.getElementById('databaseSelect').value;
-    if (databaseId) {
-      window.location.href = '/listPDFs?databaseId=' + databaseId;
+    var databaseSelect = document.getElementById('databaseSelect');
+    var databaseId = databaseSelect.value;
+
+    // 如果选择了 'All'，则不在 URL 中添加 databaseId 参数
+    if (databaseId === "all") {
+      window.location.href = '/listPDFs';  // 不包括 databaseId 参数
+    } else if (databaseId) {
+      window.location.href = '/listPDFs?databaseId=' + encodeURIComponent(databaseId);
+    } else {
+      window.location.href = '/listPDFs';  // 如果没有选择，则不包括 databaseId 参数
     }
   }
 

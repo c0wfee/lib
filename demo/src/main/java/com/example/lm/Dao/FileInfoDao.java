@@ -86,10 +86,10 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     void deleteById(int id);
 
-    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.downloadLink IS NOT NULL")
+    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.downloadLink IS NOT NULL AND LENGTH(TRIM(f.downloadLink)) > 0")
     List<FileInfo> getPDFNum(int folderId);
 
-    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.epubPath IS NOT NULL")
+    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.epubPath IS NOT NULL AND LENGTH(TRIM(f.epubPath)) > 0")
     List<FileInfo> getEPUBNum(int folderId);
 
 
@@ -112,6 +112,13 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     @Transactional
     @Query("UPDATE FileInfo b SET b.downloadLink = NULL WHERE b.downloadLink = :pdfID")
     void updateDownloadLinkToNull(String pdfID);
+    void deleteByDownloadLink(String downloadLink);
+
+    void deleteByEpubPath(String epubPath);
+
+    @Query("SELECT COUNT(f) > 0 FROM FileInfo f WHERE f.downloadLink = :downloadLink")
+    boolean existsByDownloadLink(@Param("downloadLink") String downloadLink);
+
 
     @Modifying
     @Transactional
@@ -119,10 +126,10 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     void updateEpubPathToNull(String pdfID);
 
     @Query("SELECT f FROM FileInfo f WHERE " +
-            "(:title IS NULL OR f.title LIKE %:title%) " +
+            "((:title IS NULL OR f.title LIKE %:title%) " +
             "OR (:isbn IS NULL OR f.isbn LIKE %:isbn%) " +
             "OR (:alternativeTitle IS NULL OR f.alternativeTitle LIKE %:alternativeTitle%) " +
-            "OR (:author IS NULL OR f.authors LIKE %:author%) " +
+            "OR (:author IS NULL OR f.authors LIKE %:author%)) " +
             "AND (:status IS NULL OR f.status = :status) " +
             "AND (:publisher IS NULL OR f.publisher = :publisher) " +
             "AND (:sourceType IS NULL OR f.sourceType = :sourceType) " +
