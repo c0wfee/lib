@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.time.Year;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -92,4 +93,19 @@ public class BorrowService {
         // 将List<BorrowDTO>转换为Page<BorrowDTO>对象
         return new PageImpl<>(borrowDTOList, pageable, borrows.getTotalElements());
     }
+
+    public Map<String, Long> getBorrowCountByUserForCurrentYear() {
+        int currentYear = Year.now().getValue();
+        List<Object[]> results = borrowRepository.findBorrowCountByUserForCurrentYear(currentYear);
+
+        Map<String, Long> borrowCountByUser = new HashMap<>();
+        for (Object[] result : results) {
+            String username = (String) result[0];
+            Long count = (Long) result[1];
+            borrowCountByUser.put(username, count);
+        }
+
+        return borrowCountByUser;
+    }
+
 }
