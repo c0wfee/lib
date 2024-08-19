@@ -1,27 +1,27 @@
 window.onload = function () {
-    const user = JSON.parse(localStorage.getItem('user'));  // 从 localStorage 获取用户信息
+    const user = JSON.parse(localStorage.getItem('user'));
     if (!user || !user.username) {
         alert('User not logged in');
-        window.location.href = '/login';  // 如果没有登录，重定向到登录页面
+        window.location.href = '/login';
         return;
     }
 
-    loadFilters(); // 加载筛选条件
-    searchFiles(1, 10); // 设置默认的page和size值
+    loadFilters();
+    searchFiles(1, 10);
 };
 
 function loadFilters() {
-    fetch(`/getPublisher`)
+    fetch('/getPublisher')
         .then(response => response.json())
         .then(data => populateFilterOptions('publisher-filter', data))
         .catch(error => console.error('Error fetching publishers:', error));
 
-    fetch(`/getSeries`)
+    fetch('/getSeries')
         .then(response => response.json())
         .then(data => populateFilterOptions('series-filter', data))
         .catch(error => console.error('Error fetching series:', error));
 
-    fetch(`/getYear`)
+    fetch('/getYear')
         .then(response => response.json())
         .then(data => {
             const minYear = Math.min(...data);
@@ -32,11 +32,13 @@ function loadFilters() {
         })
         .catch(error => console.error('Error fetching years:', error));
 
-    fetch(`/getDatabases`)
+    fetch('/getDatabases')
         .then(response => response.json())
         .then(data => populateFilterOptions('database-filter', data))
         .catch(error => console.error('Error fetching databases:', error));
 }
+
+let filterOptionsCache = {}; // 缓存所有的过滤选项
 
 function populateFilterOptions(filterId, options) {
     const filterElement = document.getElementById(filterId);
@@ -44,10 +46,13 @@ function populateFilterOptions(filterId, options) {
         console.error(`Element with ID '${filterId}' not found.`);
         return;
     }
-    filterElement.innerHTML = ''; // 清空现有选项
 
-    const maxItemsToShow = 5; // 初始显示的最大选项数
+    filterElement.innerHTML = '';
+    filterOptionsCache[filterId] = options; // 缓存所有选项
 
+    const maxItemsToShow = 5;
+
+    // 显示初始的maxItemsToShow项
     options.slice(0, maxItemsToShow).forEach(option => {
         const optionElement = document.createElement('li');
         optionElement.innerHTML = `
@@ -66,27 +71,51 @@ function populateFilterOptions(filterId, options) {
     }
 }
 
-// 显示更多选项
 function showMoreOptions(filterId, maxItemsToShow) {
     const filterElement = document.getElementById(filterId);
-    const options = Array.from(filterElement.children);
-    const showMoreButton = options.pop(); // 获取“Show More”按钮并移除
+    const options = filterOptionsCache[filterId];
+    const currentItems = filterElement.querySelectorAll('li'); // 获取当前显示的所有列表项
+    const showMoreButton = filterElement.querySelector('button'); // 获取“Show More”按钮
 
-    // 清除当前选项，并显示所有选项
-    filterElement.innerHTML = '';
-    const allOptions = [...options, ...showMoreButton];
+    if (showMoreButton && showMoreButton.textContent === "Show More") {
+        // 显示更多选项
+        const currentLength = currentItems.length - 1; // 减去“Show More”按钮
 
-    // 添加所有选项
-    allOptions.forEach(option => {
-        filterElement.appendChild(option);
-    });
+        // 显示下一批选项
+        options.slice(currentLength, currentLength + maxItemsToShow).forEach(option => {
+            const optionElement = document.createElement('li');
+            optionElement.innerHTML = `
+                <input type="checkbox" value="${option}" onclick="applyFilter('${filterId.split('-')[0]}', this.value)">
+                <label>${option}</label>
+            `;
+            if (showMoreButton && showMoreButton.parentNode === filterElement) {
+                filterElement.insertBefore(optionElement, showMoreButton); // 确保 showMoreButton 是当前 filterElement 的子节点
+            } else {
+                filterElement.appendChild(optionElement); // 直接插入元素
+            }
+        });
 
-    // 再次生成所有选项，并且移除“Show More”按钮
-    allOptions.forEach(option => {
-        if (option.innerText === 'Show More') {
-            filterElement.removeChild(option);
+        // 如果没有更多选项，将“Show More”按钮文本改为“Show Less”
+        if (currentLength + maxItemsToShow >= options.length) {
+            showMoreButton.textContent = "Show Less";
         }
-    });
+
+    } else if (showMoreButton && showMoreButton.textContent === "Show Less") {
+        // 隐藏显示的额外选项
+        const itemsToHide = Array.from(currentItems).slice(maxItemsToShow); // 获取要隐藏的列表项
+
+        itemsToHide.forEach(item => {
+            if (item !== showMoreButton) {
+                filterElement.removeChild(item); // 删除要隐藏的列表项
+            }
+        });
+
+        // 将按钮文本改为“Show More”
+        showMoreButton.textContent = "Show More";
+
+        // 将“Show More”按钮移到列表末尾
+        filterElement.appendChild(showMoreButton);
+    }
 }
 
 const sourceTypeImages = {
@@ -98,37 +127,25 @@ let currentPage = 1;
 const pageSize = 10;
 let filters = {};
 
-// 显示和隐藏搜索栏
 function toggleSearch() {
     const searchBar = document.getElementById('search-bar');
-    if (searchBar.style.display === 'none' || searchBar.style.display === '') {
-        searchBar.style.display = 'flex';
-    } else {
-        searchBar.style.display = 'none';
-    }
+    searchBar.style.display = searchBar.style.display === 'none' || searchBar.style.display === '' ? 'flex' : 'none';
 }
 
 window.toggleSearch = toggleSearch;
 
-// 显示和隐藏筛选列表
 function toggleList(headerElement) {
     const list = headerElement.nextElementSibling;
-    if (list.style.display === 'none' || list.style.display === '') {
-        list.style.display = 'block';
-    } else {
-        list.style.display = 'none';
-    }
+    list.style.display = list.style.display === 'none' || list.style.display === '' ? 'block' : 'none';
 }
 
 window.toggleList = toggleList;
 
-// 执行搜索并应用筛选条件
 function executeSearch() {
     currentPage = 1;
     searchFiles(currentPage, pageSize);
 }
 
-// 应用年份筛选条件
 function applyPublishedFilter() {
     const yearType = document.querySelector('input[name="yearOption"]:checked').value;
     if (yearType === 'range') {
@@ -144,10 +161,8 @@ function applyPublishedFilter() {
     searchFiles(currentPage, pageSize);
 }
 
-// 绑定函数到全局对象
 window.applyPublishedFilter = applyPublishedFilter;
 
-// 清除年份筛选条件
 function clearPublishedFilter() {
     document.getElementById('publishedFrom').value = '';
     document.getElementById('publishedTo').value = '';
@@ -159,10 +174,8 @@ function clearPublishedFilter() {
     searchFiles(currentPage, pageSize);
 }
 
-// 绑定函数到全局对象
 window.clearPublishedFilter = clearPublishedFilter;
 
-// 应用筛选条件并更新filters对象
 function applyFilter(filterType, value) {
     if (!filters[filterType]) {
         filters[filterType] = [];
@@ -178,7 +191,6 @@ function applyFilter(filterType, value) {
 
 window.applyFilter = applyFilter;
 
-// 搜索文件并应用所有筛选条件
 function searchFiles(page, size) {
     const keyword = document.getElementById('keyword').value;
 
@@ -195,7 +207,7 @@ function searchFiles(page, size) {
         database: filters['database'] || []
     };
 
-    fetch(`/search`, {
+    fetch('/search', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -204,7 +216,6 @@ function searchFiles(page, size) {
     })
         .then(response => response.json())
         .then(data => {
-
             const itemList = document.getElementById('item-list');
             itemList.innerHTML = '';
 
@@ -213,23 +224,15 @@ function searchFiles(page, size) {
                     const item = document.createElement('div');
                     item.className = 'item';
                     const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
-                    const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})" ${file.loanLabel === 'Borrowed'}>View Online</button>` : '';
+                    const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})">View Online</button>` : '';
                     const downloadButton = file.download !== "Disable" ? `<button onclick="toggleDownloadOptions('${file.id}', this)">Download</button>` : '';
 
-                    // 默认的借阅信息
                     let loanInfo = file.loanLabel === 'Borrowed' ? `On Loan, unavailable until ${file.returnDate || 'Loading...'}` : file.loanLabel || 'Available';
-
-                    // 生成借书按钮的逻辑，借书期为0时隐藏按钮
-                    const borrowButton = file.borrowPeriod <= 0
-                        ? ''  // 如果借书期为0，则不生成按钮
-                        : `<button id="borrow-button-${file.id}" onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>`;
-
-                    // 生成 loan-period 元素的逻辑，借书期为0时隐藏该元素
-                    const loanPeriodElement = file.borrowPeriod > 0
-                        ? `<p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${file.borrowPeriod} Days</p>`
+                    const borrowButton = file.borrowPeriod > 0
+                        ? `<button id="borrow-button-${file.id}" onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>`
                         : '';
 
-                    // 生成 loan-info 元素的逻辑，只有在借书期大于0且状态为Borrowed时才会显示该元素
+                    const loanPeriodElement = file.borrowPeriod > 0 ? `<p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${file.borrowPeriod} Days</p>` : '';
                     let loanInfoElement = '';
                     if (file.borrowPeriod > 0 && file.loanLabel === 'Borrowed') {
                         loanInfoElement = `<span id="loan-info-${file.id}" style="color: grey; margin-left: 10px;"></span>`;
@@ -257,11 +260,9 @@ function searchFiles(page, size) {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `;
+                    </div>`;
                     itemList.appendChild(item);
 
-                    // 如果满足条件，获取还书日期并更新 loan-info 元素
                     if (file.borrowPeriod > 0 && file.loanLabel === 'Borrowed') {
                         fetch(`/borrow/${file.id}`, {
                             method: 'GET',
@@ -269,13 +270,11 @@ function searchFiles(page, size) {
                                 'Content-Type': 'application/json'
                             }
                         })
-                            .then(response => response.text())  // 先使用 .text() 而不是 .json()
+                            .then(response => response.text())
                             .then(data => {
-                                console.log('Received data:', data);  // 打印响应数据
+                                const loanInfoElem = document.getElementById(`loan-info-${file.id}`);
                                 try {
-                                    const parsedData = JSON.parse(data);  // 手动解析 JSON
-                                    console.log('Parsed data:', parsedData);
-                                    const loanInfoElem = document.getElementById(`loan-info-${file.id}`);
+                                    const parsedData = JSON.parse(data);
                                     if (parsedData.loanEndTime) {
                                         loanInfoElem.textContent = `On Loan, unavailable until ${parsedData.loanEndTime}`;
                                     } else {
@@ -288,7 +287,6 @@ function searchFiles(page, size) {
                             .catch(error => {
                                 console.error('Error fetching borrow details:', error);
                             });
-
                     }
                 });
 
@@ -317,7 +315,6 @@ function searchFiles(page, size) {
         });
 }
 
-// 创建分页
 function createPagination(totalElements, currentPage, size) {
     const paginationContainer = document.getElementById('pagination');
     paginationContainer.innerHTML = '';
@@ -362,13 +359,11 @@ function createPagination(totalElements, currentPage, size) {
     paginationContainer.appendChild(nextButton);
 }
 
-// 移除筛选条件
 function removeFilter(filterType) {
     delete filters[filterType];
     searchFiles(currentPage, pageSize);
 }
 
-// 切换年份输入框的显示
 function toggleYearInputs(yearType) {
     const rangeInputs = document.getElementById('rangeInputs');
     const singleInput = document.getElementById('singleInput');
@@ -382,7 +377,6 @@ function toggleYearInputs(yearType) {
     }
 }
 
-// 绑定函数到全局对象
 window.toggleYearInputs = toggleYearInputs;
 
 function viewPDF(id, view) {
@@ -406,7 +400,6 @@ function viewPDF(id, view) {
     }
 }
 
-// 将 viewPDF 函数挂载到 window 对象上，使其在全局范围内可用
 window.viewPDF = viewPDF;
 
 function downloadBook(id) {
@@ -419,8 +412,7 @@ function downloadBook(id) {
                     <span id="progress-text-${id}">0%</span>
                     <span id="speed-${id}"></span>
                 </div>
-            </div>
-        `;
+            </div>`;
     const item = document.querySelector(`.item-meta button[onclick="downloadBook('${id}')"]`).parentNode;
     item.innerHTML += downloadOptions;
 }
@@ -446,8 +438,8 @@ function downloadFile(id, format) {
             progressText.innerText = `${percentComplete.toFixed(2)}%`;
 
             const currentTime = Date.now();
-            const elapsedTime = (currentTime - startTime) / 1000; // in seconds
-            const speed = ((event.loaded - previousLoaded) / 1024) / elapsedTime; // KB/s
+            const elapsedTime = (currentTime - startTime) / 1000;
+            const speed = ((event.loaded - previousLoaded) / 1024) / elapsedTime;
             speedText.innerText = `Speed: ${speed.toFixed(2)} KB/s`;
 
             previousLoaded = event.loaded;
@@ -456,7 +448,6 @@ function downloadFile(id, format) {
     };
 
     xhr.onloadstart = function () {
-        const progressContainer = document.getElementById(`progress-container-${id}`);
         if (progressContainer) {
             progressContainer.style.display = 'block';
         }
@@ -488,7 +479,6 @@ function downloadFile(id, format) {
     xhr.send();
 }
 
-// 将函数挂载到window对象上，使其在全局范围内可用
 window.downloadFile = downloadFile;
 
 function toggleDownloadOptions(id, button) {
@@ -505,46 +495,35 @@ function toggleDownloadOptions(id, button) {
     button.parentNode.appendChild(downloadOptions);
 }
 
-// 如果你希望在模块中定义，但仍然让这个函数在全局可访问，可以使用以下方式
 window.toggleDownloadOptions = toggleDownloadOptions;
 
 async function borrowBook(id) {
     try {
-        let periodUrl = `/getBookPeriod?bookID=${id}`;
-        let periodResponse = await fetch(periodUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            }
-        });
-
+        const periodResponse = await fetch(`/getBookPeriod?bookID=${id}`);
         if (!periodResponse.ok) {
             throw new Error('Failed to fetch borrow period');
         }
 
-        let borrowPeriodText = await periodResponse.text();
-        let borrowPeriod = parseInt(borrowPeriodText, 10);
+        const borrowPeriodText = await periodResponse.text();
+        const borrowPeriod = parseInt(borrowPeriodText, 10);
 
-        let data = new URLSearchParams();
+        const data = new URLSearchParams();
         data.append('bookID', id);
         data.append('borrow_period', borrowPeriod);
 
-        let borrowResponse = await fetch("/borrowBook", {
+        const borrowResponse = await fetch('/borrowBook', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
             },
-            body: data
+            body: data,
         });
 
         if (!borrowResponse.ok) {
             throw new Error('Failed to borrow book');
         }
 
-        let borrowData = await borrowResponse.json();
         alert('Operation successful');
-
-        // 刷新页面以反映借书操作
         window.location.reload();
     } catch (error) {
         console.error('Error:', error);
@@ -552,68 +531,15 @@ async function borrowBook(id) {
     }
 }
 
-// 将 borrowBook 函数挂载到 window 对象上，使其在全局范围内可用
 window.borrowBook = borrowBook;
-
-document.addEventListener('DOMContentLoaded', () => {
-    loadCurrentBorrowing(); // 页面加载时默认加载当前借阅的书目
-
-    // Tab切换时加载相应的数据
-    document.getElementById('current-borrowing-tab').addEventListener('click', () => {
-        loadCurrentBorrowing();
-    });
-
-    document.getElementById('borrowing-history-tab').addEventListener('click', () => {
-        loadBorrowingHistory();
-    });
-});
-
-function loadCurrentBorrowing() {
-    const user = JSON.parse(localStorage.getItem('user')); // 从 localStorage 获取用户信息
-    if (!user || !user.username) {
-        alert('User not logged in');
-        window.location.href = '/login';  // 如果没有登录，重定向到登录页面
-        return;
-    }
-    fetchBooks(user.username, false); // 使用从 localStorage 获取的用户名
-}
-
-function loadBorrowingHistory() {
-    const user = JSON.parse(localStorage.getItem('user')); // 从 localStorage 获取用户信息
-    if (!user || !user.username) {
-        alert('User not logged in');
-        window.location.href = '/login';  // 如果没有登录，重定向到登录页面
-        return;
-    }
-    fetchBooks(user.username, true); // 使用从 localStorage 获取的用户名
-}
-
-async function fetchBooks(username, isHistory = false) {
-    try {
-        const response = await fetch(`/api/borrows/${username}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const books = await response.json();
-        console.log('Fetched Books:', books);
-
-        let filteredBooks;
-        if (isHistory) {
-            // 筛选历史借阅书籍（status 为 "Returned"）
-            filteredBooks = books.filter(book => book.status === "Returned");
-        } else {
-            // 筛选当前借阅书籍（status 不为 "Returned"）
-            filteredBooks = books.filter(book => book.status !== "Returned");
-        }
-
-        displayBooks(filteredBooks, isHistory ? 'borrowing-history-container' : 'current-borrowing-container', isHistory);
-    } catch (error) {
-        console.error('Error fetching books:', error);
-    }
-}
 
 function displayBooks(books, containerId, isHistory = false) {
     const container = document.getElementById(containerId);
+    if (!container) {
+        console.error(`Container with ID '${containerId}' not found.`);
+        return;
+    }
+
     container.innerHTML = '';
     if (books.length === 0) {
         container.innerHTML = '<p class="text-center">No books borrowed.</p>';
@@ -623,7 +549,7 @@ function displayBooks(books, containerId, isHistory = false) {
     books.forEach(book => {
         const card = document.createElement('div');
         card.className = 'card mb-3';
-        card.setAttribute('data-borrow-id', book.borrowId); // 将 borrow_id 存储在 data 属性中
+        card.setAttribute('data-borrow-id', book.borrowId);
 
         const cardHeader = document.createElement('div');
         cardHeader.className = 'card-header';
@@ -634,15 +560,15 @@ function displayBooks(books, containerId, isHistory = false) {
 
         const author = document.createElement('p');
         author.className = 'card-text';
-        author.textContent = 'Author: ' + (book.authors || 'N/A');
+        author.textContent = `Author: ${book.authors || 'N/A'}`;
 
         const loanStartTime = document.createElement('p');
         loanStartTime.className = 'card-text';
-        loanStartTime.textContent = 'Borrowed Date: ' + book.loanStartTime;
+        loanStartTime.textContent = `Borrowed Date: ${book.loanStartTime}`;
 
         const loanEndTime = document.createElement('p');
         loanEndTime.className = 'card-text';
-        loanEndTime.textContent = 'Due Date: ' + book.loanEndTime;
+        loanEndTime.textContent = `Due Date: ${book.loanEndTime}`;
 
         cardBody.appendChild(author);
         cardBody.appendChild(loanStartTime);
@@ -651,22 +577,20 @@ function displayBooks(books, containerId, isHistory = false) {
         if (isHistory) {
             const returnedDate = document.createElement('p');
             returnedDate.className = 'card-text';
-            returnedDate.textContent = 'Returned Date: ' + (book.returnedDate || 'N/A');
+            returnedDate.textContent = `Returned Date: ${book.returnedDate || 'N/A'}`;
             cardBody.appendChild(returnedDate);
         } else {
             const viewButton = document.createElement('button');
             viewButton.className = 'btn btn-primary view-button mr-2';
             viewButton.textContent = 'View Online';
-            viewButton.addEventListener('click', () => {
-                viewBook(book.bookId);
-            });
+            viewButton.addEventListener('click', () => viewBook(book.bookId));
 
             const returnButton = document.createElement('button');
             returnButton.className = 'btn btn-secondary return-button';
             returnButton.textContent = 'Return';
             returnButton.addEventListener('click', () => {
                 if (confirm('Are you sure you want to return this book?')) {
-                    const borrowId = card.getAttribute('data-borrow-id'); // 获取存储的 borrow_id
+                    const borrowId = card.getAttribute('data-borrow-id');
                     returnBook(borrowId);
                 }
             });
@@ -682,34 +606,5 @@ function displayBooks(books, containerId, isHistory = false) {
 }
 
 function viewBook(bookId) {
-    console.log('View book with ID:', bookId);
     window.location.href = `/pdf?fileId=${encodeURIComponent(bookId)}`;
-}
-
-function returnBook(borrowId) {
-    let data = new URLSearchParams();
-    data.append('borrow_id', borrowId); // 这里使用新的参数名 'borrow_id'
-
-    fetch("/returnBook", {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: data
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text(); // 后端返回的是字符串，不是 JSON
-        })
-        .then(data => {
-            console.log('Success:', data);
-            alert(data); // 提示成功信息
-            loadCurrentBorrowing(); // 重新加载当前借阅的书目
-        })
-        .catch((error) => {
-            console.error('Error:', error);
-            alert('Operation failed');
-        });
 }

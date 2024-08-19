@@ -42,18 +42,26 @@ body {
 }
 
 .search-bar {
-    display: none;
-    flex: 1;
+    display: flex; /* 确保搜索栏默认显示 */
     align-items: center;
+    margin-bottom: 15px; /* 确保搜索框和Logo、其他元素之间有间距 */
 }
+
 
 .search-bar input {
     flex: 1;
     padding: 10px;
-    font-size: 16px;
-    border: 1px solid #ccc;
+    font-size: 18px; /* 增大字体 */
+    border: 2px solid #007bff; /* 加粗边框并使用醒目的颜色 */
     border-radius: 5px;
+    background-color: #f9f9f9; /* 使用淡色背景，增加对比度 */
     margin-right: 10px;
+    transition: background-color 0.3s ease, border-color 0.3s ease; /* 增加平滑的过渡效果 */
+}
+
+.search-bar input:focus {
+    background-color: #ffffff; /* 聚焦时使背景色变为白色，增加视觉效果 */
+    border-color: #0056b3; /* 聚焦时改变边框颜色 */
 }
 
 .search-bar .icon-button {
