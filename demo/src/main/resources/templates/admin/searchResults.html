@@ -1,11 +1,10 @@
 <!DOCTYPE html>
-<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>搜索结果</title>
-  <link rel="stylesheet" href="/css/admin/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/vendor/bootstrap/css/bootstrap.min.css">
   <style>
     .table {
       font-size: 12px; /* 调整表格字体大小 */
@@ -419,34 +418,11 @@
   </div>
 
   <!-- Bootstrap JS -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
+  <script src="/static/vendor/jquery/jquery.min.js"></script>
+  <script src="/static/vendor/popper/popper.min.js"></script>
+  <script src="/static/js/bootstrap/bootstrap.min.js"></script>
   <!-- 自定义JS -->
   <script>
-    // function showEditModal(button) {
-    //   var id = button.getAttribute('data-id');
-    //   var type = button.getAttribute('data-type');
-    //   var value = button.getAttribute('data-value');
-    //
-    //   $('#editId').val(id);
-    //   $('#editType').val(type);
-    //
-    //   var select = $('#editField');
-    //   select.empty();  // Clear existing options
-    //
-    //   if (type === 'status') {
-    //     select.append('<option value="Published">Published</option>');
-    //     select.append('<option value="Unpublished">Unpublished</option>');
-    //   } else {
-    //     select.append('<option value="Enable">Enable</option>');
-    //     select.append('<option value="Disable">Disable</option>');
-    //   }
-    //
-    //   select.val(value);  // Set the current value
-    //   $('#editModal').modal('show');
-    // }
 
     function updateField(id, editType, editField) {
       fetch('/test/updateField', {
@@ -549,10 +525,6 @@
 
   </script>
 </div>
-<!-- Core -->
-<script src="/static/vendor/jquery/jquery.min.js"></script>
-<script src="/static/vendor/popper/popper.min.js"></script>
-<script src="/static/js/bootstrap/bootstrap.min.js"></script>
 <!-- FontAwesome 5 -->
 <script src="/static/vendor/fontawesome/js/fontawesome-all.min.js" defer></script>
 <!-- Scripts used only for this demo only - Remove these in your project -->
@@ -564,8 +536,6 @@
 <script src="/static/vendor/holderjs/holder.min.js"></script>
 <script src="/static/js/demo.js"></script>
 <script src="/static/vendor/textarea-autosize/textarea-autosize.min.js"></script>
-<!-- Theme JS -->
-<script src="/static/js/theme.js"></script>
-<script src="/static/js/admin/sourceDatabase.js"></script>
+
 </body>
 </html>
