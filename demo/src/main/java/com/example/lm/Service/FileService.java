@@ -263,6 +263,8 @@ public class FileService {
                 fileInfo.setDownload(download);
                 fileInfo.setBorrowPeriod(borrow_period);
                 fileInfo.setLoanLabel("Returned");
+                fileInfo.setEpubPath("NULL");
+                fileInfo.setDownloadLink("NULL");
                 fileInfoDao.save(fileInfo);
             }
         } catch (Exception e) {
@@ -419,10 +421,6 @@ public class FileService {
             countJpql += " AND f.published <= :publishedTo";
         }
 
-        if (publishedYear != null) {
-            jpql += " AND f.published = :publishedYear";
-            countJpql += " AND f.published = :publishedYear";
-        }
 
         TypedQuery<FileInfo> query = entityManager.createQuery(jpql, FileInfo.class);
         TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class);
@@ -687,6 +685,8 @@ public class FileService {
                             bookMetadata.setDownload(download);
                             bookMetadata.setBorrowPeriod(borrow_period);
                             bookMetadata.setResourcesId(folderId);
+                            bookMetadata.setDownloadLink("NULL");
+                            bookMetadata.setEpubPath("NULL");
 
                             bookMetadata.setLoanLabel("Returned");
                             ResourcesLib rl = resourcesLibDao.findResourcesLibById(folderId);

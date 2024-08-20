@@ -1,5 +1,7 @@
 package com.example.lm.utils;
 
+import com.example.lm.Model.YearRange;
+
 import java.util.List;
 
 public class FilterData {
@@ -8,8 +10,8 @@ public class FilterData {
     private List<String> publisher;
     private List<String> subject;
     private List<String> database;
-    private Integer publishedFrom;
-    private Integer publishedTo;
+    private YearRange yearRange;
+
     private Integer publishedYear;
     private int page;
     private int size;
@@ -26,8 +28,6 @@ public class FilterData {
                 ", publisher=" + publisher +
                 ", subject=" + subject +
                 ", database=" + database +
-                ", publishedFrom=" + publishedFrom +
-                ", publishedTo=" + publishedTo +
                 ", publishedYear=" + publishedYear +
                 ", page=" + page +
                 ", size=" + size +
@@ -70,20 +70,12 @@ public class FilterData {
         this.subject = subject;
     }
 
-    public Integer getPublishedTo() {
-        return publishedTo;
+    public YearRange getYearRange() {
+        return yearRange;
     }
 
-    public void setPublishedTo(Integer publishedTo) {
-        this.publishedTo = publishedTo;
-    }
-
-    public Integer getPublishedFrom() {
-        return publishedFrom;
-    }
-
-    public void setPublishedFrom(Integer publishedFrom) {
-        this.publishedFrom = publishedFrom;
+    public void setYearRange(YearRange yearRange) {
+        this.yearRange = yearRange;
     }
 
     public Integer getPublishedYear() {
