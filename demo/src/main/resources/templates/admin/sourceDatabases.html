@@ -57,7 +57,6 @@
             <tr>
                 <th>Database Name</th>
                 <th>Alternate Names</th>
-                <th>Description</th>
                 <th>Titles</th>
                 <th>PDFs</th>
                 <th>EPUBs</th>
@@ -75,7 +74,6 @@
             <tr th:each="folder : ${folders}">
                 <td th:text="${folder.name}">Database Name</td>
                 <td th:text="${folder.alternateName}">Alternate Names</td>
-                <td th:text="${folder.description}">Description</td>
                 <td>
                     <a th:href="@{/test/search2(databaseId=${folder.id})}" th:text="${folder.marcCount}">Marc Count</a>
                 </td>
@@ -92,7 +90,7 @@
                        th:data-description="${folder.description}" th:data-type="${folder.type}">Edit Details</a>
                 </td>
                 <td>
-                    <a th:href="@{/table(folderId=${folder.id})}" class="btn btn-sm btn-primary edit-marc-info">Edit Marc Info</a>
+                    <a th:href="@{/table(folderId=${folder.id})}" class="btn btn-sm btn-primary edit-marc-info">Edit Titles</a>
                 </td>
                 <td>
                     <div class="dropdown">
