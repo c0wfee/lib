@@ -369,8 +369,9 @@ public class FileService {
 
     public Page<FileInfo> advancedSearch(String keyword, List<String> series, List<String> publisher, List<String> subjects, List<String> database, Integer publishedFrom, Integer publishedTo, Integer publishedYear, Pageable pageable) {
         String searchPattern = "%" + keyword + "%"; // 在关键字前后加上百分号
-        String jpql = "SELECT f FROM FileInfo f WHERE f.status = 'published' AND f.downloadLink IS NOT NULL";
-        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.status = 'published'AND f.downloadLink IS NOT NULL";
+        String jpql = "SELECT f FROM FileInfo f WHERE f.status = 'published' AND (f.downloadLink IS NOT NULL OR f.epubPath IS NOT NULL)";
+
+        String countJpql = "SELECT COUNT(f) FROM FileInfo f WHERE f.status = 'published' AND (f.downloadLink IS NOT NULL OR f.epubPath IS NOT NULL)";
         List<Integer> databaseIds = null;
 
         if (database != null && !database.isEmpty()) {
@@ -468,20 +469,19 @@ public class FileService {
         }
 
         // 打印调试信息
-        System.out.println("JPQL Query: " + jpql);
-        System.out.println("Keyword: " + searchPattern);
-        System.out.println("Series: " + series);
-        System.out.println("Publisher: " + publisher);
-        System.out.println("Subjects: " + subjects);
-        System.out.println("Database: " + database);
-        System.out.println("PublishedFrom: " + publishedFrom);
-        System.out.println("PublishedTo: " + publishedTo);
-        System.out.println("PublishedYear: " + publishedYear);
+        //System.out.println("JPQL Query: " + jpql);
+        //System.out.println("Keyword: " + searchPattern);
+        //System.out.println("Series: " + series);
+        //System.out.println("Publisher: " + publisher);
+        //System.out.println("Subjects: " + subjects);
+        //System.out.println("Database: " + database);
+        //System.out.println("PublishedFrom: " + publishedFrom);
+        //System.out.println("PublishedTo: " + publishedTo);
+        //System.out.println("PublishedYear: " + publishedYear);
 
         // 获取总记录数
         long total = countQuery.getSingleResult();
         System.out.println(total);
-
         // 设置分页
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());
