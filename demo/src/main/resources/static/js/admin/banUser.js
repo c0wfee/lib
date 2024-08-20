@@ -34,7 +34,7 @@ function searchUsers(page, size) {
 
                     // 将今年的借阅次数添加到每个用户
                     filteredUsers.forEach(user => {
-                        user.thisYearBorrowings = borrowCounts[user.id] || 0;
+                        user.thisYearBorrowings = borrowCounts[user.username] || 0;
                     });
 
                     // 根据选择的排序字段进行排序

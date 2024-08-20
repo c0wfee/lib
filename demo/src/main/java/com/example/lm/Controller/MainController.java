@@ -381,6 +381,10 @@ public class MainController {
             filterData.setDatabase(null);
         }
 
+        Integer publishedFrom = filterData.getYearRange().getFrom();
+        Integer publishedTo = filterData.getYearRange().getTo();
+
+
         Pageable pageable = PageRequest.of(filterData.getPage() - 1, filterData.getSize());
         Page<FileInfo> files = fileService.advancedSearch(
                 filterData.getKeyword(),
@@ -388,8 +392,8 @@ public class MainController {
                 filterData.getPublisher(),
                 filterData.getSubject(),
                 filterData.getDatabase(),
-                filterData.getPublishedFrom(),
-                filterData.getPublishedTo(),
+                publishedFrom,
+                publishedTo,
                 filterData.getPublishedYear(),
                 pageable
         );
@@ -408,8 +412,8 @@ public class MainController {
         filters.put("publisher", filterData.getPublisher());
         filters.put("subject", filterData.getSubject());
         filters.put("database", filterData.getDatabase());
-        filters.put("publishedFrom", filterData.getPublishedFrom());
-        filters.put("publishedTo", filterData.getPublishedTo());
+        filters.put("publishedFrom", publishedFrom);
+        filters.put("publishedTo", publishedTo);
         filters.put("publishedYear", filterData.getPublishedYear());
 
         response.put("filters", filters);
