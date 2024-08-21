@@ -421,6 +421,10 @@ public class FileService {
             countJpql += " AND f.published <= :publishedTo";
         }
 
+        if (publishedYear != null) {
+            jpql += " AND SUBSTRING(f.published, 1, 4) = :publishedYear";
+            countJpql += " AND SUBSTRING(f.published, 1, 4) = :publishedYear";
+        }
 
         TypedQuery<FileInfo> query = entityManager.createQuery(jpql, FileInfo.class);
         TypedQuery<Long> countQuery = entityManager.createQuery(countJpql, Long.class);

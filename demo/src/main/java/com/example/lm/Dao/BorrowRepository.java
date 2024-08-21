@@ -26,5 +26,7 @@ public interface BorrowRepository extends JpaRepository<Borrow, Integer> {
     @Query(value = "SELECT username, COUNT(*) FROM borrow WHERE YEAR(STR_TO_DATE(loan_start_time, '%Y-%m-%d %H:%i:%s')) = :currentYear GROUP BY username", nativeQuery = true)
     List<Object[]> findBorrowCountByUserForCurrentYear(@Param("currentYear") int currentYear);
 
+    @Query(value = "SELECT * FROM borrow b WHERE (b.status IS NULL OR b.status != 'Returned') AND STR_TO_DATE(b.loan_end_time, '%Y-%m-%d %H:%i:%s') < STR_TO_DATE(:currentTime, '%Y-%m-%d %H:%i:%s')", nativeQuery = true)
+    List<Borrow> getOverDueDate(@Param("currentTime") String currentTime);
 
 }
