@@ -85,13 +85,19 @@ public class MainController {
     }
 
     @GetMapping("/resourcesLib")
-    public String getFileExplorer(@RequestParam(name = "query", required = false, defaultValue = "") String query,
-                                  @RequestParam(name = "type", required = false, defaultValue = "") String type,
-                                  @RequestParam(name = "display", required = false, defaultValue = "") String status,
-                                  Model model) {
-        List<ResourcesLib> folders = resourcesLibService.searchFolders(query, type, status);
+    public String getFileExplorer(
+            @RequestParam(name = "query", required = false, defaultValue = "") String query,
+            @RequestParam(name = "type", required = false, defaultValue = "") String type,
+            @RequestParam(name = "display", required = false, defaultValue = "") String status,
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size, // 每页显示10条记录
+            Model model) {
+
+        PageRequest pageRequest = PageRequest.of(page, size);
+        Page<ResourcesLib> foldersPage = resourcesLibService.searchFolders(query, type, status, pageRequest);
+
         Map<Integer, List<File>> folderPDFMap = new HashMap<>();
-        for (ResourcesLib folder : folders) {
+        for (ResourcesLib folder : foldersPage.getContent()) {
             List<File> PDFs = fileService.getPDFsByLib(folder.getId());
             int marcCount = fileService.getMarcNum(folder.getId());
             int pdfCount = fileService.getPDFNum(folder.getId());
@@ -102,8 +108,9 @@ public class MainController {
             resourcesLibService.save(folder);
             folderPDFMap.put(folder.getId(), PDFs);
         }
+
         model.addAttribute("folderPDFMap", folderPDFMap);
-        model.addAttribute("folders", folders);
+        model.addAttribute("foldersPage", foldersPage); // 将分页对象传递到前端
         return "admin/sourceDatabases"; // 返回的模板名称
     }
 
