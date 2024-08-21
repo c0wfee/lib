@@ -71,7 +71,7 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="folder : ${folders}">
+            <tr th:each="folder : ${foldersPage.content}">
                 <td th:text="${folder.name}">Database Name</td>
                 <td th:text="${folder.alternateName}">Alternate Names</td>
                 <td>
@@ -494,7 +494,23 @@
         </div>
     </div>
 </div>
-
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item" th:classappend="${foldersPage.hasPrevious()} ? '': 'disabled'">
+            <a class="page-link" th:href="@{/resourcesLib(query=${query}, type=${type}, display=${display}, page=${foldersPage.number - 1}, size=${foldersPage.size})}" aria-label="Previous">
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        <li class="page-item" th:each="i : ${#numbers.sequence(1, foldersPage.totalPages)}" th:classappend="${foldersPage.number + 1 == i} ? 'active' : ''">
+            <a class="page-link" th:text="${i}" th:href="@{/resourcesLib(query=${query}, type=${type}, display=${display}, page=${i - 1}, size=${foldersPage.size})}"></a>
+        </li>
+        <li class="page-item" th:classappend="${foldersPage.hasNext()} ? '': 'disabled'">
+            <a class="page-link" th:href="@{/resourcesLib(query=${query}, type=${type}, display=${display}, page=${foldersPage.number + 1}, size=${foldersPage.size})}" aria-label="Next">
+                <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+    </ul>
+</nav>
 <!-- Core -->
 <script src="/static/vendor/jquery/jquery.min.js"></script>
 <script src="/static/vendor/popper/popper.min.js"></script>

@@ -113,7 +113,7 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE FileInfo b SET b.downloadLink = NULL WHERE b.downloadLink = :pdfID")
+    @Query("UPDATE FileInfo b SET b.downloadLink = 'NULL' WHERE b.downloadLink = :pdfID")
     void updateDownloadLinkToNull(String pdfID);
     void deleteByDownloadLink(String downloadLink);
 
@@ -122,10 +122,12 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     @Query("SELECT COUNT(f) > 0 FROM FileInfo f WHERE f.downloadLink = :downloadLink")
     boolean existsByDownloadLink(@Param("downloadLink") String downloadLink);
 
+    @Query("SELECT COUNT(f) > 0 FROM FileInfo f WHERE f.epubPath = :epubPath")
+    boolean existsByEpubPath(@Param("epubPath") String epubPath);
 
     @Modifying
     @Transactional
-    @Query("UPDATE FileInfo b SET b.epubPath = NULL WHERE b.epubPath = :pdfID")
+    @Query("UPDATE FileInfo b SET b.epubPath = 'NULL' WHERE b.epubPath = :pdfID")
     void updateEpubPathToNull(String pdfID);
 
     @Query("SELECT f FROM FileInfo f WHERE " +

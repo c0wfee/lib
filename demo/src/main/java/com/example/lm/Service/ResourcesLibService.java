@@ -4,6 +4,8 @@ import com.example.lm.Dao.FileInfoDao;
 import com.example.lm.Dao.ResourcesLibDao;
 import com.example.lm.Model.ResourcesLib;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -108,19 +110,20 @@ public class ResourcesLibService {
         fileInfoDao.deleteFileInfoByResourcesId(folderId);
     }
 
-    public List<ResourcesLib> searchFolders(String query, String type, String status) {
+    public Page<ResourcesLib> searchFolders(String query, String type, String status, Pageable pageable) {
         if ((type != null && !type.isEmpty()) && (status == null || status.isEmpty())) {
-            return resourcesLibDao.searchResources(query, type);
+            return resourcesLibDao.searchResources(query, type, pageable);
         }
         if ((status != null && !status.isEmpty()) && (type == null || type.isEmpty())) {
-            return resourcesLibDao.searchResourcesByStatus(query, status);
+            return resourcesLibDao.searchResourcesByStatus(query, status, pageable);
         }
         if ((status != null && !status.isEmpty()) && (type != null && !type.isEmpty())) {
-            return resourcesLibDao.searchResourcesByStatusAndType(query, status, type);
+            return resourcesLibDao.searchResourcesByStatusAndType(query, status, type, pageable);
         }
         return resourcesLibDao.findByNameContainingIgnoreCaseOrAlternateNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(
-                query, query, query);
+                query, query, query, pageable);
     }
+
 
     public void save(ResourcesLib rl){
         resourcesLibDao.save(rl);

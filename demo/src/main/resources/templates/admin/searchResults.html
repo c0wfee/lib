@@ -228,11 +228,11 @@
         <td th:text="${book.published}">Published</td>
         <td th:text="${book.sourceType}">Source Type</td>
         <td>
-          <a th:if="${book.downloadLink != null && !book.downloadLink.isEmpty()}"
+          <a th:if="${book.downloadLink != null && !book.downloadLink.isEmpty() && book.downloadLink != 'NULL'}"
              th:href="@{/downloadfiles/{bookId}(bookId=${book.id})}">
             Download
           </a>
-          <span th:if="${book.downloadLink == null || book.downloadLink.isEmpty()}"
+          <span th:if="${book.downloadLink == null || book.downloadLink.isEmpty() || book.downloadLink == 'NULL'}"
                 data-toggle="modal"
                 data-target="#uploadPdfModal"
                 th:data-id="${book.id}"
@@ -270,11 +270,11 @@
         </div>
 
         <td>
-          <a th:if="${book.epubPath != null && !book.epubPath.isEmpty()}"
+          <a th:if="${book.epubPath != null && !book.epubPath.isEmpty() && book.epubPath != 'NULL'}"
           th:href="@{/viewEpub/{bookId}(bookId=${book.id})}">
             Download
           </a>
-          <span th:if="${book.epubPath == null || book.epubPath.isEmpty()}"
+          <span th:if="${book.epubPath == null || book.epubPath.isEmpty()||book.epubPath == 'NULL'}"
                 data-toggle="modal"
                 data-target="#uploadEpubModal"
                 th:data-id="${book.id}"
