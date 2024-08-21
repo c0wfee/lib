@@ -105,8 +105,10 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     @Query("SELECT DISTINCT b FROM FileInfo b WHERE b.epubPath IS NOT NULL " +
             "AND b.epubPath <> '' " +
+            "AND b.epubPath <> 'NULL' " + // 检查epubPath不是字符串“NULL”
             "AND (:databaseId IS NULL OR b.resourcesId = :databaseId)")
     List<FileInfo> findEpubs(@Param("databaseId") Integer databaseId);
+
 
 
     @Modifying

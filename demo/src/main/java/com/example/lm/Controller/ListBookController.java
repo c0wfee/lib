@@ -269,9 +269,14 @@ public class ListBookController {
         // 获取所有 PDF 的名称，通过 downloadLink 关联
         List<String> downloadLinks = pdfList.stream()
                 .map(FileInfo::getDownloadLink)
+                .filter(link -> link != null && link.matches("\\d+"))  // 过滤出仅包含数字的字符串
                 .distinct()
                 .collect(Collectors.toList());
+
+
         Map<String, String> pdfNames = fileService.getPdfNamesByLinks(downloadLinks);
+
+        System.out.println(pdfNames);
 
         // 根据 searchType 和 searchValue 进行过滤
         List<FileInfo> filteredPdfList;
@@ -302,6 +307,10 @@ public class ListBookController {
 
         // 按照 downloadLink 分组
         Map<String, List<FileInfo>> groupedByDownloadLink = filteredPdfList.stream()
+                .filter(fileInfo -> {
+                    String downloadLink = fileInfo.getDownloadLink();
+                    return downloadLink != null && downloadLink.matches("\\d+");  // 过滤非数字的 downloadLink
+                })
                 .collect(Collectors.groupingBy(FileInfo::getDownloadLink));
 
         // 获取所有数据库的 ID 和名称的映射
@@ -317,6 +326,8 @@ public class ListBookController {
         Set<Integer> uniqueNoTitles = groupedByDownloadLink.values().stream()
                 .map(List::size)
                 .collect(Collectors.toSet());
+
+        System.out.println(groupedByDownloadLink);
 
         model.addAttribute("pdfs", groupedByDownloadLink);
         model.addAttribute("pdfNames", pdfNames);
@@ -361,13 +372,15 @@ public class ListBookController {
                                                Model model) {
         // 获取所有 PDF 文件
         List<FileInfo> pdfList = fileService.getListEpubs(databaseId);
-        //System.out.println(pdfList);
+        System.out.println(pdfList);
 
         // 获取所有 PDF 的名称，通过 downloadLink 关联
         List<String> path = pdfList.stream()
                 .map(FileInfo::getEpubPath)
+                .filter(epubPath -> epubPath != null && !"NULL".equals(epubPath))  // 过滤掉 "NULL" 字符串
                 .distinct()
                 .collect(Collectors.toList());
+
         Map<String, String> epubNames = fileService.getPdfNamesByLinks(path);
 
         // 根据 searchType 和 searchValue 进行过滤
