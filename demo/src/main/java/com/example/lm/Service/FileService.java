@@ -540,7 +540,7 @@ public class FileService {
         String pdfId = fileInfo.getDownloadLink();
         int databaseId = fileInfo.getResourcesId();
         fileInfoDao.deleteById(id);
-        if (!fileInfoDao.existsByDownloadLink(pdfId)){
+        if (!fileInfoDao.existsByDownloadLink(pdfId)&&!pdfId.equals("NULL")){
             Optional<PDFs> fileOptional = pdfDao.findById(Integer.valueOf(pdfId));
             if (fileOptional.isPresent()) {
                 String fileName =fileOptional.get().getName();

@@ -221,7 +221,7 @@ public class ListBookController {
     @ResponseBody
     public ResponseEntity<String> uploadEpub(@RequestParam("file") MultipartFile file,
                                             @RequestParam("id") Integer id) {
-        System.out.println(id);
+//        System.out.println(id);
         try {
             fileService.uploadSingleEpub(file, id);
             return ResponseEntity.ok("File uploaded successfully.");
@@ -276,7 +276,7 @@ public class ListBookController {
 
         Map<String, String> pdfNames = fileService.getPdfNamesByLinks(downloadLinks);
 
-        System.out.println(pdfNames);
+        //System.out.println(pdfNames);
 
         // 根据 searchType 和 searchValue 进行过滤
         List<FileInfo> filteredPdfList;
@@ -327,7 +327,7 @@ public class ListBookController {
                 .map(List::size)
                 .collect(Collectors.toSet());
 
-        System.out.println(groupedByDownloadLink);
+        //System.out.println(groupedByDownloadLink);
 
         model.addAttribute("pdfs", groupedByDownloadLink);
         model.addAttribute("pdfNames", pdfNames);
@@ -372,7 +372,7 @@ public class ListBookController {
                                                Model model) {
         // 获取所有 PDF 文件
         List<FileInfo> pdfList = fileService.getListEpubs(databaseId);
-        System.out.println(pdfList);
+        //System.out.println(pdfList);
 
         // 获取所有 PDF 的名称，通过 downloadLink 关联
         List<String> path = pdfList.stream()
