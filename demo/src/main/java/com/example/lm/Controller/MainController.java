@@ -403,6 +403,8 @@ public class MainController {
             System.out.println(file.getId());
         }
 
+        List<Borrow> borrows = borrowService.getBorrow();
+
         Map<String, Object> response = new HashMap<>();
         response.put("content", files.getContent());
         response.put("totalElements", files.getTotalElements());
@@ -418,6 +420,7 @@ public class MainController {
         filters.put("publishedYear", filterData.getPublishedYear());
 
         response.put("filters", filters);
+        response.put("borrowInfo", borrows);
 
         return response;
     }
