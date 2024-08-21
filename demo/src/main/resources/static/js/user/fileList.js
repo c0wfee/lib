@@ -153,13 +153,16 @@ function applyPublishedFilter() {
         const toYear = document.getElementById('publishedTo').value || document.getElementById('publishedTo').placeholder;
         filters['publishedFrom'] = fromYear;
         filters['publishedTo'] = toYear;
+        filters['publishedYear'] = null;  // 清空单一年份的过滤条件
     } else if (yearType === 'single') {
         const year = document.getElementById('publishedYear').value || document.getElementById('publishedYear').placeholder;
-        filters['publishedFrom'] = year;
-        filters['publishedTo'] = year;
+        filters['publishedYear'] = year;
+        filters['publishedFrom'] = null;  // 清空年份范围的过滤条件
+        filters['publishedTo'] = null;
     }
     searchFiles(currentPage, pageSize);
 }
+
 
 window.applyPublishedFilter = applyPublishedFilter;
 
@@ -204,7 +207,8 @@ function searchFiles(page, size) {
             from: filters['publishedFrom'] || '',
             to: filters['publishedTo'] || ''
         },
-        database: filters['database'] || []
+        database: filters['database'] || [],
+        publishedYear: filters['publishedYear'] || null  // 确保publishedYear字段被包含在请求数据中
     };
 
     fetch('/search', {
@@ -409,11 +413,13 @@ function toggleDownloadOptions(id, downloadLink, epubPath, button) {
     let selectElement = `<select onchange="handleDownloadSelect('${id}', this.value)">`;
     selectElement += `<option value="">Select format</option>`;  // 默认提示
 
-    if (downloadLink) {
+    // 检查 downloadLink 是否为 "NULL"
+    if (downloadLink && downloadLink !== "NULL") {
         selectElement += `<option value="pdf,${downloadLink}">Download PDF</option>`;
     }
 
-    if (epubPath) {
+    // 检查 epubPath 是否为 "NULL"
+    if (epubPath && epubPath !== "NULL") {
         selectElement += `<option value="epub,${epubPath}">Download EPUB</option>`;
     }
 
