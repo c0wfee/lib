@@ -87,10 +87,10 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
 
     void deleteById(int id);
 
-    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.downloadLink IS NOT NULL AND LENGTH(TRIM(f.downloadLink)) > 0")
+    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.downloadLink IS NOT NULL AND LENGTH(TRIM(f.downloadLink)) > 0 AND FUNCTION('REGEXP_LIKE', f.downloadLink, '^[0-9]+$') = true")
     List<FileInfo> getPDFNum(int folderId);
 
-    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.epubPath IS NOT NULL AND LENGTH(TRIM(f.epubPath)) > 0")
+    @Query("SELECT f FROM FileInfo f WHERE f.resourcesId = :folderId AND f.epubPath IS NOT NULL AND LENGTH(TRIM(f.epubPath)) > 0 AND FUNCTION('REGEXP_LIKE', f.epubPath, '^[0-9]+$') = true")
     List<FileInfo> getEPUBNum(int folderId);
 
 
