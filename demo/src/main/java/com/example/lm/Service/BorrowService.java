@@ -73,6 +73,10 @@ public class BorrowService {
         return "Successfully deleted";
     }
 
+    public List<Borrow> getBorrow() {
+       return borrowRepository.findAll();
+    }
+
     public Page<BorrowDTO> getBorrowInfoForAdmin(int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Borrow> borrows = borrowRepository.findAll(pageable);
