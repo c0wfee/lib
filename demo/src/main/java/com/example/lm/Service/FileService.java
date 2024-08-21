@@ -538,6 +538,7 @@ public class FileService {
     public void deleteBook(int id) {
         FileInfo fileInfo = fileInfoDao.findById(id);
         String pdfId = fileInfo.getDownloadLink();
+        String epubId = fileInfo.getEpubPath();
         int databaseId = fileInfo.getResourcesId();
         fileInfoDao.deleteById(id);
         if (!fileInfoDao.existsByDownloadLink(pdfId)&&!pdfId.equals("NULL")){
@@ -550,6 +551,21 @@ public class FileService {
                     Files.deleteIfExists(filePath);
                 } catch (Exception e) {
                     e.printStackTrace();
+                }
+            }
+
+            if (!fileInfoDao.existsByEpubPath(epubId)&&!epubId.equals("NULL")) {
+                Optional<PDFs> epubOptional = pdfDao.findById(Integer.valueOf(epubId));
+                if (fileOptional.isPresent()) {
+                    String fileName = epubOptional.get().getName();
+                    pdfDao.deleteByName(fileName);
+                    try {
+                        Path filePath = Paths.get(EPUBUploadPath + databaseId + "/" + fileName);
+//                        System.out.println(filePath);
+                        Files.deleteIfExists(filePath);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
                 }
             }
         }
@@ -879,7 +895,7 @@ public class FileService {
     }
 
     public void uploadSingleFile(MultipartFile file, Integer id) throws IOException {
-//
+
         Optional<FileInfo> fileInfo = fileInfoDao.findById(id);
         if (fileInfo.isPresent()) {
             FileInfo f = fileInfo.get();
@@ -895,19 +911,29 @@ public class FileService {
 
             if (PDFName != null && PDFName.toLowerCase().endsWith(".pdf")) {
                 PDFName = PDFName.substring(0, PDFName.length() - 4);
-                System.out.println(isbn);
-                System.out.println(PDFName);
+//                System.out.println(isbn);
+//                System.out.println(PDFName);
                 if (isbn.contains(PDFName)) {
                     java.io.File targetFile = new java.io.File(uploadDir.getAbsolutePath() + "/" + PDFName + ".pdf");
                     try {
                         file.transferTo(targetFile);
                         PDFs pdf = new PDFs();
+                        if (!pdfDao.existsByName(file.getOriginalFilename())){
                         pdf.setName(file.getOriginalFilename());
                         pdf.setAddress(targetFile.getAbsolutePath());
                         pdf.setResourcesId(databaseId);
                         pdfDao.save(pdf);
-
                         f.setDownloadLink(Integer.toString(pdf.getId()));
+                        }else {
+                            Optional<PDFs> lastPdf = pdfDao.findLastByName(file.getOriginalFilename());
+                            if (lastPdf.isPresent()) {
+                                int i = lastPdf.get().getId();
+                                f.setDownloadLink(String.valueOf(i));
+                                //System.out.println(f.getDownloadLink());
+                            } else {
+                                throw new IllegalArgumentException("unfound");
+                            }
+                        }
                         fileInfoDao.save(f);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -924,7 +950,6 @@ public class FileService {
 
 
     public void uploadSingleEpub(MultipartFile file, Integer id) throws IOException {
-//
         Optional<FileInfo> fileInfo = fileInfoDao.findById(id);
         if (fileInfo.isPresent()) {
             FileInfo f = fileInfo.get();

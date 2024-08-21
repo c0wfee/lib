@@ -274,7 +274,7 @@
           th:href="@{/viewEpub/{bookId}(bookId=${book.id})}">
             Download
           </a>
-          <span th:if="${book.epubPath == null || book.epubPath.isEmpty()||book.epubPath != 'NULL'}"
+          <span th:if="${book.epubPath == null || book.epubPath.isEmpty()||book.epubPath == 'NULL'}"
                 data-toggle="modal"
                 data-target="#uploadEpubModal"
                 th:data-id="${book.id}"
