@@ -8,51 +8,46 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const username = user.username;
 
-    loadCurrentBorrowing(username); // 页面加载时默认加载当前借阅的书目
+    fetchAndStoreBooks(username).then(() => {
+        loadCurrentBorrowing(); // 页面加载时默认加载当前借阅的书目
+    });
 
     // Tab切换时加载相应的数据
     document.getElementById('current-borrowing-tab').addEventListener('click', () => {
-        loadCurrentBorrowing(username);
+        loadCurrentBorrowing();
     });
 
     document.getElementById('borrowing-history-tab').addEventListener('click', () => {
-        loadBorrowingHistory(username);
+        loadBorrowingHistory();
     });
 });
 
-function loadCurrentBorrowing(username) {
-    fetchBooks(username, false); // 使用从 localStorage 获取的用户名，false 表示加载当前借阅的书目
-}
+let allBooks = []; // 用于存储所有的借阅记录
 
-function loadBorrowingHistory(username) {
-    fetchBooks(username, true); // 使用从 localStorage 获取的用户名，true 表示加载历史借阅的书目
-}
-
-async function fetchBooks(username, isHistory = false) {
+async function fetchAndStoreBooks(username) {
     try {
         const response = await fetch(`/api/borrows/${encodeURIComponent(username)}`);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-        const books = await response.json();
-        console.log('Fetched Books:', books);
-
-        let filteredBooks;
-        if (isHistory) {
-            // 筛选历史借阅书籍（status 为 "Returned"）
-            filteredBooks = books.filter(book => book.status === "Returned");
-        } else {
-            // 筛选当前借阅书籍（status 不为 "Returned"）
-            filteredBooks = books.filter(book => book.status !== "Returned");
-        }
-
-        displayBooks(filteredBooks, isHistory ? 'borrowing-history-container' : 'current-borrowing-container', isHistory);
+        allBooks = await response.json(); // 存储到全局变量
+        console.log('Fetched Books:', allBooks);
     } catch (error) {
         console.error('Error fetching books:', error);
     }
 }
 
-function displayBooks(books, containerId, isHistory = false) {
+function loadCurrentBorrowing() {
+    const currentBooks = allBooks.filter(book => book.status !== "Returned"); // 筛选当前借阅书籍
+    displayBooks(currentBooks, 'current-borrowing-container', false);
+}
+
+function loadBorrowingHistory() {
+    const historyBooks = allBooks.filter(book => book.status === "Returned"); // 筛选历史借阅书籍
+    displayBooks(historyBooks, 'borrowing-history-container', true);
+}
+
+function displayBooks(books, containerId, isHistory) {
     const container = document.getElementById(containerId);
     container.innerHTML = '';
     if (books.length === 0) {
@@ -146,8 +141,14 @@ function returnBook(borrowId) {
         .then(data => {
             console.log('Success:', data);
             alert(data); // 提示成功信息
-            const user = JSON.parse(localStorage.getItem('user'));  // 重新获取用户名
-            loadCurrentBorrowing(user.username); // 重新加载当前借阅的书目
+            // 更新本地存储的 allBooks 数组
+            allBooks = allBooks.map(book =>
+                book.borrowId === parseInt(borrowId) ? { ...book, status: 'Returned' } : book
+            );
+            fetchAndStoreBooks(JSON.parse(localStorage.getItem('user')).username).then(() => {
+                loadCurrentBorrowing(); // 重新加载当前借阅的书目
+                loadBorrowingHistory(); // 更新历史借阅的书目
+            });
         })
         .catch((error) => {
             console.error('Error:', error);
