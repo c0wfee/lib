@@ -357,3 +357,13 @@ body {
     flex-direction: column;
     gap: 10px;
 }
+
+.download-options select {
+    padding: 5px;
+    font-size: 14px;
+    margin-top: 5px;
+    border-radius: 5px;
+    border: 1px solid #007bff;
+    background-color: white;
+    cursor: pointer;
+}

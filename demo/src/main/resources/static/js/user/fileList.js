@@ -216,6 +216,7 @@ function searchFiles(page, size) {
     })
         .then(response => response.json())
         .then(data => {
+            console.log(data);
             const itemList = document.getElementById('item-list');
             itemList.innerHTML = '';
 
@@ -224,12 +225,15 @@ function searchFiles(page, size) {
                     const item = document.createElement('div');
                     item.className = 'item';
                     const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
-                    const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})">View Online</button>` : '';
-                    const downloadButton = file.download !== "Disable" ? `<button onclick="toggleDownloadOptions('${file.id}', this)">Download</button>` : '';
+
+                    let downloadButton = '';
+                    if (file.downloadLink || file.epubPath) {
+                        downloadButton = `<button onclick="toggleDownloadOptions('${file.id}', '${file.downloadLink}', '${file.epubPath}', this)">Download</button>`;
+                    }
 
                     let loanInfo = file.loanLabel === 'Borrowed' ? `On Loan, unavailable until ${file.returnDate || 'Loading...'}` : file.loanLabel || 'Available';
                     const borrowButton = file.borrowPeriod > 0
-                        ? `<button id="borrow-button-${file.id}" onclick="borrowBook('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>`
+                        ? `<button id="borrow-button-${file.id}" onclick="confirmBorrow('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>`
                         : '';
 
                     const loanPeriodElement = file.borrowPeriod > 0 ? `<p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${file.borrowPeriod} Days</p>` : '';
@@ -253,7 +257,6 @@ function searchFiles(page, size) {
                                 <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
                                 <a href="${file.url || '#'}" target="_blank" style="display: none;">URL: ${file.url || 'N/A'}</a>
                                 <div class="button-container">
-                                    ${viewButton}
                                     ${downloadButton}
                                     ${borrowButton}
                                     ${loanInfoElement}
@@ -262,32 +265,6 @@ function searchFiles(page, size) {
                         </div>
                     </div>`;
                     itemList.appendChild(item);
-
-                    if (file.borrowPeriod > 0 && file.loanLabel === 'Borrowed') {
-                        fetch(`/borrow/${file.id}`, {
-                            method: 'GET',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                            .then(response => response.text())
-                            .then(data => {
-                                const loanInfoElem = document.getElementById(`loan-info-${file.id}`);
-                                try {
-                                    const parsedData = JSON.parse(data);
-                                    if (parsedData.loanEndTime) {
-                                        loanInfoElem.textContent = `On Loan, unavailable until ${parsedData.loanEndTime}`;
-                                    } else {
-                                        loanInfoElem.style.display = 'none';
-                                    }
-                                } catch (e) {
-                                    console.error('Error parsing JSON:', e);
-                                }
-                            })
-                            .catch(error => {
-                                console.error('Error fetching borrow details:', error);
-                            });
-                    }
                 });
 
                 document.getElementById('no-files').style.display = 'none';
@@ -314,6 +291,9 @@ function searchFiles(page, size) {
             console.error('Error fetching files:', error);
         });
 }
+
+
+
 
 function createPagination(totalElements, currentPage, size) {
     const paginationContainer = document.getElementById('pagination');
@@ -417,15 +397,47 @@ function downloadBook(id) {
     item.innerHTML += downloadOptions;
 }
 
-function downloadFile(id, format) {
-    const url = `/downloadpdfs/${encodeURIComponent(id)}?format=${format}`;
+function toggleDownloadOptions(id, downloadLink, epubPath, button) {
+    const existingOptions = document.querySelector('.download-options');
+    if (existingOptions) {
+        existingOptions.remove();
+    }
+
+    const downloadOptions = document.createElement('div');
+    downloadOptions.className = 'download-options';
+
+    let selectElement = `<select onchange="handleDownloadSelect('${id}', this.value)">`;
+    selectElement += `<option value="">Select format</option>`;  // 默认提示
+
+    if (downloadLink) {
+        selectElement += `<option value="pdf,${downloadLink}">Download PDF</option>`;
+    }
+
+    if (epubPath) {
+        selectElement += `<option value="epub,${epubPath}">Download EPUB</option>`;
+    }
+
+    selectElement += `</select>`;
+    downloadOptions.innerHTML = selectElement;
+
+    button.parentNode.appendChild(downloadOptions);
+}
+
+function handleDownloadSelect(id, value) {
+    if (value) {
+        const [format, link] = value.split(',');
+        downloadFile(id, format, link);
+    }
+}
+
+function downloadFile(id, format, link) {
     const xhr = new XMLHttpRequest();
     const progressContainer = document.getElementById(`progress-container-${id}`);
     const progressBar = document.getElementById(`progress-${id}`);
     const progressText = document.getElementById(`progress-text-${id}`);
     const speedText = document.getElementById(`speed-${id}`);
 
-    xhr.open('GET', url, true);
+    xhr.open('GET', link, true);
     xhr.responseType = 'blob';
 
     let previousLoaded = 0;
@@ -479,23 +491,15 @@ function downloadFile(id, format) {
     xhr.send();
 }
 
+window.toggleDownloadOptions = toggleDownloadOptions;
 window.downloadFile = downloadFile;
 
-function toggleDownloadOptions(id, button) {
-    const existingOptions = document.querySelector('.download-options');
-    if (existingOptions) {
-        existingOptions.remove();
-    }
-    const downloadOptions = document.createElement('div');
-    downloadOptions.className = 'download-options';
-    downloadOptions.innerHTML = `
-        <button onclick="downloadFile('${id}', 'pdf')">Download PDF</button>
-        <button onclick="downloadFile('${id}', 'epub')">Download EPUB</button>
-    `;
-    button.parentNode.appendChild(downloadOptions);
-}
 
-window.toggleDownloadOptions = toggleDownloadOptions;
+function confirmBorrow(id) {
+    if (confirm('Are you sure you want to borrow this book?')) {
+        borrowBook(id);
+    }
+}
 
 async function borrowBook(id) {
     try {
@@ -530,6 +534,7 @@ async function borrowBook(id) {
         alert('Operation failed');
     }
 }
+
 
 window.borrowBook = borrowBook;
 
