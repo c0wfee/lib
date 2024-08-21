@@ -367,6 +367,7 @@ public class MainController {
     @PostMapping("/search")
     @ResponseBody
     public Map<String, Object> searchFiles(@RequestBody FilterData filterData) {
+        borrowService.updateOverDueBorrows();
         // 检查参数是否为 "undefined" 字符串并将其设为 null
         if (filterData.getSeries() != null && filterData.getSeries().size() == 1 && "undefined".equals(filterData.getSeries().get(0))) {
             filterData.setSeries(null);

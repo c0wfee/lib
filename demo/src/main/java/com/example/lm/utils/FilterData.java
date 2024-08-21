@@ -11,7 +11,6 @@ public class FilterData {
     private List<String> subject;
     private List<String> database;
     private YearRange yearRange;
-
     private Integer publishedYear;
     private int page;
     private int size;

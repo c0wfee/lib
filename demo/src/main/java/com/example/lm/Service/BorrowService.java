@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.time.Year;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -106,6 +108,32 @@ public class BorrowService {
         }
 
         return borrowCountByUser;
+    }
+
+    public void updateOverDueBorrows() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String currentTime = now.format(formatter);
+
+
+        List<Borrow> overdueBorrows = borrowRepository.getOverDueDate(currentTime);
+
+        for (Borrow borrow : overdueBorrows) {
+            borrow.setStatus("Returned");
+            borrow.setReturnedDate(currentTime);
+            borrowRepository.save(borrow);
+
+            Optional<FileInfo> bookOptional = fileInfoDao.findById(borrow.getBookId());
+
+            if (bookOptional.isPresent()) {
+                FileInfo book = bookOptional.get();
+                book.setLoanLabel("Returned");
+                fileInfoDao.save(book);
+            } else {
+                System.out.println("Book with ID " + borrow.getBookId() + " not found.");
+            }
+
+        }
     }
 
 }
