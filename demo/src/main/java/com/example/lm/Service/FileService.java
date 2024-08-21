@@ -865,7 +865,11 @@ public class FileService {
     }
 
     public Map<String, String> getPdfNamesByLinks(List<String> links) {
-        List<Integer> ids = links.stream().map(Integer::parseInt).collect(Collectors.toList());
+        List<Integer> ids = links.stream()
+                .filter(link -> link.matches("\\d+"))  // 过滤出仅包含数字的字符串
+                .map(Integer::parseInt)                // 将字符串转换为 Integer
+                .collect(Collectors.toList());
+
         List<PDFs> pdfList = pdfDao.findByIdIn(ids);
         return pdfList.stream().collect(Collectors.toMap(pdf -> String.valueOf(pdf.getId()), PDFs::getName));
     }
