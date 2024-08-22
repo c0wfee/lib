@@ -53,19 +53,21 @@
                 <li><input type="checkbox" value="On Loan" onclick="applyFilter('loanLabel', this.value)"> On Loan</li>
             </ul>
         </div>
+
         <div class="col-md-3">
             <label>Borrowed Date:</label>
             <input type="date" id="borrowedFrom" placeholder="From" class="form-control mb-2">
             <input type="date" id="borrowedTo" placeholder="To" class="form-control">
-            <button onclick="applyPublishedFilter()">Apply</button>
-            <button id="clear-borrowed-date" class="btn btn-secondary btn-sm ml-2">Clear</button>
+            <button onclick="applyPublishedFilter()" class="btn btn-primary mt-2">Apply</button>
+            <button id="clear-borrowed-date" class="btn btn-secondary btn-sm mt-2">Clear</button>
         </div>
+
         <div class="col-md-3">
             <label>Due Date:</label>
             <input type="date" id="dueFrom" placeholder="From" class="form-control mb-2">
             <input type="date" id="dueTo" placeholder="To" class="form-control">
-            <button onclick="applyPublishedFilter()">Apply</button>
-            <button id="clear-due-date" class="btn btn-secondary btn-sm ml-2">Clear</button>
+            <button onclick="applyPublishedFilter()" class="btn btn-primary mt-2">Apply</button>
+            <button id="clear-due-date" class="btn btn-secondary btn-sm mt-2">Clear</button>
         </div>
     </div>
 

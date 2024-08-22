@@ -221,82 +221,113 @@ function searchFiles(page, size) {
     })
         .then(response => response.json())
         .then(data => {
-            console.log(data);
-            displayFiles(data, page, size);
+            console.log(data);document.addEventListener('DOMContentLoaded', () => {
+                const user = JSON.parse(localStorage.getItem('user'));  // 从 localStorage 获取用户信息
+                if (!user || !user.username) {
+                    alert('User not logged in');
+                    window.location.href = '/login';  // 如果没有登录，重定向到登录页面
+                    return;
+                }
+
+                const username = user.username;
+
+                fetchAndStoreBooks(username).then(() => {
+                    loadCurrentBorrowing(); // 页面加载时默认加载当前借阅的书目
+                });
+
+                // Tab切换时加载相应的数据
+                document.getElementById('current-borrowing-tab').addEventListener('click', () => {
+                    loadCurrentBorrowing();
+                });
+
+                document.getElementById('borrowing-history-tab').addEventListener('click', () => {
+                    loadBorrowingHistory();
+                });
+            });
+
+            const itemList = document.getElementById('item-list');
+            itemList.innerHTML = '';
+
+            if (data.content.length > 0) {
+                data.content.forEach(file => {
+                    const item = document.createElement('div');
+                    item.className = 'item';
+                    const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
+
+                    let downloadButton = '';
+                    if (file.downloadLink || file.epubPath) {
+                        downloadButton = `<button onclick="toggleDownloadOptions('${file.id}', '${file.downloadLink}', '${file.epubPath}', this)">Download</button>`;
+                    }
+
+                    const borrowRecord = data.borrowInfo.find(record => record.bookId === file.id);
+
+                    let loanInfo = borrowRecord && borrowRecord.loanEndTime
+                        ? `On Loan, unavailable until ${borrowRecord.loanEndTime}`
+                        : file.loanLabel || 'Available';
+
+
+                    const borrowButton = file.borrowPeriod > 0
+                        ? `<button id="borrow-button-${file.id}" onclick="confirmBorrow('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>`
+                        : '';
+
+                    const loanPeriodElement = file.borrowPeriod > 0 ? `<p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${file.borrowPeriod} Days</p>` : '';
+                    let loanInfoElement = '';
+                    if (file.borrowPeriod > 0 && file.loanLabel === 'Borrowed') {
+                        loanInfoElement = `<span id="loan-info-${file.id}" style="color: grey; margin-left: 10px;">${loanInfo}</span>`;
+                    }
+
+                    item.innerHTML = `
+                    <div class="item-details">
+                        <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
+                        <div class="item-content">
+                            <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
+                            ${file.authors ? `<p><strong>Authors:</strong> ${file.authors}</p>` : `<p><strong>Editors:</strong> ${file.editors || 'N/A'}</p>`}
+                            <p><strong>ISBN:</strong> ${file.isbn || 'N/A'}</p>
+                            <p><strong>Publisher:</strong> ${file.publisher || 'N/A'}</p>
+                            <p><strong>Published:</strong> ${file.published || 'N/A'}</p>
+                            ${loanPeriodElement}
+                            <p>${file.description || ''}</p>
+                            <div class="item-meta">
+                                <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
+                                <a href="${file.url || '#'}" target="_blank" style="display: none;">URL: ${file.url || 'N/A'}</a>
+                                <div class="button-container">
+                                    ${borrowButton}
+                                    ${loanInfoElement}
+                                    ${downloadButton}
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                    itemList.appendChild(item);
+                });
+
+                document.getElementById('no-files').style.display = 'none';
+                const resultsCount = document.getElementById('results-count');
+                resultsCount.innerText = `You are looking at ${(page - 1) * size + 1} - ${Math.min((page - 1) * size + size, data.totalElements)} of ${data.totalElements} items`;
+
+                const activeFilters = document.getElementById('active-filters');
+                activeFilters.innerHTML = '';
+                Object.entries(data.filters).forEach(([key, value]) => {
+                    if (value) {
+                        const filterBadge = document.createElement('div');
+                        filterBadge.className = 'filter-badge';
+                        filterBadge.innerHTML = `${key}: ${value} <button onclick="removeFilter('${key}')">&minus;</button>`;
+                        activeFilters.appendChild(filterBadge);
+                    }
+                });
+
+                createPagination(data.totalElements, page, size);
+            } else {
+                document.getElementById('no-files').style.display = 'block';
+            }
         })
         .catch(error => {
             console.error('Error fetching files:', error);
         });
 }
 
-function displayFiles(data, page, size) {
-    const itemList = document.getElementById('item-list');
-    itemList.innerHTML = '';
 
-    if (data.content.length > 0) {
-        for (const file of data.content) {
-            const item = document.createElement('div');
-            item.className = 'item';
-            const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
 
-            let loanInfo = file.loanLabel === 'Borrowed'
-                ? `On Loan, unavailable until ${file.returnDate || 'Loading...'}`
-                : file.loanLabel || 'Available';
-
-            const borrowButton = file.borrowPeriod > 0
-                ? `<button id="borrow-button-${file.id}" onclick="confirmBorrow('${file.id}')" ${file.loanLabel === 'Borrowed' ? 'disabled style="background-color: grey; color: white;"' : ''}>Borrow</button>`
-                : '';
-
-            const loanPeriodElement = file.borrowPeriod > 0 ? `<p id="loan-period-${file.id}"><strong>Loan Period:</strong> ${file.borrowPeriod} Days</p>` : '';
-            let loanInfoElement = '';
-            if (file.borrowPeriod > 0 && file.loanLabel === 'Borrowed') {
-                loanInfoElement = `<span id="loan-info-${file.id}" style="color: grey; margin-left: 10px;">${loanInfo}</span>`;
-            }
-
-            item.innerHTML = `
-        <div class="item-details">
-            <img src="${sourceImage}" alt="${file.sourceType}" class="source-type-image">
-            <div class="item-content">
-                <h3><strong>Title:</strong> <a href="/bookDetail?id=${file.id}" target="_blank">${file.title}</a></h3>
-                ${file.authors ? `<p><strong>Authors:</strong> ${file.authors}</p>` : `<p><strong>Editors:</strong> ${file.editors || 'N/A'}</p>`}
-                <p><strong>ISBN:</strong> ${file.isbn || 'N/A'}</p>
-                <p><strong>Publisher:</strong> ${file.publisher || 'N/A'}</p>
-                <p><strong>Published:</strong> ${file.published || 'N/A'}</p>
-                ${loanPeriodElement}
-                <p>${file.description || ''}</p>
-                <div class="item-meta">
-                    <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
-                    <a href="${file.url || '#'}" target="_blank" style="display: none;">URL: ${file.url || 'N/A'}</a>
-                    <div class="button-container">
-                        ${borrowButton}
-                        ${loanInfoElement}
-                    </div>
-                </div>
-            </div>
-        </div>`;
-            itemList.appendChild(item);
-        }
-
-        document.getElementById('no-files').style.display = 'none';
-        const resultsCount = document.getElementById('results-count');
-        resultsCount.innerText = `You are looking at ${(page - 1) * size + 1} - ${Math.min((page - 1) * size + size, data.totalElements)} of ${data.totalElements} items`;
-
-        const activeFilters = document.getElementById('active-filters');
-        activeFilters.innerHTML = '';
-        Object.entries(data.filters).forEach(([key, value]) => {
-            if (value) {
-                const filterBadge = document.createElement('div');
-                filterBadge.className = 'filter-badge';
-                filterBadge.innerHTML = `${key}: ${value} <button onclick="removeFilter('${key}')">&minus;</button>`;
-                activeFilters.appendChild(filterBadge);
-            }
-        });
-
-        createPagination(data.totalElements, page, size);
-    } else {
-        document.getElementById('no-files').style.display = 'block';
-    }
-}
 
 function createPagination(totalElements, currentPage, size) {
     const paginationContainer = document.getElementById('pagination');
@@ -387,15 +418,15 @@ window.viewPDF = viewPDF;
 
 function downloadBook(id) {
     const downloadOptions = `
-        <div id="download-options-${id}">
-            <button onclick="downloadFile('${id}', 'pdf')">Download PDF</button>
-            <button onclick="downloadFile('${id}', 'epub')">Download EPUB</button>
-            <div id="progress-container-${id}" style="margin-top: 10px; display: none;">
-                <progress id="progress-${id}" value="0" max="100"></progress>
-                <span id="progress-text-${id}">0%</span>
-                <span id="speed-${id}"></span>
-            </div>
-        </div>`;
+            <div id="download-options-${id}">
+                <button onclick="downloadFile('${id}', 'pdf')">Download PDF</button>
+                <button onclick="downloadFile('${id}', 'epub')">Download EPUB</button>
+                <div id="progress-container-${id}" style="margin-top: 10px; display: none;">
+                    <progress id="progress-${id}" value="0" max="100"></progress>
+                    <span id="progress-text-${id}">0%</span>
+                    <span id="speed-${id}"></span>
+                </div>
+            </div>`;
     const item = document.querySelector(`.item-meta button[onclick="downloadBook('${id}')"]`).parentNode;
     item.innerHTML += downloadOptions;
 }
@@ -499,6 +530,7 @@ function downloadFile(id, format, link) {
 window.toggleDownloadOptions = toggleDownloadOptions;
 window.downloadFile = downloadFile;
 
+
 function confirmBorrow(id) {
     if (confirm('Are you sure you want to borrow this book?')) {
         borrowBook(id);
@@ -538,6 +570,7 @@ async function borrowBook(id) {
         alert('Operation failed');
     }
 }
+
 
 window.borrowBook = borrowBook;
 
