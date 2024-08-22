@@ -1,9 +1,11 @@
 package com.example.lm.Dao;
 
 import com.example.lm.Model.Borrow;
+import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -28,5 +30,10 @@ public interface BorrowRepository extends JpaRepository<Borrow, Integer> {
 
     @Query(value = "SELECT * FROM borrow b WHERE (b.status IS NULL OR b.status != 'Returned') AND STR_TO_DATE(b.loan_end_time, '%Y-%m-%d %H:%i:%s') < STR_TO_DATE(:currentTime, '%Y-%m-%d %H:%i:%s')", nativeQuery = true)
     List<Borrow> getOverDueDate(@Param("currentTime") String currentTime);
+
+    @Modifying
+    @Transactional
+    @Query("DELETE FROM Borrow b WHERE b.bookId = :bookId")
+    void deleteByBookId(int bookId);
 
 }

@@ -1,10 +1,7 @@
 package com.example.lm.Service;
 
 import com.example.lm.Dao.*;
-import com.example.lm.Model.File;
-import com.example.lm.Model.FileInfo;
-import com.example.lm.Model.PDFs;
-import com.example.lm.Model.ResourcesLib;
+import com.example.lm.Model.*;
 import com.mongodb.client.gridfs.GridFSBucket;
 import com.mongodb.client.gridfs.GridFSFindIterable;
 import com.mongodb.client.gridfs.model.GridFSFile;
@@ -541,6 +538,11 @@ public class FileService {
         String epubId = fileInfo.getEpubPath();
         int databaseId = fileInfo.getResourcesId();
         fileInfoDao.deleteById(id);
+        Optional<Borrow> borrowOptional = borrowRepository.findByBookId(id);
+        if (borrowOptional.isPresent()) {
+            borrowRepository.deleteByBookId(id);
+        }
+
         if (!fileInfoDao.existsByDownloadLink(pdfId)&&!pdfId.equals("NULL")){
             Optional<PDFs> fileOptional = pdfDao.findById(Integer.valueOf(pdfId));
             if (fileOptional.isPresent()) {
@@ -561,7 +563,6 @@ public class FileService {
                     pdfDao.deleteByName(fileName);
                     try {
                         Path filePath = Paths.get(EPUBUploadPath + databaseId + "/" + fileName);
-//                        System.out.println(filePath);
                         Files.deleteIfExists(filePath);
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -581,15 +582,15 @@ public class FileService {
         }
     }
 
-    @Transactional
-    public void updateStatus(int id, String newStatus) {
-        fileInfoDao.updateStatusById(id, newStatus);
-    }
-
-    @Transactional
-    public void updateLoan(int id, String newLoan) {
-        fileInfoDao.updateLoanById(id, newLoan);
-    }
+//    @Transactional
+//    public void updateStatus(int id, String newStatus) {
+//        fileInfoDao.updateStatusById(id, newStatus);
+//    }
+//
+//    @Transactional
+//    public void updateLoan(int id, String newLoan) {
+//        fileInfoDao.updateLoanById(id, newLoan);
+//    }
     @Transactional
     public void updateField(int id, String editType, String editField) {
         FileInfo book = fileInfoDao.findById(id);
