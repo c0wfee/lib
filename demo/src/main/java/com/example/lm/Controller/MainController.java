@@ -336,6 +336,7 @@ public class MainController {
         borrow.setUsername("admin1");
         borrow.setLoanStartTime(String.valueOf(System.currentTimeMillis()));
         borrow.setLoanEndTime(String.valueOf(System.currentTimeMillis() + period * 24 * 60 * 60 * 1000));
+        borrow.setStatus("Borrowed");
         borrowService.saveBorrow(borrow, period);
 
         User user = userService.findUser("admin1");
