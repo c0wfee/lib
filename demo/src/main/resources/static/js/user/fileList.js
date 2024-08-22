@@ -461,19 +461,19 @@ function toggleDownloadOptions(id, downloadLink, epubPath, button) {
 
 function handleDownloadSelect(id, value) {
     if (value) {
-        const [format, link] = value.split(',');
-        downloadFile(id, format, link);
+        const [format, link] = value.split(','); // 注意 link 在此场景不再需要，因为会直接从服务器获取文件
+        downloadFile(id, format);
     }
 }
 
-function downloadFile(id, format, link) {
+function downloadFile(id, format) {
     const xhr = new XMLHttpRequest();
     const progressContainer = document.getElementById(`progress-container-${id}`);
     const progressBar = document.getElementById(`progress-${id}`);
     const progressText = document.getElementById(`progress-text-${id}`);
     const speedText = document.getElementById(`speed-${id}`);
 
-    xhr.open('GET', link, true);
+    xhr.open('GET', `/downloadpdfs/${encodeURIComponent(id)}?format=${encodeURIComponent(format)}`, true);
     xhr.responseType = 'blob';
 
     let previousLoaded = 0;
@@ -526,6 +526,7 @@ function downloadFile(id, format, link) {
 
     xhr.send();
 }
+
 
 window.toggleDownloadOptions = toggleDownloadOptions;
 window.downloadFile = downloadFile;

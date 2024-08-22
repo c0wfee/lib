@@ -40,7 +40,7 @@
             <button class="btn btn-link" onclick="toggleDatabaseSelect()">Select Database</button>
             <div id="database-select-container" style="display:none;">
                 <select id="database-select" multiple class="form-control">
-                    <!-- 动态加载选项 -->
+                    <!-- Dynamically loaded options -->
                 </select>
                 <button id="apply-database-filter" class="btn btn-primary mt-2">Apply Database Filter</button>
             </div>
@@ -48,10 +48,16 @@
 
         <div class="col-md-3">
             <label>Loan Status:</label>
-            <ul id="status-filter">
-                <li><input type="checkbox" value="Returned" onclick="applyFilter('loanLabel', this.value)"> Returned</li>
-                <li><input type="checkbox" value="On Loan" onclick="applyFilter('loanLabel', this.value)"> On Loan</li>
-            </ul>
+            <div class="status-container">
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" value="Returned" onclick="applyFilter('loanLabel', this.value)">
+                    <label class="form-check-label">Returned</label>
+                </div>
+                <div class="form-check">
+                    <input type="checkbox" class="form-check-input" value="On Loan" onclick="applyFilter('loanLabel', this.value)">
+                    <label class="form-check-label">On Loan</label>
+                </div>
+            </div>
         </div>
 
         <div class="col-md-3">

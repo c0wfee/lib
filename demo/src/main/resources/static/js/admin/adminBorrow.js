@@ -105,24 +105,57 @@ function applyFiltersAndDisplay() {
 
     // 过滤 Loan Status
     if (filters.loanLabel.length > 0) {
-        filteredData = filteredData.filter(book => filters.loanLabel.includes(book.loanLabel));
+        filteredData = filteredData.filter(book => {
+            let loanStatus;
+            if (book.status === 'Returned') {
+                loanStatus = 'Returned';
+            } else if (book.status === 'Borrowed') {
+                loanStatus = 'On Loan';
+            }
+
+            if (filters.loanLabel.includes('Returned') && filters.loanLabel.includes('On Loan')) {
+                return true; // 如果都选中了，则不过滤，显示全部
+            } else if (filters.loanLabel.includes('Returned')) {
+                return loanStatus === 'Returned';
+            } else if (filters.loanLabel.includes('On Loan')) {
+                return loanStatus === 'On Loan';
+            }
+            return false;  // 如果没有匹配的条件，不显示数据
+        });
     }
 
     // 过滤 Borrowed Date
     if (filters.borrowedFrom) {
-        filteredData = filteredData.filter(book => new Date(book.loanStartTime) >= new Date(filters.borrowedFrom));
+        filteredData = filteredData.filter(book => {
+            let borrowedDate = new Date(book.loanStartTime);
+            borrowedDate.setHours(0, 0, 0, 0); // 清除时间部分
+            return borrowedDate >= new Date(filters.borrowedFrom).setHours(0, 0, 0, 0);
+        });
     }
     if (filters.borrowedTo) {
-        filteredData = filteredData.filter(book => new Date(book.loanStartTime) <= new Date(filters.borrowedTo));
+        filteredData = filteredData.filter(book => {
+            let borrowedDate = new Date(book.loanStartTime);
+            borrowedDate.setHours(0, 0, 0, 0); // 清除时间部分
+            return borrowedDate <= new Date(filters.borrowedTo).setHours(23, 59, 59, 999);
+        });
     }
 
-    // 过滤 Due Date
+// 过滤 Due Date
     if (filters.dueFrom) {
-        filteredData = filteredData.filter(book => new Date(book.loanEndTime) >= new Date(filters.dueFrom));
+        filteredData = filteredData.filter(book => {
+            let dueDate = new Date(book.loanEndTime);
+            dueDate.setHours(0, 0, 0, 0); // 清除时间部分
+            return dueDate >= new Date(filters.dueFrom).setHours(0, 0, 0, 0);
+        });
     }
     if (filters.dueTo) {
-        filteredData = filteredData.filter(book => new Date(book.loanEndTime) <= new Date(filters.dueTo));
+        filteredData = filteredData.filter(book => {
+            let dueDate = new Date(book.loanEndTime);
+            dueDate.setHours(0, 0, 0, 0); // 清除时间部分
+            return dueDate <= new Date(filters.dueTo).setHours(23, 59, 59, 999);
+        });
     }
+
 
     // 过滤 Database
     if (filters.database.length > 0) {
@@ -183,16 +216,13 @@ function displayBooks(books) {
 
         // 显示 Database
         const databaseCell = document.createElement('td');
-        databaseCell.textContent = book.databaseName || 'N/A'; // 使用 databaseName
+        databaseCell.textContent = book.databaseName || 'N/A';
         row.appendChild(databaseCell);
 
-        // 显示 Loan Status (转换 Borrowed 为 On Loan)
+        // 显示 Loan Status
         const loanStatusCell = document.createElement('td');
-        let loanStatus = book.loanLabel;
-        if (loanStatus === 'Borrowed') {
-            loanStatus = 'On Loan';
-        }
-        loanStatusCell.textContent = loanStatus || 'N/A';
+        let loanStatus = (book.status && book.status.toLowerCase() === 'returned') ? 'Returned' : 'On Loan';
+        loanStatusCell.textContent = loanStatus;
         row.appendChild(loanStatusCell);
 
         // 显示 Borrowed Date (Loan Start Time)
@@ -217,10 +247,18 @@ function displayBooks(books) {
 
         // 添加 Actions 列，包含 Return 和 Delete 按钮
         const actionsCell = document.createElement('td');
+
         const returnButton = document.createElement('button');
         returnButton.className = 'btn btn-success btn-sm';
         returnButton.textContent = 'Return';
-        returnButton.onclick = () => returnBook(book.borrowId);
+
+        if (loanStatus === 'Returned') {
+            returnButton.disabled = true;
+            returnButton.classList.add('btn-secondary'); // 添加灰色样式
+            returnButton.classList.remove('btn-success'); // 移除绿色样式
+        } else {
+            returnButton.onclick = () => returnBook(book.borrowId);
+        }
 
         const deleteButton = document.createElement('button');
         deleteButton.className = 'btn btn-danger btn-sm ml-2';
@@ -287,11 +325,6 @@ function applyFilter(type, value) {
         return;
     }
 
-    // 将 On Loan 转换为 Borrowed 进行过滤
-    if (value === 'On Loan') {
-        value = 'Borrowed';
-    }
-
     if (!filters[type].includes(value)) {
         filters[type].push(value);
     } else {
@@ -337,7 +370,16 @@ function clearSearch() {
 }
 
 // 归还书籍
+// 归还书籍
 async function returnBook(borrowId) {
+    // 显示确认对话框
+    const confirmation = confirm('Are you sure you want to return this book?');
+
+    if (!confirmation) {
+        // 如果用户取消操作，则退出函数
+        return;
+    }
+
     try {
         const params = new URLSearchParams();
         params.append('borrow_id', borrowId);
@@ -351,7 +393,7 @@ async function returnBook(borrowId) {
         });
         if (response.ok) {
             alert('Successfully returned book.');
-            fetchData(); // 刷新数据
+            location.reload(); // 刷新页面
         } else {
             alert('Failed to return book.');
         }
@@ -361,7 +403,17 @@ async function returnBook(borrowId) {
 }
 
 // 删除借阅记录
+
+// 删除借阅记录
 async function deleteBorrow(borrowId) {
+    // 显示确认对话框
+    const confirmation = confirm('Are you sure you want to delete this borrow record?');
+
+    if (!confirmation) {
+        // 如果用户取消操作，则退出函数
+        return;
+    }
+
     try {
         const params = new URLSearchParams();
         params.append('borrow_id', borrowId);
@@ -376,7 +428,7 @@ async function deleteBorrow(borrowId) {
 
         if (response.ok) {
             alert('Successfully deleted borrow record.');
-            fetchData(); // 刷新数据
+            location.reload(); // 刷新页面
         } else {
             alert('Failed to delete borrow record.');
         }
