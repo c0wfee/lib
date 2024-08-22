@@ -63,7 +63,7 @@ public interface FileInfoDao extends JpaRepository<FileInfo, Integer> {
     @Query("SELECT DISTINCT f.status FROM FileInfo f")
     List<String> findAllDistinctStatus();
 
-    @Query("SELECT DISTINCT f.series FROM FileInfo f")
+    @Query("SELECT DISTINCT f.series FROM FileInfo f WHERE f.series IS NOT NULL AND f.series <> ''")
     List<String> findAllDistinctSeries();
 
     @Query("SELECT DISTINCT f.copyrightYear FROM FileInfo f")
