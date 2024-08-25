@@ -382,9 +382,10 @@
                  th:text="'Disable'"></a>
               <a class="dropdown-item"
                  href="#"
-                 th:onclick="'showLoanDaysPrompt(' + ${book.id} + ')'"
+                 th:onclick="'enableBorrowWithPeriod(' + ${book.id} + ')'"
                  th:text="'Enable'"></a>
             </div>
+
           </div>
         </td>
 
@@ -423,6 +424,15 @@
   <script src="/static/js/bootstrap/bootstrap.min.js"></script>
   <!-- 自定义JS -->
   <script>
+    function enableBorrowWithPeriod(bookId) {
+      let period = prompt("Please enter the borrow period (days):", "30");
+      if (period != null && !isNaN(period)) {
+        updateField(bookId, 'loan', period);
+      } else {
+        alert("Please enter a valid number.");
+      }
+    }
+
 
     function updateField(id, editType, editField) {
       fetch('/test/updateField', {
