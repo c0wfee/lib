@@ -253,9 +253,9 @@ function searchFiles(page, size) {
                     const item = document.createElement('div');
                     item.className = 'item';
                     const sourceImage = sourceTypeImages[file.sourceType] || '../static/images/book.png';
-
+                    const viewButton = file.view !== "Disable" ? `<button onclick="viewPDF('${file.id}', ${file.display})">View Online</button>` : '';
                     let downloadButton = '';
-                    if (file.downloadLink || file.epubPath) {
+                    if (file.download !== "Disable") {
                         downloadButton = `<button onclick="toggleDownloadOptions('${file.id}', '${file.downloadLink}', '${file.epubPath}', this)">Download</button>`;
                     }
 
@@ -291,6 +291,7 @@ function searchFiles(page, size) {
                                 <p><strong>Subjects:</strong> ${file.subjects || 'N/A'}</p>
                                 <a href="${file.url || '#'}" target="_blank" style="display: none;">URL: ${file.url || 'N/A'}</a>
                                 <div class="button-container">
+                                    ${viewButton}
                                     ${borrowButton}
                                     ${loanInfoElement}
                                     ${downloadButton}
