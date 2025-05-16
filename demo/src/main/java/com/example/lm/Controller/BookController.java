@@ -15,4 +15,21 @@ public class BookController {
         return "bookDetail";
     }
 
+    @Autowired
+    private BookService bookService;
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Book>> search(@RequestParam String q) {
+        return ResponseEntity.ok(bookService.search(q));
+    }
+
+    @GetMapping("/autocomplete")
+    public ResponseEntity<List<String>> autoComplete(@RequestParam String prefix) {
+        return ResponseEntity.ok(bookService.autoComplete(prefix));
+    }
+
+    @GetMapping("/recommend")
+    public ResponseEntity<List<String>> recommendKeywords() {
+        return ResponseEntity.ok(bookService.recommendKeywords());
+    }
 }
