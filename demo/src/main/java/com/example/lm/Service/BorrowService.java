@@ -45,3 +45,19 @@ public class BorrowService {
 
     // Other service methods can be added here
 }
+
+public interface BookRepository extends JpaRepository<Book, Long> {
+
+    @Query("SELECT b FROM Book b WHERE " +
+            "LOWER(b.title) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "LOWER(b.pinyinInitials) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
+            "b.isbn = :keyword")
+    List<Book> searchBooks(@Param("keyword") String keyword);
+
+    @Query("SELECT DISTINCT b.title FROM Book b WHERE b.title LIKE CONCAT(:prefix, '%')")
+    List<String> autoCompleteTitle(@Param("prefix") String prefix);
+
+    @Query(value = "SELECT b.title FROM books b GROUP BY b.title ORDER BY COUNT(*) DESC LIMIT 10", nativeQuery = true)
+    List<String> getPopularTitles();
+}
+
