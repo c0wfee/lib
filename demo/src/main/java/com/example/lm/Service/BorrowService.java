@@ -46,6 +46,7 @@ public class BorrowService {
     // Other service methods can be added here
 }
 
+
 public interface BookRepository extends JpaRepository<Book, Long> {
 
     @Query("SELECT b FROM Book b WHERE " +
@@ -60,4 +61,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
     @Query(value = "SELECT b.title FROM books b GROUP BY b.title ORDER BY COUNT(*) DESC LIMIT 10", nativeQuery = true)
     List<String> getPopularTitles();
 }
+
 
